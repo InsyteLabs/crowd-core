@@ -2,6 +2,7 @@
 
 const db = require('../db');
 
+import * as bcrypt from 'bcrypt';
 import { User } from '../models';
 
 export class UserService{
@@ -30,4 +31,8 @@ export class UserService{
             return new User({});
         }
     }
+
+    // async createUser(user): Promise<User>{
+
+    // }
 }
