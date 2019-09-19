@@ -1,6 +1,8 @@
 'use strict';
 
-const userService = require('./services/user-service');
+import { UserService } from './services';
+
+const userService = new UserService();
 
 (async () => {
 

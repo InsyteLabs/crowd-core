@@ -1,9 +1,11 @@
 'use strict';
 
-const fs   = require('fs'),
-      path = require('path');
+import * as fs   from 'fs';
+import * as path from 'path';
 
-const queries = [
+import { IQueryDescriptor } from '../../interfaces';
+
+export const queries: IQueryDescriptor[] = [
     /*
         ============
         USER QUERIES
@@ -18,7 +20,7 @@ const queries = [
         path:     './user/get-user.sql',
         firstRow: true
     }
-].map(q => {
+].map((q: any) => {
     try{
         q.sql = fs.readFileSync(path.resolve(__dirname, q.path), 'utf8');
     }
@@ -29,5 +31,3 @@ const queries = [
 
     return q;
 });
-
-module.exports = queries;
