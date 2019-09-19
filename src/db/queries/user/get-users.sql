@@ -1,14 +1,14 @@
 
 SELECT
     id,
-    clientId,
-    firstName,
-    lastName,
+    client_id,
+    first_name,
+    last_name,
     email,
     username,
     password,
-    isdisabled,
-    disabledComment
+    is_disabled,
+    disabled_comment
     
 FROM
     account.user;
