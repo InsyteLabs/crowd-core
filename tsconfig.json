@@ -11,7 +11,7 @@
     "allowJs": true,                       /* Allow javascript files to be compiled. */
     "checkJs": false,
     "sourceMap": true,                     /* Generates corresponding '.map' file. */
-    // "incremental": true,                   /* Enable incremental compilation */
+    "incremental": true,                   /* Enable incremental compilation */
     "removeComments": true                /* Do not emit comments to output. */
     // "watch": true
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
