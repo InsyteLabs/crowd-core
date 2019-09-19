@@ -13,6 +13,7 @@ export class UserService{
         }
         catch(e){
             console.error('Failed to get users from database');
+            console.log(e);
             return [];
         }
     }
