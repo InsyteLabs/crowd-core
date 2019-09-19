@@ -1,5 +1,8 @@
 
+DROP TABLE event.vote;
 DROP TABLE event.question;
+DROP TABLE event.setting;
+DROP TABLE event.chat;
 DROP TABLE event.event;
 
 DROP SCHEMA event;
