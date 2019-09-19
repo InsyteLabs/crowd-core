@@ -1,18 +1,20 @@
 'use strict';
 
-const pgConf = require('../conf').pg;
+import * as conf from '../conf';
 
-const { Pool } = require('pg'),
-        pool   = new Pool(pgConf);
+import { Pool }             from 'pg';
+import { queries }          from './queries';
+import { IQueryDescriptor } from '../interfaces';
 
-const queries = require('./queries');
+const pgConf = conf.pg;
+const pool = new Pool(pgConf);
 
 function _getClient(){ return pool.connect() }
 
 // Base query wrapper
 // Checks out clients from the pool,
 // executes queries, and returns a promise
-async function _exec(q, vals){
+async function _exec(q: string, vals: any[]){
     const client = await _getClient();
 
     return new Promise(async (resolve, reject) => {
@@ -29,37 +31,25 @@ async function _exec(q, vals){
     });
 }
 
-async function query(queryName, vals, o={}){
+async function query(queryName: string, vals: any[], o: any = {}){
 
     if(o.rawQuery){
         return _exec(queryName, vals);
     }
 
-    const query = queries.filter(q => q.name === queryName)[0];
+    const query: IQueryDescriptor = queries.filter(q => q.name === queryName)[0];
 
     if(!query){
         throw new Error(`Query "${ queryName }" not found`);
     }
 
-    let result = await _exec(query.sql, vals);
+    let result: any = await _exec(query.sql as string, vals);
 
     if(query.firstRow){
         result = result.rows[0];
     }
     else{
         result = result.rows;
-    }
-
-    if(query.model){
-
-        const Model = models[query.model];
-
-        if(Array.isArray(result)){
-            result = result.map(item => new Model(item));
-        }
-        else{
-            result = new Model(result);
-        }
     }
 
     return result;

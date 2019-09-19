@@ -1,5 +1,7 @@
 
 conf/**
 !.gitkeep
-node_modules
 database.json
+build/**
+
+node_modules
