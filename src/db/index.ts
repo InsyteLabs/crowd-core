@@ -1,6 +1,6 @@
 'use strict';
 
-import * as conf from '../conf';
+import conf from '../conf';
 
 import { Pool }             from 'pg';
 import { queries }          from './queries';
