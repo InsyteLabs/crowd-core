@@ -1,7 +1,7 @@
 'use strict';
 
 export class User{
-    id:              number;
+    id?:             number;
     clientId:        number;
     firstName:       string;
     lastName:        string;
