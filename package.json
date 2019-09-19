@@ -16,7 +16,11 @@
     "url": "https://github.com/InsyteLabs/crowd-core/issues"
   },
   "homepage": "https://github.com/InsyteLabs/crowd-core#readme",
-  "dependencies": {},
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "express": "^4.17.1",
+    "pg": "^7.12.1"
+  },
   "devDependencies": {
     "db-migrate-pg": "^1.0.0",
     "jest": "^24.9.0"

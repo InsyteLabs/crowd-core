@@ -7,19 +7,19 @@
 CREATE SCHEMA account;
 
 CREATE TABLE account.user (
-    id              serial       NOT NULL PRIMARY KEY,
-    clientId        int,
-    firstName       varchar(50),
-    lastName        varchar(50),
-    email           varchar(75),
-    username        varchar(50),
-    password        varchar(50),
-    isDisabled      boolean      DEFAULT false,
-    disabledComment text
+    id               serial       NOT NULL PRIMARY KEY,
+    client_id        int,
+    first_name       varchar(50),
+    last_name        varchar(50),
+    email            varchar(75),
+    username         varchar(50),
+    password         varchar(50),
+    is_disabled      boolean      DEFAULT false,
+    disabled_comment text
 );
 
 INSERT INTO account.user
-    (firstName, lastName, email, username)
+    (first_name, last_name, email, username)
 VALUES
     ('Bryce', 'Jech', 'bryce@brycejech.com', 'pyguy');
 
@@ -29,21 +29,21 @@ CREATE TABLE account.role (
 );
 
 CREATE TABLE account.user_role (
-    userId int REFERENCES account.user(id),
-    roleId int REFERENCES account.role(id)
+    user_id int REFERENCES account.user(id),
+    role_id int REFERENCES account.role(id)
 );
 
 CREATE TABLE account.client (
-    id              serial       NOT NULL PRIMARY KEY,
-    name            varchar(50),
-    slug            varchar(50),
-    ownerId         int,
-    isDisabled      boolean      DEFAULT false,
-    disabledComment text
+    id               serial       NOT NULL PRIMARY KEY,
+    name             varchar(50),
+    slug             varchar(50),
+    owner_id         int,
+    is_disabled      boolean      DEFAULT false,
+    disabled_comment text
 );
 
 INSERT INTO account.client
-    (name, slug, ownerId)
+    (name, slug, owner_id)
 VALUES
     ('InsyteLabs', 'InsyteLabs', 1);
 
@@ -53,8 +53,8 @@ CREATE TABLE account.type (
 );
 
 CREATE TABLE account.client_type (
-    clientId int REFERENCES account.client(id),
-    typeId   int REFERENCES account.type(id)
+    client_id int REFERENCES account.client(id),
+    type_id   int REFERENCES account.type(id)
 );
 
 
@@ -66,18 +66,18 @@ CREATE TABLE account.client_type (
 CREATE SCHEMA event;
 
 CREATE TABLE event.event (
-    id          serial       NOT NULL PRIMARY KEY,
-    clientId    int          REFERENCES account.client(id),
-    title       varchar(75),
-    slug        varchar(75),
-    description text,
+    id           serial       NOT NULL PRIMARY KEY,
+    client_id    int          REFERENCES account.client(id),
+    title        varchar(75),
+    slug         varchar(75),
+    description  text,
 
-    start_time  timestamp with time zone DEFAULT (now() at time zone 'utc'),
-    end_time    timestamp with time zone
+    start_time   timestamp with time zone DEFAULT (now() at time zone 'utc'),
+    end_time     timestamp with time zone
 );
 
 INSERT INTO event.event
-    (clientId, title, slug, description, end_time)
+    (client_id, title, slug, description, end_time)
 VALUES
     (
         1,
@@ -88,9 +88,9 @@ VALUES
     );
 
 CREATE TABLE event.question (
-    id        serial NOT NULL PRIMARY KEY,
-    eventId   int    NOT NULL REFERENCES event.event(id),
-    text      text,
-    hidden    boolean DEFAULT false,
-    createdBy int
+    id         serial NOT NULL PRIMARY KEY,
+    event_id   int    NOT NULL REFERENCES event.event(id),
+    text       text,
+    hidden     boolean DEFAULT false,
+    created_by int
 );
