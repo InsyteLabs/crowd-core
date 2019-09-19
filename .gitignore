@@ -1,3 +1,5 @@
 
+conf/**
+!.gitkeep
 node_modules
 database.json
