@@ -1,15 +1,17 @@
 'use strict';
 
 export class User{
-    id?:             number;
-    clientId:        number;
-    firstName:       string;
-    lastName:        string;
-    email:           string;
-    username:        string;
-    password:        string;
-    isDisabled:      boolean;
-    disabledComment: string;
+    [key: string]: any;
+
+    id?:              number;
+    clientId:         number;
+    firstName:        string;
+    lastName:         string;
+    email:            string;
+    username:         string;
+    password:         string;
+    isDisabled:       boolean;
+    disabledComment?: string|null;
 
     constructor(user: any){
         this.id              = user.id

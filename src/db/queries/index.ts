@@ -21,8 +21,18 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
     {
+        name:     'get-user-by-username',
+        path:     './user/get-user-by-username.sql',
+        firstRow: true
+    },
+    {
         name:    'create-user',
         path:    './user/create-user.sql',
+        firstRow: true
+    },
+    {
+        name:     'update-user',
+        path:     './user/update-user.sql',
         firstRow: true
     }
 ].map((q: any) => {
