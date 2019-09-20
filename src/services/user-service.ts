@@ -1,19 +1,18 @@
 'use strict';
 
-const db = require('../db');
-
 import * as bcrypt from 'bcrypt';
 
+import { db }       from '../db';
 import { User }     from '../models';
 import { INewUser } from '../interfaces';
 
-export class UserService{
+class UserService{
 
     private SALT_ROUNDS: number = 15;
 
     async getUsers(): Promise<User[]>{
         try{
-            const users = await db.query('get-users');
+            const users = await db.q('get-users');
     
             return users.map((u: any) => new User(u));
         }
@@ -171,3 +170,5 @@ export class UserService{
         });
     }
 }
+
+export const userService = new UserService();
