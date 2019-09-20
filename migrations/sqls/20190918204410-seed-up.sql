@@ -14,17 +14,12 @@ CREATE TABLE account.user (
     client_id        int,
     first_name       varchar(50),
     last_name        varchar(50),
-    email            varchar(75),
-    username         varchar(50),
-    password         varchar(50),
+    email            varchar(75)  NOT NULL,
+    username         varchar(50)  NOT NULL UNIQUE,
+    password         char(60),
     is_disabled      boolean      DEFAULT false,
     disabled_comment text
 );
-
-INSERT INTO account.user
-    (first_name, last_name, email, username)
-VALUES
-    ('Bryce', 'Jech', 'bryce@brycejech.com', 'pyguy');
 
 
 

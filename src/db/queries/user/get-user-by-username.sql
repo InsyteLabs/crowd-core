@@ -14,4 +14,4 @@ FROM
     account.user
 
 WHERE
-    id=$1;
+    username=$1;
