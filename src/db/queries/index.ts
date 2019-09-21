@@ -34,26 +34,26 @@ export const queries: IQueryDescriptor[] = [
     
     /*
         ============
-        ROLE QUERIES
+        TYPE QUERIES
         ============
     */
     {
-        name: 'get-roles',
-        path: './role/get-roles.sql'
+        name: 'get-types',
+        path: './type/get-types.sql'
     },
     {
-        name:     'get-role',
-        path:     './role/get-role.sql',
+        name:     'get-type',
+        path:     './type/get-type.sql',
         firstRow: true
     },
     {
-        name:     'create-role',
-        path:     './role/create-role.sql',
+        name:     'create-type',
+        path:     './type/create-type.sql',
         firstRow: true
     },
     {
-        name:     'update-role',
-        path:     './role/update-role.sql',
+        name:     'update-type',
+        path:     './type/update-type.sql',
         firstRow: true
     },
 
@@ -85,6 +85,32 @@ export const queries: IQueryDescriptor[] = [
     {
         name:     'update-user',
         path:     './user/update-user.sql',
+        firstRow: true
+    },
+
+    
+    /*
+        ============
+        ROLE QUERIES
+        ============
+    */
+    {
+        name: 'get-roles',
+        path: './role/get-roles.sql'
+    },
+    {
+        name:     'get-role',
+        path:     './role/get-role.sql',
+        firstRow: true
+    },
+    {
+        name:     'create-role',
+        path:     './role/create-role.sql',
+        firstRow: true
+    },
+    {
+        name:     'update-role',
+        path:     './role/update-role.sql',
         firstRow: true
     }
 ].map((q: any) => {
