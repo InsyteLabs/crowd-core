@@ -1,15 +1,25 @@
 'use strict';
 
-import { userService } from './services';
-import { User }        from './models';
-import { db }          from './db';
+import { db }                         from './db';
+import { userService, clientService } from './services';
+import { User, Client }               from './models';
 
 (async () => {
 
     try{
-        const users = await userService.getUsers();
+        
+        const client = await clientService.getClient(1);
 
-        console.log(users);
+        if(client && client.id){
+            const disabled = await clientService.disableClient(client.id, 'Non-payment');
+            console.log(disabled);
+        }
+        if(client && client.id){
+            console.log('--------------');
+            const enabled = await clientService.enableClient(client.id);
+            console.log(enabled);
+        }
+
     }
     catch(e){
         console.log(e);

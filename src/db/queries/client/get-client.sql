@@ -8,4 +8,7 @@ SELECT
     disabled_comment
 
 FROM
-    account.client;
+    account.client
+
+WHERE
+    id=$1;

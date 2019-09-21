@@ -1,4 +1,4 @@
 'use strict';
 
 export { userService }   from './user-service';
-export { ClientService } from './client-service';
+export { clientService } from './client-service';
