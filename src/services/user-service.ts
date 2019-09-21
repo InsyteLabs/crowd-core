@@ -97,14 +97,14 @@ class UserService{
         }
 
         const args = [
-            user.id,
-            user.firstName,
-            user.lastName,
-            user.email,
-            user.username,
-            user.password,
-            user.isDisabled,
-            user.disabledComment
+            curUser.id,
+            curUser.firstName,
+            curUser.lastName,
+            curUser.email,
+            curUser.username,
+            curUser.password,
+            curUser.isDisabled,
+            curUser.disabledComment
         ];
 
         return new Promise(async (resolve, reject) => {

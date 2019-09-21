@@ -7,6 +7,31 @@ import { IQueryDescriptor } from '../../interfaces';
 
 export const queries: IQueryDescriptor[] = [
     /*
+        ==============
+        CLIENT QUERIES
+        ==============
+    */
+    {
+        name: 'get-clients',
+        path: './client/get-clients.sql'
+    },
+    {
+        name:     'get-client',
+        path:     './client/get-client.sql',
+        firstRow: true
+    },
+    {
+        name:     'create-client',
+        path:     './client/create-client.sql',
+        firstRow: true
+    },
+    {
+        name:     'update-client',
+        path:     './client/update-client.sql',
+        firstRow: true
+    },
+
+    /*
         ============
         USER QUERIES
         ============
