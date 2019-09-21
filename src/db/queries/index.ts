@@ -31,6 +31,33 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
 
+    
+    /*
+        ============
+        ROLE QUERIES
+        ============
+    */
+    {
+        name: 'get-roles',
+        path: './role/get-roles.sql'
+    },
+    {
+        name:     'get-role',
+        path:     './role/get-role.sql',
+        firstRow: true
+    },
+    {
+        name:     'create-role',
+        path:     './role/create-role.sql',
+        firstRow: true
+    },
+    {
+        name:     'update-role',
+        path:     './role/update-role.sql',
+        firstRow: true
+    },
+
+
     /*
         ============
         USER QUERIES

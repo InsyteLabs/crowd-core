@@ -2,13 +2,20 @@
 
 import * as bcrypt from 'bcrypt';
 
-import { db }   from '../db';
-import { User } from '../models';
+import { db }    from '../db';
+import { User }  from '../models';
+import { IRole } from '../interfaces';
 
 class UserService{
 
     private SALT_ROUNDS: number = 15;
 
+
+    /*
+        ============
+        USER METHODS
+        ============
+    */
     async getUsers(): Promise<User[]>{
         try{
             const users = await db.q('get-users');
@@ -148,6 +155,66 @@ class UserService{
 
         return this.updateUser(user);
     }
+
+
+    /*
+        ============
+        ROLE METHODS
+        ============
+    */
+    async getRoles(): Promise<IRole[]>{
+        try{
+            return await db.q('get-roles');
+        }
+        catch(e){
+            console.error('Failed to get roles from database');
+            console.error(e);
+
+            return Promise.resolve([]);
+        }
+    }
+
+    async getRole(id: number): Promise<IRole>{
+        try{
+            return await db.q('get-role', [ id ]);
+        }
+        catch(e){
+            console.error(`Failed to get role "${ id }" from database`);
+            console.error(e);
+
+            return Promise.resolve({id: null, name: ''});
+        }
+    }
+
+    async createRole(role: IRole): Promise<IRole>{
+        try{
+            return await db.q('create-role', [ role.name ]);
+        }
+        catch(e){
+            console.error(`Failed to create role "${ role.name }"`);
+            console.error(e);
+
+            return Promise.reject({id: null, name: ''});
+        }
+    }
+
+    async updateRole(role: IRole): Promise<IRole>{
+        let curRole;
+        try{
+            curRole = await this.getRole(role.id as number);
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+
+        for(let prop in role){
+            if(role[prop] !== undefined){
+                curRole[prop] = role[prop];
+            }
+        }
+        return db.q('update-role', [ curRole.id, curRole.name ]);
+    }
+
 
     /*
         ===============

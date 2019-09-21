@@ -26,7 +26,7 @@ CREATE TABLE account.user (
 -- ROLE TYPES
 CREATE TABLE account.role (
     id   serial      NOT NULL PRIMARY KEY,
-    name varchar(50)
+    name varchar(50) NOT NULL UNIQUE
 );
 
 
@@ -48,12 +48,6 @@ CREATE TABLE account.client (
     is_disabled      boolean      DEFAULT false,
     disabled_comment text
 );
-
-INSERT INTO account.client
-    (name, slug, owner_id)
-VALUES
-    ('InsyteLabs', 'InsyteLabs', 1);
-
 
 
 -- CLIENT TYPE TABLE
@@ -95,17 +89,6 @@ CREATE TABLE event.event (
     end_time     timestamp with time zone
 );
 
-INSERT INTO event.event
-    (client_id, title, slug, description, end_time)
-VALUES
-    (
-        1,
-        'The First CrowdCore Event',
-        'the-first-crowdcore-event',
-        'Our very first event to ever be created',
-        now() at time zone 'utc' + (1 * interval '1 day')
-    );
-
 
 
 -- EVENT SETTINGS TABLE
@@ -117,9 +100,6 @@ CREATE TABLE event.setting (
     require_login    boolean  DEFAULT False,
     enable_chat      boolean  DEFAULT True
 );
-
-INSERT INTO event.setting (event_id)
-VALUES (1);
 
 
 

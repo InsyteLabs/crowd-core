@@ -4,7 +4,7 @@ export class User{
     [key: string]: any;
 
     id?:              number;
-    clientId:         number;
+    clientId?:        number|null;
     firstName:        string;
     lastName:         string;
     email:            string;
