@@ -2,9 +2,8 @@
 
 import * as bcrypt from 'bcrypt';
 
-import { db }       from '../db';
-import { User }     from '../models';
-import { INewUser } from '../interfaces';
+import { db }   from '../db';
+import { User } from '../models';
 
 class UserService{
 
@@ -36,7 +35,7 @@ class UserService{
         }
     }
 
-    async createUser(newUser: INewUser): Promise<User>{
+    async createUser(newUser: User): Promise<User>{
         return new Promise(async (resolve, reject) => {
             let hash;
             try{
@@ -84,10 +83,10 @@ class UserService{
     async updateUser(user: User): Promise<User>{
         let curUser;
         try{
-            curUser = await db.q('get-user', [ user.id ]);
+            curUser = await this.getUser(user.id as number);
         }
         catch(e){
-            return Promise.reject('Failed to get user from database');
+            return Promise.reject(e);
         }
 
         for(let prop in user){
@@ -123,10 +122,10 @@ class UserService{
     async disableUser(id: number, comment: string): Promise<User>{
         let user;
         try{
-            user = await db.q('get-user', [ id ]);
+            user = await this.getUser(id);
         }
         catch(e){
-            return Promise.reject('Failed to get user from database');
+            return Promise.reject(e);
         }
 
         user.isDisabled      = true;
@@ -138,10 +137,10 @@ class UserService{
     async enableUser(id: number): Promise<User>{
         let user;
         try{
-            user = await db.q('get-user', [ id ]);
+            user = await this.getUser(id);
         }
         catch(e){
-            return Promise.reject('Failed to get user from database');
+            return Promise.reject(e);
         }
 
         user.isDisabled      = false;

@@ -8,18 +8,6 @@ import { User, Client }               from './models';
 
     try{
         
-        const client = await clientService.getClient(1);
-
-        if(client && client.id){
-            const disabled = await clientService.disableClient(client.id, 'Non-payment');
-            console.log(disabled);
-        }
-        if(client && client.id){
-            console.log('--------------');
-            const enabled = await clientService.enableClient(client.id);
-            console.log(enabled);
-        }
-
     }
     catch(e){
         console.log(e);

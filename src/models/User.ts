@@ -10,7 +10,7 @@ export class User{
     email:            string;
     username:         string;
     password:         string;
-    isDisabled:       boolean;
+    isDisabled?:      boolean;
     disabledComment?: string|null;
 
     constructor(user: any){
