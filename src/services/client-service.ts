@@ -16,6 +16,14 @@ class ClientService{
         try{
             const clients = await db.q('get-clients');
 
+            for(let i = 0, len = clients.length; i < len; i++){
+                const client = clients[i];
+
+                const clientTypes = await this.getClientTypes(client.id);
+
+                client.types = clientTypes.map(t => t.name);
+            }
+
             return clients.map((c: any) => new Client(c));
         }
         catch(e){
@@ -27,7 +35,10 @@ class ClientService{
 
     async getClient(id: number): Promise<Client>{
         try{
-            const client = await db.q('get-client', [ id ]);
+            const client = await db.q('get-client', [ id ]),
+                  types  = await this.getClientTypes(id);
+            
+            client.types = types.map(t => t.name);
 
             return new Client(client);
         }
@@ -142,6 +153,23 @@ class ClientService{
         }
     }
 
+    async getTypeIds(): Promise<number[]>{
+        try{
+            const types = await this.getTypes();
+
+            const validTypes: number[] = types.reduce((acc: number[], t: IType) => {
+                acc.push(t.id as number);
+
+                return acc;
+            }, []);
+
+            return validTypes;
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+    }
+
     async getType(id: number): Promise<IType>{
         try{
             const type = await db.q('get-type', [ id ]);
@@ -180,6 +208,107 @@ class ClientService{
         }
 
         return db.q('update-type', [ curType.id, curType.name ]);
+    }
+
+    async getClientTypes(clientId: number): Promise<IType[]>{
+        try{
+            const types: IType[] = await db.q('get-client-types', [ clientId ]);
+
+            return types;
+        }
+        catch(e){
+            console.error(`Failed to get types for clientId "${ clientId }"`);
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async updateClientTypes(clientId: number, types: number[]){
+        let validTypes: number[];
+        try{
+            validTypes = await this.getTypeIds();
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+
+        // Filter out types that are not valid
+        types = types.filter(t => validTypes.includes(t));
+
+        // Drop all types for the client
+        try{
+            await this.dropClientTypes(clientId);
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+
+        // Set the provided types
+        try{
+            const typesAdded = await this.addClientTypes(clientId, types);
+
+            return typesAdded;
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+    }
+
+    async addClientTypes(clientId: number, types: number[]): Promise<number[]>{
+        try{
+            const insertedTypes = [];
+            for(let i = 0, len = types.length; i < len; i++){
+                const inserted = await db.q('add-client-type', [ types[i], clientId ]);
+
+                inserted && insertedTypes.push(inserted.type_id);
+            }
+
+            return insertedTypes;
+        }
+        catch(e){
+            console.error('Error adding client types to database');
+            console.error(e);
+
+            return [];
+        }
+    }
+    
+    async removeClientTypes(clientId: number, types: number[]): Promise<number[]>{
+        try{
+            const deletedTypes = [];
+            for(let i = 0, len = types.length; i < len; i++){
+                const deleted = await db.q('remove-client-type', [ types[i], clientId ]);
+
+                deleted && deletedTypes.push(deleted.type_id);
+            }
+
+            return deletedTypes;
+        }
+        catch(e){
+            console.error('Error deleting client types from database');
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async dropClientTypes(clientId: number): Promise<number[]>{
+        try{
+            const droppedTypes = await db.q('drop-client-types', [ clientId ]);
+
+            return droppedTypes.reduce((acc: number[], t: any) => {
+                acc.push(t.type_id);
+
+                return acc;
+            }, []);
+        }
+        catch(e){
+            console.error(`Failed to drop types for clientId: "${ clientId }"`);
+            console.error(e);
+
+            return []
+        }
     }
 }
 

@@ -56,7 +56,24 @@ export const queries: IQueryDescriptor[] = [
         path:     './type/update-type.sql',
         firstRow: true
     },
-
+    {
+        name: 'get-client-types',
+        path: './type/get-client-types.sql'
+    },
+    {
+        name:     'add-client-type',
+        path:     './type/add-client-type.sql',
+        firstRow: true
+    },
+    {
+        name:     'remove-client-type',
+        path:     './type/remove-client-type.sql',
+        firstRow: true
+    },
+    {
+        name: 'drop-client-types',
+        path: './type/drop-all-client-types.sql'
+    },
 
     /*
         ============
