@@ -23,9 +23,9 @@ class UserService{
             for(let i = 0, len = users.length; i < len; i++){
                 const user = users[i];
 
-                const roles = await this.getUserRoles(user.id);
+                const roles: IRole[] = await this.getUserRoles(user.id);
 
-                user.roles = roles;
+                user.roles = roles.map(r => r.name);
             }
     
             return users.map((u: any) => new User(u));
@@ -33,6 +33,7 @@ class UserService{
         catch(e){
             console.error('Failed to get users from database');
             console.error(e);
+
             return [];
         }
     }
@@ -42,13 +43,14 @@ class UserService{
             const user  = await db.query('get-user', [ id ]),
                   roles = await this.getUserRoles(id);
             
-            user.roles = roles;
+            user.roles = roles.map(r => r.name);
     
             return new User(user);
         }
         catch(e){
             console.error(`Failed to get user of ID "${ id }"`);
             console.error(e);
+
             return new User({});
         }
     }
@@ -185,6 +187,23 @@ class UserService{
         }
     }
 
+    async getRoleIds(): Promise<number[]>{
+        try{
+            const roles = await this.getRoles();
+
+            const validRoleIds: number[] = roles.reduce((acc: number[], r: IRole) => {
+                acc.push(r.id as number);
+    
+                return acc;
+            }, []);
+
+            return validRoleIds;
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+    }
+
     async getRole(id: number): Promise<IRole>{
         try{
             return await db.q('get-role', [ id ]);
@@ -226,15 +245,102 @@ class UserService{
         return db.q('update-role', [ curRole.id, curRole.name ]);
     }
 
-    async getUserRoles(userId: number): Promise<string[]>{
+    async getUserRoles(userId: number): Promise<IRole[]>{
 
         try{
-            const { roles } = await db.query('get-user-roles', [ userId ]);
+            const roles = await db.query('get-user-roles', [ userId ]);
 
-            return roles || [];
+            return roles;
         }
         catch(e){
             console.error(`Failed to get roles for userID "${ userId }"`);
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async updateUserRoles(userId: number, roles: number[]){
+        let validRoles: number[];
+        try{
+            validRoles = await this.getRoleIds();
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+
+        // Filter out roles that are not valid
+        roles = roles.filter(r => validRoles.includes(r));
+
+        // Drop all roles for the user
+        try{
+            await this.dropUserRoles(userId);
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+
+        // Set the provided roles
+        try{
+            const rolesAdded = await this.addUserRoles(userId, roles);
+
+            return rolesAdded;
+        }
+        catch(e){
+            return Promise.reject(e);
+        }
+    }
+
+    async addUserRoles(userId: number, roles: number[]){
+        try{
+            const insertedRoles = [];
+            for(let i = 0, len = roles.length; i < len; i++){
+                const inserted = await db.q('add-user-role', [ roles[i], userId ]);
+
+                inserted && insertedRoles.push(inserted.role_id);
+            }
+
+            return insertedRoles;
+        }
+        catch(e){
+            console.error('Error adding user roles to database');
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async removeUserRoles(userId: number, roles: number[]){
+        try{
+            const deletedRoles = [];
+            for(let i = 0, len = roles.length; i < len; i++){
+                const deleted = await db.q('remove-user-role', [ roles[i], userId ]);
+
+                deleted && deletedRoles.push(deleted.role_id);
+            }
+
+            return deletedRoles.filter(r => r);
+        }
+        catch(e){
+            console.error('Error deleting user roles from database');
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async dropUserRoles(userId: number){
+        try{
+            const droppedRoles = await db.q('drop-user-roles', [ userId ]);
+
+            return droppedRoles.reduce((acc: number[], r: any) => {
+                acc.push(r.role_id);
+
+                return acc;
+            }, []);
+        }
+        catch(e){
+            console.error(`Failed to drop roles for userID "${ userId }"`);
             console.error(e);
 
             return [];
