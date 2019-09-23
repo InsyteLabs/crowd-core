@@ -19,6 +19,14 @@ class UserService{
     async getUsers(): Promise<User[]>{
         try{
             const users = await db.q('get-users');
+
+            for(let i = 0, len = users.length; i < len; i++){
+                const user = users[i];
+
+                const roles = await this.getUserRoles(user.id);
+
+                user.roles = roles;
+            }
     
             return users.map((u: any) => new User(u));
         }
@@ -31,7 +39,10 @@ class UserService{
 
     async getUser(id: number): Promise<User>{
         try{
-            const user = await db.query('get-user', [ id ]);
+            const user  = await db.query('get-user', [ id ]),
+                  roles = await this.getUserRoles(id);
+            
+            user.roles = roles;
     
             return new User(user);
         }
@@ -213,6 +224,21 @@ class UserService{
             }
         }
         return db.q('update-role', [ curRole.id, curRole.name ]);
+    }
+
+    async getUserRoles(userId: number): Promise<string[]>{
+
+        try{
+            const { roles } = await db.query('get-user-roles', [ userId ]);
+
+            return roles || [];
+        }
+        catch(e){
+            console.error(`Failed to get roles for userID "${ userId }"`);
+            console.error(e);
+
+            return [];
+        }
     }
 
 

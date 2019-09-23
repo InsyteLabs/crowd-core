@@ -22,7 +22,8 @@ import { Client, User }               from './models';
                 lastName:  'Jech',
                 email:     'bryce@brycejech.com',
                 username:  'PyGuy',
-                password:  'myFakePa$$wor^d'
+                password:  'myFakePa$$wor^d',
+                roles:     []
             },
             {
                 clientId:  null,
@@ -30,7 +31,8 @@ import { Client, User }               from './models';
                 lastName:  'Jech',
                 email:     'laryn_burns@yahoo.com',
                 username:  'Laryolyn',
-                password:  'aSuperF4k$pass'
+                password:  'aSuperF4k$pass',
+                roles:     []
             },
             {
                 clientId:  null,
@@ -38,7 +40,8 @@ import { Client, User }               from './models';
                 lastName:  'Jech',
                 email:     'traceyjech@gmail.com',
                 username:  'Gammy',
-                password:  'theM0$stSecur%epass4Eva'
+                password:  'theM0$stSecur%epass4Eva',
+                roles:     []
             }
         ];
 
@@ -130,6 +133,29 @@ import { Client, User }               from './models';
         CREATE TYPES
         ============
     */
+    const types = await clientService.getTypes();
+
+    if(!types.length){
+        console.log('DB has no account types, creating...');
+
+        const typesToCreate = [
+            { name: 'demo'  },
+            { name: 'free'  },
+            { name: 'pro'   },
+            { name: 'elite' }
+        ];
+
+        for(let i = 0, len = typesToCreate.length; i < len; i++){
+            const type = typesToCreate[i];
+
+            console.log(`Creating type "${ type.name }"`);
+            
+            await clientService.createType(type);
+        }
+
+        console.log('Done creating types');
+        console.log(new Array(25).fill('-').join(''));
+    }
     
 
 })();

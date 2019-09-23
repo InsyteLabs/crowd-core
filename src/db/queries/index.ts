@@ -112,6 +112,11 @@ export const queries: IQueryDescriptor[] = [
         name:     'update-role',
         path:     './role/update-role.sql',
         firstRow: true
+    },
+    {
+        name:     'get-user-roles',
+        path:     './role/get-user-roles.sql',
+        firstRow: true
     }
 ].map((q: any) => {
     try{
