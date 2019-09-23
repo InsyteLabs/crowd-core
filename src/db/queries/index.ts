@@ -115,8 +115,21 @@ export const queries: IQueryDescriptor[] = [
     },
     {
         name:     'get-user-roles',
-        path:     './role/get-user-roles.sql',
+        path:     './role/get-user-roles.sql'
+    },
+    {
+        name:     'add-user-role',
+        path:     './role/add-user-role.sql',
         firstRow: true
+    },
+    {
+        name:     'remove-user-role',
+        path:     './role/remove-user-role.sql',
+        firstRow: true
+    },
+    {
+        name: 'drop-user-roles',
+        path: './role/drop-all-user-roles.sql'
     }
 ].map((q: any) => {
     try{
