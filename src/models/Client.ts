@@ -7,6 +7,7 @@ export class Client{
     name:             string;
     slug?:            string;
     ownerId:          number;
+    types:            string[];
     isDisabled?:      boolean;
     disabledComment?: string|null;
 
@@ -15,6 +16,7 @@ export class Client{
         this.name            = c.name;
         this.slug            = c.slug;
         this.ownerId         = c.owner_id;
+        this.types           = c.types || [];
         this.isDisabled      = c.is_disabled;
         this.disabledComment = c.disabled_comment;
     }
