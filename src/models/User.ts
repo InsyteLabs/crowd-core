@@ -10,6 +10,7 @@ export class User{
     email:            string;
     username:         string;
     password:         string;
+    roles:            string[];
     isDisabled?:      boolean;
     disabledComment?: string|null;
 
@@ -21,6 +22,7 @@ export class User{
         this.email           = user.email
         this.username        = user.username
         this.password        = user.password
+        this.roles           = user.roles ||[];
         this.isDisabled      = user.is_disabled
         this.disabledComment = user.disabled_comment
     }
