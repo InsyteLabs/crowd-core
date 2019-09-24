@@ -74,15 +74,27 @@ class UserService{
                 hash
             ];
 
+            let user;
             try{
-                const user = await db.query('create-user', args);
-                
-                resolve(new User(user));
+                user = await db.query('create-user', args);
             }
             catch(e){
                 console.error(e);
                 reject('Error saving user to database');
             }
+
+            if(newUser.roles && newUser.roles.length){
+                try{
+                    const roles = await this.updateUserRoles(user.id, <number[]>newUser.roles);
+                }
+                catch(e){
+                    return reject(e);
+                }
+            }
+
+            user = await this.getUser(user.id);
+
+            resolve(user);
         });
     }
 
@@ -126,17 +138,27 @@ class UserService{
             curUser.disabledComment
         ];
 
-        return new Promise(async (resolve, reject) => {
-            try{
-                const updated = await db.q('update-user', args);
+        let updated;
+        try{
+            updated = await db.q('update-user', args);
+        }
+        catch(e){
+            console.error('Error updating user')
+            console.error(e);
 
-                resolve(new User(updated));
+            return Promise.reject('Failed to update user');
+        }
+
+        if(user.roles && user.roles.length){
+            try{
+                const roles = await this.updateUserRoles(updated.id, <number[]>user.roles);
             }
             catch(e){
-                console.error(e);
-                reject('Error updating user');
+                return Promise.reject(e);
             }
-        });      
+        }
+
+        return this.getUser(updated.id);
     }
 
     async disableUser(id: number, comment: string): Promise<User>{
