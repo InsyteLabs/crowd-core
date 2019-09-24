@@ -113,6 +113,9 @@ class UserService{
     }
 
     async updateUser(user: User): Promise<User>{
+
+        console.log(user);
+        
         let curUser;
         try{
             curUser = await this.getUser(user.id as number);
