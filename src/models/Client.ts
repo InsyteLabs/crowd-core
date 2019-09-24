@@ -7,7 +7,7 @@ export class Client{
     name:             string;
     slug?:            string;
     ownerId:          number;
-    types:            string[];
+    types:            (string|number)[];
     isDisabled?:      boolean;
     disabledComment?: string|null;
 
