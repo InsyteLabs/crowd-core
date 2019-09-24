@@ -49,17 +49,16 @@ class ClientService{
         }
     }
 
-    async createClient(client: Client): Promise<Client>{
+    async createClient(newClient: Client): Promise<Client>{
         const args = [
-            client.name,
-            client.slug || slugify(client.name),
-            client.ownerId
+            newClient.name,
+            newClient.slug || slugify(newClient.name),
+            newClient.ownerId
         ];
 
+        let client;
         try{
-            const client = await db.q('create-client', args);
-
-            return new Client(client);
+            client = await db.q('create-client', args);
         }
         catch(e){
             console.error('Error creating new client');
@@ -67,6 +66,17 @@ class ClientService{
 
             return new Client({});
         }
+
+        if(newClient.types && newClient.types.length){
+            try{
+                const types = await this.updateClientTypes(client.id, <number[]>newClient.types);
+            }
+            catch(e){
+                return Promise.reject(e);
+            }
+        }
+
+        return this.getClient(client.id);
     }
 
     async updateClient(client: Client): Promise<Client>{
@@ -93,10 +103,9 @@ class ClientService{
             curClient.disabledComment
         ];
 
+        let updated;
         try{
-            const updated = await db.q('update-client', args);
-
-            return new Client(updated);
+            updated = await db.q('update-client', args);
         }
         catch(e){
             console.error(`Error updating client "${ client.name }"`);
@@ -104,6 +113,17 @@ class ClientService{
 
             return Promise.reject(`Error updating client "${ client.name }"`);
         }
+
+        if(client.types && client.types.length){
+            try{
+                const types = await this.updateClientTypes(updated.id, <number[]>client.types);
+            }
+            catch(e){
+                return Promise.reject(e);
+            }
+        }
+
+        return this.getClient(updated.id);
     }
 
     async disableClient(id: number, comment: string): Promise<Client>{
