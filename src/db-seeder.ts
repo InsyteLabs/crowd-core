@@ -4,6 +4,35 @@ import { clientService, userService } from './services';
 import { Client, User }               from './models';
 
 (async () => {
+    /*
+        ============
+        CREATE ROLES
+        ============
+    */
+    const roles = await userService.getRoles();
+
+    if(!roles.length){
+        console.log('DB has no roles, creating...');
+
+        const rolesToCreate = [
+            { name: 'admin'     },
+            { name: 'sub-admin' },
+            { name: 'moderator' }
+        ];
+
+        for(let i = 0, len = rolesToCreate.length; i < len; i++){
+            const role = rolesToCreate[i];
+
+            console.log(`Creating role ${ role.name }`);
+
+            await userService.createRole(role);
+        }
+
+        console.log('Done creating roles');
+        console.log(new Array(25).fill('-').join(''));
+    }
+
+
 
     /*
         ============
@@ -61,31 +90,33 @@ import { Client, User }               from './models';
 
     /*
         ============
-        CREATE ROLES
+        CREATE TYPES
         ============
     */
-    const roles = await userService.getRoles();
+    const types = await clientService.getTypes();
 
-    if(!roles.length){
-        console.log('DB has no roles, creating...');
+    if(!types.length){
+        console.log('DB has no account types, creating...');
 
-        const rolesToCreate = [
-            { name: 'admin'     },
-            { name: 'sub-admin' },
-            { name: 'moderator' }
+        const typesToCreate = [
+            { name: 'demo'  },
+            { name: 'free'  },
+            { name: 'pro'   },
+            { name: 'elite' }
         ];
 
-        for(let i = 0, len = rolesToCreate.length; i < len; i++){
-            const role = rolesToCreate[i];
+        for(let i = 0, len = typesToCreate.length; i < len; i++){
+            const type = typesToCreate[i];
 
-            console.log(`Creating role ${ role.name }`);
-
-            await userService.createRole(role);
+            console.log(`Creating type "${ type.name }"`);
+            
+            await clientService.createType(type);
         }
 
-        console.log('Done creating roles');
+        console.log('Done creating types');
         console.log(new Array(25).fill('-').join(''));
     }
+
 
 
     /*
@@ -127,36 +158,5 @@ import { Client, User }               from './models';
         console.log('Done creating clients');
         console.log(new Array(25).fill('-').join(''));
     }
-
-
-    /*
-        ============
-        CREATE TYPES
-        ============
-    */
-    const types = await clientService.getTypes();
-
-    if(!types.length){
-        console.log('DB has no account types, creating...');
-
-        const typesToCreate = [
-            { name: 'demo'  },
-            { name: 'free'  },
-            { name: 'pro'   },
-            { name: 'elite' }
-        ];
-
-        for(let i = 0, len = typesToCreate.length; i < len; i++){
-            const type = typesToCreate[i];
-
-            console.log(`Creating type "${ type.name }"`);
-            
-            await clientService.createType(type);
-        }
-
-        console.log('Done creating types');
-        console.log(new Array(25).fill('-').join(''));
-    }
     
-
 })();
