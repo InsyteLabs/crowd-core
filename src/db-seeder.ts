@@ -52,7 +52,7 @@ import { Client, User }               from './models';
                 email:     'bryce@brycejech.com',
                 username:  'PyGuy',
                 password:  'myFakePa$$wor^d',
-                roles:     []
+                roles:     [1]
             },
             {
                 clientId:  null,
@@ -61,7 +61,7 @@ import { Client, User }               from './models';
                 email:     'laryn_burns@yahoo.com',
                 username:  'Laryolyn',
                 password:  'aSuperF4k$pass',
-                roles:     []
+                roles:     [2, 3]
             },
             {
                 clientId:  null,
@@ -70,7 +70,7 @@ import { Client, User }               from './models';
                 email:     'traceyjech@gmail.com',
                 username:  'Gammy',
                 password:  'theM0$stSecur%epass4Eva',
-                roles:     []
+                roles:     [2, 3]
             }
         ];
 
@@ -143,7 +143,7 @@ import { Client, User }               from './models';
                 name:    'InsyteLabs',
                 slug:    'insyte-labs',
                 ownerId: owner.id as number,
-                types:   []
+                types:   [4]
             }
         ];
 
@@ -158,5 +158,5 @@ import { Client, User }               from './models';
         console.log('Done creating clients');
         console.log(new Array(25).fill('-').join(''));
     }
-    
+
 })();
