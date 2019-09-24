@@ -147,6 +147,32 @@ export const queries: IQueryDescriptor[] = [
     {
         name: 'drop-user-roles',
         path: './role/drop-all-user-roles.sql'
+    },
+
+
+    /*
+        =============
+        EVENT QUERIES
+        =============
+    */
+    {
+        name: 'get-events',
+        path: './event/get-events.sql'
+    },
+    {
+        name:     'get-event',
+        path:     './event/get-event.sql',
+        firstRow: true
+    },
+    {
+        name:     'create-event',
+        path:     './event/create-event.sql',
+        firstRow: true
+    },
+    {
+        name:     'update-event',
+        path:     './event/update-event.sql',
+        firstRow: true
     }
 ].map((q: any) => {
     try{
