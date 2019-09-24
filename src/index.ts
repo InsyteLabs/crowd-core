@@ -1,22 +1,31 @@
 'use strict';
 
-import { db }                         from './db';
-import { userService, clientService } from './services';
-import { User, Client }               from './models';
+import Express    from 'express';
+import bodyParser from 'body-parser';
+import { router } from './routes';
 
-(async () => {
+const server = Express();
 
-    try{
-        
-    }
-    catch(e){
-        console.log(e);
-    }
-    finally{
-        db.disconnect().then(() => {
-            console.log('Disconnected');
-            process.exit();
-        });
-    }
+server.set('case sensitive routing', true);
+server.enable('trust proxy'); // If running behind Nginx proxy
 
-})();
+// Accept form data
+const jsonBody = bodyParser.json(),
+      urlBody  = bodyParser.urlencoded({ extended: true });
+server.use(jsonBody, urlBody);
+
+// Remove "X-Powered-By" header
+server.use((req, res, next) => {
+    res.removeHeader('X-Powered-By');
+    next();
+});
+
+server.get('/', (req, res, next) => {
+    return res.send({ message: 'OK' });
+});
+
+server.use(router);
+
+server.listen(8080, () => {
+    console.log('Server listening on 8080');
+});
