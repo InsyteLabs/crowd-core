@@ -13,21 +13,21 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-clients',
-        path: './client/get-clients.sql'
+        path: './account/client/get-clients.sql'
     },
     {
         name:     'get-client',
-        path:     './client/get-client.sql',
+        path:     './account/client/get-client.sql',
         firstRow: true
     },
     {
         name:     'create-client',
-        path:     './client/create-client.sql',
+        path:     './account/client/create-client.sql',
         firstRow: true
     },
     {
         name:     'update-client',
-        path:     './client/update-client.sql',
+        path:     './account/client/update-client.sql',
         firstRow: true
     },
 
@@ -39,40 +39,40 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-types',
-        path: './type/get-types.sql'
+        path: './account/type/get-types.sql'
     },
     {
         name:     'get-type',
-        path:     './type/get-type.sql',
+        path:     './account/type/get-type.sql',
         firstRow: true
     },
     {
         name:     'create-type',
-        path:     './type/create-type.sql',
+        path:     './account/type/create-type.sql',
         firstRow: true
     },
     {
         name:     'update-type',
-        path:     './type/update-type.sql',
+        path:     './account/type/update-type.sql',
         firstRow: true
     },
     {
         name: 'get-client-types',
-        path: './type/get-client-types.sql'
+        path: './account/type/get-client-types.sql'
     },
     {
         name:     'add-client-type',
-        path:     './type/add-client-type.sql',
+        path:     './account/type/add-client-type.sql',
         firstRow: true
     },
     {
         name:     'remove-client-type',
-        path:     './type/remove-client-type.sql',
+        path:     './account/type/remove-client-type.sql',
         firstRow: true
     },
     {
         name: 'drop-client-types',
-        path: './type/drop-all-client-types.sql'
+        path: './account/type/drop-all-client-types.sql'
     },
 
     /*
@@ -82,26 +82,26 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-users',
-        path: './user/get-users.sql'
+        path: './account/user/get-users.sql'
     },
     {
         name:     'get-user',
-        path:     './user/get-user.sql',
+        path:     './account/user/get-user.sql',
         firstRow: true
     },
     {
         name:     'get-user-by-username',
-        path:     './user/get-user-by-username.sql',
+        path:     './account/user/get-user-by-username.sql',
         firstRow: true
     },
     {
         name:    'create-user',
-        path:    './user/create-user.sql',
+        path:    './account/user/create-user.sql',
         firstRow: true
     },
     {
         name:     'update-user',
-        path:     './user/update-user.sql',
+        path:     './account/user/update-user.sql',
         firstRow: true
     },
 
@@ -113,40 +113,40 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-roles',
-        path: './role/get-roles.sql'
+        path: './account/role/get-roles.sql'
     },
     {
         name:     'get-role',
-        path:     './role/get-role.sql',
+        path:     './account/role/get-role.sql',
         firstRow: true
     },
     {
         name:     'create-role',
-        path:     './role/create-role.sql',
+        path:     './account/role/create-role.sql',
         firstRow: true
     },
     {
         name:     'update-role',
-        path:     './role/update-role.sql',
+        path:     './account/role/update-role.sql',
         firstRow: true
     },
     {
         name:     'get-user-roles',
-        path:     './role/get-user-roles.sql'
+        path:     './account/role/get-user-roles.sql'
     },
     {
         name:     'add-user-role',
-        path:     './role/add-user-role.sql',
+        path:     './account/role/add-user-role.sql',
         firstRow: true
     },
     {
         name:     'remove-user-role',
-        path:     './role/remove-user-role.sql',
+        path:     './account/role/remove-user-role.sql',
         firstRow: true
     },
     {
         name: 'drop-user-roles',
-        path: './role/drop-all-user-roles.sql'
+        path: './account/role/drop-all-user-roles.sql'
     },
 
 
@@ -157,21 +157,21 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-events',
-        path: './event/get-events.sql'
+        path: './event/event/get-events.sql'
     },
     {
         name:     'get-event',
-        path:     './event/get-event.sql',
+        path:     './event/event/get-event.sql',
         firstRow: true
     },
     {
         name:     'create-event',
-        path:     './event/create-event.sql',
+        path:     './event/event/create-event.sql',
         firstRow: true
     },
     {
         name:     'update-event',
-        path:     './event/update-event.sql',
+        path:     './event/event/update-event.sql',
         firstRow: true
     },
 
@@ -183,25 +183,25 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-questions',
-        path: './question/get-questions.sql'
+        path: './event/question/get-questions.sql'
     },
     {
         name:     'get-question',
-        path:     './question/get-question.sql',
+        path:     './event/question/get-question.sql',
         firstRow: true
     },
     {
         name: 'get-event-questions',
-        path: './question/get-event-questions.sql'
+        path: './event/question/get-event-questions.sql'
     },
     {
         name:     'create-question',
-        path:     './question/create-question.sql',
+        path:     './event/question/create-question.sql',
         firstRow: true
     },
     {
         name:     'update-question',
-        path:     './question/update-question.sql',
+        path:     './event/question/update-question.sql',
         firstRow: true
     }
 ].map((q: any) => {
