@@ -1,15 +1,21 @@
 'use strict';
 
-import { db }      from '../db';
-import { slugify } from '../utilities';
+import { db }              from '../db';
+import { Event, Question } from '../models';
+import { slugify }         from '../utilities';
 
 class EventService{
 
+    /*
+        =============
+        EVENT METHODS
+        =============
+    */
     async getEvents(){
         try{
-            const events = await db.q('get-events');
+            const events: Event[] = await db.q('get-events');
 
-            return events;
+            return events.map(e => Event.from(e));
         }
         catch(e){
             console.error('Failed to get events from database');
@@ -21,9 +27,9 @@ class EventService{
 
     async getEvent(id: number){
         try{
-            const event = await db.q('get-event', [ id ]);
+            const event: Event = await db.q('get-event', [ id ]);
 
-            return event;
+            return Event.from(event);
         }
         catch(e){
             console.error('Failed to get event from database');
@@ -77,6 +83,74 @@ class EventService{
             console.error(e);
 
             return {}
+        }
+    }
+
+
+    /*
+        ================
+        QUESTION METHODS
+        ================
+    */
+    async getQuestions(){
+        try{
+            const questions = await db.query('get-questions');
+
+            return questions.map((q: any) => Question.from(q));
+        }
+        catch(e){
+            console.error('Failed to get questions from database');
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async getQuestion(id: number){
+        try{
+            const question = await db.q('get-question', [ id ]);
+
+            return Question.from(question);
+        }
+        catch(e){
+            console.error(`Failed to get question of ID ${ id } from database`);
+            console.error(e);
+
+            return new Question({});
+        }
+    }
+
+    async getEventQuestions(eventId: number){
+        try{
+            const questions = await db.q('get-event-questions', [ eventId ]);
+
+            return questions.map((q: any) => Question.from(q));
+        }
+        catch(e){
+            console.error(`Failed to load quations for event of ID ${ eventId }`);
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async createQuestion(q: Question){
+        const args = [
+            q.eventId,
+            q.text,
+            q.userId
+        ];
+
+        try{
+            const question = await db.q('create-question', args);
+
+            return Question.from(question);
+        }
+        catch(e){
+            console.error(`Failed to create question for event of ID ${ q.eventId }`);
+            console.error(e);
+
+            return {};
         }
     }
 }
