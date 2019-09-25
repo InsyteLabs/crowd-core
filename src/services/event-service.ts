@@ -52,7 +52,7 @@ class EventService{
         try{
             const event = await db.q('create-event', args);
 
-            return event;
+            return Event.from(event);
         }
         catch(e){
             console.error(`Failed to create event "${ event.title }"`);
@@ -76,7 +76,7 @@ class EventService{
         try{
             const event = await db.q('update-event', args);
 
-            return event;
+            return Event.from(event);
         }
         catch(e){
             console.error(`Failed to update event "${ event.title }"`);
