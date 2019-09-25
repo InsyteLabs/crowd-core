@@ -114,8 +114,6 @@ class UserService{
 
     async updateUser(user: User): Promise<User>{
 
-        console.log(user);
-        
         let curUser;
         try{
             curUser = await this.getUser(user.id as number);
@@ -136,7 +134,6 @@ class UserService{
             curUser.lastName,
             curUser.email,
             curUser.username,
-            curUser.password,
             curUser.isDisabled,
             curUser.disabledComment
         ];

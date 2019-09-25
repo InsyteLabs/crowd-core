@@ -6,9 +6,8 @@ SET
     last_name=$3,
     email=$4,
     username=$5,
-    password=$6,
-    is_disabled=$7,
-    disabled_comment=$8
+    is_disabled=$6,
+    disabled_comment=$7
 
 WHERE id=$1
 
