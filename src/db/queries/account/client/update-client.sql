@@ -11,4 +11,10 @@ SET
 WHERE
     id=$1
 
-RETURNING *;
+RETURNING
+    id,
+    name,
+    slug,
+    owner_id,
+    is_disabled,
+    disabled_comment;
