@@ -198,6 +198,11 @@ export const queries: IQueryDescriptor[] = [
         name:     'create-question',
         path:     './question/create-question.sql',
         firstRow: true
+    },
+    {
+        name:     'update-question',
+        path:     './question/update-question.sql',
+        firstRow: true
     }
 ].map((q: any) => {
     try{

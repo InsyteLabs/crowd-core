@@ -2,8 +2,8 @@
 INSERT INTO event.question
 (
     event_id,
-    text,
-    user_id
+    user_id,
+    text
 )
 
 VALUES
@@ -15,5 +15,5 @@ VALUES
 
 RETURNING
     event_id,
-    text,
-    user_id;
+    user_id,
+    text;

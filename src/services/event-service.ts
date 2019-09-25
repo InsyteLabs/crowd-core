@@ -11,7 +11,7 @@ class EventService{
         EVENT METHODS
         =============
     */
-    async getEvents(){
+    async getEvents(): Promise<Event[]>{
         try{
             const events: Event[] = await db.q('get-events');
 
@@ -25,7 +25,7 @@ class EventService{
         }
     }
 
-    async getEvent(id: number){
+    async getEvent(id: number): Promise<Event>{
         try{
             const event: Event = await db.q('get-event', [ id ]);
 
@@ -35,11 +35,11 @@ class EventService{
             console.error('Failed to get event from database');
             console.error(e);
 
-            return {}
+            return new Event({});
         }
     }
 
-    async createEvent(event: any){
+    async createEvent(event: any): Promise<Event>{
         const args = [
             event.clientId,
             event.title,
@@ -58,11 +58,11 @@ class EventService{
             console.error(`Failed to create event "${ event.title }"`);
             console.error(e);
 
-            return {}
+            return new Event({});
         }
     }
 
-    async updateEvent(event: any){
+    async updateEvent(event: any): Promise<Event>{
         const args = [
             event.id,
             event.clientId,
@@ -82,7 +82,7 @@ class EventService{
             console.error(`Failed to update event "${ event.title }"`);
             console.error(e);
 
-            return {}
+            return new Event({});
         }
     }
 
@@ -92,7 +92,7 @@ class EventService{
         QUESTION METHODS
         ================
     */
-    async getQuestions(){
+    async getQuestions(): Promise<Question[]>{
         try{
             const questions = await db.query('get-questions');
 
@@ -106,7 +106,7 @@ class EventService{
         }
     }
 
-    async getQuestion(id: number){
+    async getQuestion(id: number): Promise<Question>{
         try{
             const question = await db.q('get-question', [ id ]);
 
@@ -120,7 +120,7 @@ class EventService{
         }
     }
 
-    async getEventQuestions(eventId: number){
+    async getEventQuestions(eventId: number): Promise<Question[]>{
         try{
             const questions = await db.q('get-event-questions', [ eventId ]);
 
@@ -134,11 +134,11 @@ class EventService{
         }
     }
 
-    async createQuestion(q: Question){
+    async createQuestion(q: Question): Promise<Question>{
         const args = [
             q.eventId,
-            q.text,
-            q.userId
+            q.userId,
+            q.text
         ];
 
         try{
@@ -150,7 +150,28 @@ class EventService{
             console.error(`Failed to create question for event of ID ${ q.eventId }`);
             console.error(e);
 
-            return {};
+            return new Question({});
+        }
+    }
+
+    async updateQuestion(q: Question): Promise<Question>{
+        const args = [
+            q.eventId,
+            q.userId,
+            q.text,
+            q.hidden
+        ];
+
+        try{
+            const question = await db.q('update-question', args);
+
+            return Question.from(question);
+        }
+        catch(e){
+            console.error(`Failed to update question for event of ID ${ q.eventId }`);
+            console.error(e);
+
+            return new Question({});
         }
     }
 }

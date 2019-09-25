@@ -94,6 +94,19 @@ router.post('/events/:id/questions', async (req, res, next) => {
     }
 });
 
+router.put('/events/:id/questions/:questionId', async (req, res, next) => {
+    try{
+        const question = await eventService.updateQuestion(req.body);
+
+        return res.json(question);
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+})
+
 
 
 export default router;
