@@ -11,4 +11,13 @@ SET
 
 WHERE id=$1
 
-RETURNING *;
+RETURNING
+    id,
+    client_id,
+    first_name,
+    last_name,
+    email,
+    username,
+    password,
+    is_disabled,
+    disabled_comment;
