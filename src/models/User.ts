@@ -16,14 +16,29 @@ export class User{
 
     constructor(user: any){
         this.id              = user.id
-        this.clientId        = user.client_id
-        this.firstName       = user.first_name
-        this.lastName        = user.last_name
+        this.clientId        = user.clientId
+        this.firstName       = user.firstName
+        this.lastName        = user.lastName
         this.email           = user.email
         this.username        = user.username
         this.password        = user.password
         this.roles           = user.roles ||[];
-        this.isDisabled      = user.is_disabled
-        this.disabledComment = user.disabled_comment
+        this.isDisabled      = user.isDisabled
+        this.disabledComment = user.disabledComment
+    }
+
+    static from(u: any): User{
+        return new User({
+            id:              u.id,
+            clientId:        u.client_id,
+            firstName:       u.first_name,
+            lastName:        u.last_name,
+            email:           u.email,
+            username:        u.username,
+            password:        u.password,
+            roles:           u.roles,
+            isDisabled:      u.is_disabled,
+            disabledComment: u.disabled_comment
+        })
     }
 }

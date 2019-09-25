@@ -24,7 +24,7 @@ class ClientService{
                 client.types = clientTypes.map(t => t.name);
             }
 
-            return clients.map((c: any) => new Client(c));
+            return clients.map((c: any) => Client.from(c));
         }
         catch(e){
             console.error('Failed to get clients from database');
@@ -40,11 +40,12 @@ class ClientService{
             
             client.types = types.map(t => t.name);
 
-            return new Client(client);
+            return Client.from(client);
         }
         catch(e){
             console.error(`Failed to get client of ID "${ id }"`);
             console.error(e);
+            
             return new Client({});
         }
     }

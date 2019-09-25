@@ -28,7 +28,7 @@ class UserService{
                 user.roles = roles.map(r => r.name);
             }
     
-            return users.map((u: any) => new User(u));
+            return users.map((u: any) => User.from(u));
         }
         catch(e){
             console.error('Failed to get users from database');
@@ -45,7 +45,7 @@ class UserService{
             
             user.roles = roles.map(r => r.name);
     
-            return new User(user);
+            return User.from(user);
         }
         catch(e){
             console.error(`Failed to get user of ID "${ id }"`);
@@ -80,6 +80,7 @@ class UserService{
             }
             catch(e){
                 console.error(e);
+
                 reject('Error saving user to database');
             }
 
@@ -167,7 +168,7 @@ class UserService{
         try{
             const user = await db.q('update-user-password', [ userId, hash ]);
 
-            return new User(user);
+            return User.from(user);
         }
         catch(e){
             console.error(`Failed to update password for user of ID ${ userId }`);
