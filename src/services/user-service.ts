@@ -161,6 +161,22 @@ class UserService{
         return this.getUser(updated.id);
     }
 
+    async setUserPassword(userId: number, password: string): Promise<User>{
+        const hash = await this._hashPassword(password);
+
+        try{
+            const user = await db.q('update-user-password', [ userId, hash ]);
+
+            return new User(user);
+        }
+        catch(e){
+            console.error(`Failed to update password for user of ID ${ userId }`);
+            console.error(e);
+
+            return new User({});
+        }
+    }
+
     async disableUser(id: number, comment: string): Promise<User>{
         let user;
         try{

@@ -104,6 +104,11 @@ export const queries: IQueryDescriptor[] = [
         path:     './account/user/update-user.sql',
         firstRow: true
     },
+    {
+        name:     'update-user-password',
+        path:     './account/user/update-password.sql',
+        firstRow: true
+    },
 
     
     /*
