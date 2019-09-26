@@ -105,7 +105,65 @@ router.put('/events/:id/questions/:questionId', async (req, res, next) => {
             message: 'Server Error'
         });
     }
-})
+});
+
+
+/*
+    ====================
+    EVENT MESSAGE ROUTES
+    ====================
+*/
+router.get('/events/:id/messages', async (req, res, next) => {
+    try{
+        const messages = await eventService.getEventMessages(+req.params.id);
+
+        return res.json(messages);
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+});
+
+router.post('/events/:id/messages', async (req, res, next) => {
+    try{
+        const message = await eventService.createEventMessage(req.body);
+
+        return res.json(message);
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+});
+
+router.put('/events/:id/messages/:messageId', async (req, res, next) => {
+    try{
+        const message = await eventService.updateEventMessage(req.body);
+
+        return res.json(message);
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+});
+
+router.delete('/events/:id/messages/:messageId', async (req, res, next) => {
+    try{
+        const deleted = await eventService.deleteEventMessage(+req.params.messageId);
+
+        return res.json({ success: deleted });
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+});
 
 
 

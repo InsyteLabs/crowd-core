@@ -208,6 +208,30 @@ export const queries: IQueryDescriptor[] = [
         name:     'update-question',
         path:     './event/question/update-question.sql',
         firstRow: true
+    },
+
+    /*
+        ============
+        CHAT QUERIES
+        ============
+    */
+    {
+        name: 'get-event-messages',
+        path: './event/chat/get-event-messages.sql'
+    },
+    {
+        name:    'create-event-message',
+        path:    './event/chat/create-event-message.sql',
+        firstRow: true
+    },
+    {
+        name:     'update-event-message',
+        path:     './event/chat/update-event-message.sql',
+        firstRow: true
+    },
+    {
+        name: 'delete-event-message',
+        path: './event/chat/delete-event-message.sql'
     }
 ].map((q: any) => {
     try{
