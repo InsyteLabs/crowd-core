@@ -1,7 +1,7 @@
 'use strict';
 
 import { db }              from '../db';
-import { Event, Question } from '../models';
+import { Event, Question, Message } from '../models';
 import { slugify }         from '../utilities';
 
 class EventService{
@@ -176,6 +176,80 @@ class EventService{
             console.error(e);
 
             return new Question({});
+        }
+    }
+
+
+    /*
+        ==================
+        EVENT CHAT METHODS
+        ==================
+    */
+    async getEventMessages(eventId: number): Promise<Message[]>{
+        try{
+            let messages = await db.q('get-event-messages', [ eventId ]);
+
+            return messages.map((m: any) => Message.from(m));
+        }
+        catch(e){
+            console.error(`Failed to get messages for event of ID ${ eventId }`);
+            console.error(e);
+
+            return [];
+        }
+    }
+
+    async createEventMessage(m: Message): Promise<Message>{
+        const args = [
+            m.eventId,
+            m.userId,
+            m.text
+        ];
+
+        try{
+            const message = await db.q('create-event-message', args);
+
+            return Message.from(message);
+        }
+        catch(e){
+            console.error(`Failed to create message for event of ID ${ m.id }`);
+            console.error(e);
+
+            return new Message({});
+        }
+    }
+
+    async updateEventMessage(m: Message): Promise<Message>{
+        const args = [
+            m.id,
+            m.text,
+            m.hidden
+        ];
+
+        try{
+            const message = await db.q('update-event-message', args);
+
+            return Message.from(message);
+        }
+        catch(e){
+            console.error(`Failed to update message of ID ${ m.id }`);
+            console.error(e);
+
+            return new Message({});
+        }
+    }
+
+    async deleteEventMessage(id: number): Promise<boolean>{
+        try{
+            const deleted = await db.q('delete-event-message', [ id ]);
+
+            return deleted ? true : false;
+        }
+        catch(e){
+            console.error(`Failed to delete message of ID ${ id }`);
+            console.error(e);
+
+            return false;
         }
     }
 }
