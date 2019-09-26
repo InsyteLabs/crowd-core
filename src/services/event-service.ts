@@ -27,7 +27,10 @@ class EventService{
 
     async getEvent(id: number): Promise<Event>{
         try{
-            const event: Event = await db.q('get-event', [ id ]);
+            const event:     Event      = await db.q('get-event', [ id ]),
+                  questions: Question[] = await this.getEventQuestions(id);
+
+            event.questions = questions;
 
             return Event.from(event);
         }
@@ -156,6 +159,7 @@ class EventService{
 
     async updateQuestion(q: Question): Promise<Question>{
         const args = [
+            q.id,
             q.eventId,
             q.userId,
             q.text,
