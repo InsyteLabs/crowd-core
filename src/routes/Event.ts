@@ -109,6 +109,41 @@ router.put('/events/:id/questions/:questionId', async (req, res, next) => {
 
 
 /*
+    ======================
+    QUESTION VOTING ROUTES
+    ======================
+*/
+router.get('/events/:id/questions/:questionId/votes', async (req, res, next) => {
+    try{
+        const { id, questionId } = req.params;
+
+        const score = await eventService.getQuestionScore(+id, +questionId);
+
+        return res.json(score);
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+});
+
+router.post('/events/:id/questions/:id/votes', async (req, res, next) => {
+    try{
+        const vote = await eventService.createQuestionVote(req.body);
+
+        return res.json(vote);
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+});
+
+
+
+/*
     ====================
     EVENT MESSAGE ROUTES
     ====================

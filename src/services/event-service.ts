@@ -227,11 +227,16 @@ class EventService{
         }
 
         if(existing && existing.id){
-            try{
-                await this.deleteVote(existing.id);
+            if(existing.value === vote.value){
+                return existing;
             }
-            catch(e){
-                throw e;
+            else{
+                try{
+                    await this.deleteVote(existing.id);
+                }
+                catch(e){
+                    throw e;
+                }
             }
         }
 
