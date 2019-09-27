@@ -210,6 +210,34 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
 
+
+    /*
+        ============
+        VOTE QUERIES
+        ============
+    */
+    {
+        name:     'get-question-vote-by-user',
+        path:     './event/vote/get-question-vote-by-user.sql',
+        firstRow: true
+    },
+    {
+        name:     'create-question-vote',
+        path:     './event/vote/create-question-vote.sql',
+        firstRow: true
+    },
+    {
+        name:     'get-question-score',
+        path:     './event/vote/get-question-score.sql',
+        firstRow: true
+    },
+    {
+        name:     'delete-vote',
+        path:     './event/vote/delete-vote.sql',
+        firstRow: true
+    },
+
+
     /*
         ============
         CHAT QUERIES
