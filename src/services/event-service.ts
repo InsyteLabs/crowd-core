@@ -1,8 +1,9 @@
 'use strict';
 
 import { db }              from '../db';
-import { Event, Question, Message } from '../models';
+import { Event, Question, Message, Vote } from '../models';
 import { slugify }         from '../utilities';
+import { IQuestionScore } from '../interfaces';
 
 class EventService{
 
@@ -111,7 +112,10 @@ class EventService{
 
     async getQuestion(id: number): Promise<Question>{
         try{
-            const question = await db.q('get-question', [ id ]);
+            const question = await db.q('get-question', [ id ]),
+                  stats    = await this.getQuestionScore(question.eventId, id);
+
+            question.stats = stats;
 
             return Question.from(question);
         }
@@ -126,6 +130,17 @@ class EventService{
     async getEventQuestions(eventId: number): Promise<Question[]>{
         try{
             const questions = await db.q('get-event-questions', [ eventId ]);
+
+            /*
+                This bad, need to refactor the question getting query to also get
+                the score
+            */
+            for(let i = 0, len = questions.length; i < len; i++){
+                const question = questions[i],
+                      stats    = await this.getQuestionScore(eventId, question.id);
+                
+                question.stats = stats;
+            }
 
             return questions.map((q: any) => Question.from(q));
         }
@@ -176,6 +191,93 @@ class EventService{
             console.error(e);
 
             return new Question({});
+        }
+    }
+
+
+    /*
+        =====================
+        QUESTION VOTE METHODS
+        =====================
+    */
+    async getQuestionVoteByUser(questionId: number, userId: number): Promise<Vote>{
+        try{
+            let vote = await db.q('get-question-vote-by-user', [ questionId, userId ]);
+
+            return Vote.from(vote);
+        }
+        catch(e){
+            console.error(`Error fetching vote of questionId ${ questionId } and userId ${ userId }`);
+            console.error(e);
+
+            return Vote.from({});
+        }
+    }
+
+    async createQuestionVote(vote: Vote): Promise<Vote>{
+        let existing
+        try{
+            existing = await this.getQuestionVoteByUser(vote.questionId, vote.userId);
+        }
+        catch(e){
+            console.error(`Error fetching existing vote of questionId ${ vote.questionId } and userId ${ vote.userId }`);
+            console.error(e);
+
+            return Vote.from({});
+        }
+
+        if(existing && existing.id){
+            try{
+                await this.deleteVote(existing.id);
+            }
+            catch(e){
+                throw e;
+            }
+        }
+
+        const args = [
+            vote.eventId,
+            vote.questionId,
+            vote.userId,
+            vote.value
+        ];
+
+        try{
+            let vote = await db.q('create-question-vote', args);
+            
+            return Vote.from(vote);
+        }
+        catch(e){
+            console.error(`Error creating vote of questionId ${ vote.questionId } and userId ${ vote.userId }`);
+            console.error(e);
+
+            return Vote.from({});
+        }
+    }
+
+    async deleteVote(voteId: number): Promise<void>{
+        try{
+            const deleted = await db.q('delete-vote', [ voteId ]);
+        }
+        catch(e){
+            console.error(`Error deleting vote of ID ${ voteId }`);
+            console.error(e);
+
+            throw e;
+        }
+    }
+
+    async getQuestionScore(eventId: number, questionId: number): Promise<IQuestionScore>{
+        try{
+            const score: IQuestionScore = await db.q('get-question-score', [ eventId, questionId ]);
+
+            return score;
+        }
+        catch(e){
+            console.error(`Failed to get score for questionId ${ questionId }`);
+            console.error(e);
+
+            return {}
         }
     }
 
