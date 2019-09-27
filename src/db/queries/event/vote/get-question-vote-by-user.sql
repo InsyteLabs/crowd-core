@@ -10,5 +10,5 @@ FROM
     event.vote
 
 WHERE
-        qustion_id=$1
+        question_id=$1
     AND user_id=$2;
