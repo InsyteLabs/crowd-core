@@ -1,7 +1,10 @@
 'use strict';
 
-import { Router }      from 'express';
-import { userService } from '../services';
+import { Router }         from 'express';
+import * as jwt           from 'jsonwebtoken';
+import conf               from '../conf';
+import { SECONDS_IN_DAY } from '../constants';
+import { userService }    from '../services';
 
 const router = Router();
 
@@ -38,20 +41,48 @@ router.post('/users', async (req, res, next) => {
     }
 });
 
+router.post('/authenticate', async (req, res, next) => {
+    const { username, password } = req.body;
+
+    if(!(username && password)){
+        return res.status(400).json({
+            message: 'User and password fields required'
+        });
+    }
+
+    try{
+        const user  = await userService.getUserByUsername(username),
+              valid = await userService.checkUserPassword(username, password);
+
+        const token = await jwt.sign({
+            issuer: 'CROWDCORE_API',
+            exp: Math.floor(Date.now() / 1000) + (SECONDS_IN_DAY),
+            data: user
+        }, conf.SECRET);
+        
+        return res.json({ token });
+    }
+    catch(e){
+        return res.status(500).json({
+            message: 'Server Error'
+        });
+    }
+});
+
 router.post('/users/:id/password', async (req, res, next) => {
     try{
+        const { password, newPassword } = req.body;
+
+        if(!(password && newPassword)){
+            return res.status(400).json({ message: '"password" and "newPassword" fields required' });
+        }
+
         const user = await userService.getUser(+req.params.id);
 
         if(!(user && user.id)){
             return res.status(404).json({
                 message: 'Not Found'
             });
-        }
-
-        const { password, newPassword } = req.body;
-
-        if(!(password && newPassword)){
-            return res.status(400).json({ message: '"password" and "newPassword" fields required' });
         }
 
         const valid = await userService.checkUserPassword(user.username, password);
@@ -108,6 +139,6 @@ router.get('/users/:id/enable', async (req, res, next) => {
     catch(e){
         return res.status(500).json({ message: 'Server Error' });
     }
-})
+});
 
 export default router;
