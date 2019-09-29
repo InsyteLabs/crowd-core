@@ -55,6 +55,20 @@ class UserService{
         }
     }
 
+    async getUserByUsername(username: string): Promise<User>{
+        try{
+            const user = await db.q('get-user-by-username', [ username ]);
+
+            return User.from(user);
+        }
+        catch(e){
+            console.error(`Failed to get user of username ${ username }`);
+            console.error(e);
+
+            return User.from({});
+        }
+    }
+
     async createUser(newUser: User): Promise<User>{
         return new Promise(async (resolve, reject) => {
             let hash;
