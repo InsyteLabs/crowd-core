@@ -17,6 +17,13 @@ server.use(jsonBody, urlBody);
 // Remove "X-Powered-By" header
 server.use((req, res, next) => {
     res.removeHeader('X-Powered-By');
+
+    res.header({
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Origin':  '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    });
+
     next();
 });
 
