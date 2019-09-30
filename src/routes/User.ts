@@ -5,6 +5,7 @@ import * as jwt           from 'jsonwebtoken';
 import conf               from '../conf';
 import { SECONDS_IN_DAY } from '../constants';
 import { userService }    from '../services';
+import { sendError }      from '../utilities';
 
 const router = Router();
 
@@ -37,7 +38,7 @@ router.post('/users', async (req, res, next) => {
         return res.json(user);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return sendError(res, e);
     }
 });
 
@@ -54,6 +55,12 @@ router.post('/authenticate', async (req, res, next) => {
         const user  = await userService.getUserByUsername(username),
               valid = await userService.checkUserPassword(username, password);
 
+        if(!valid){
+            return res.status(400).json({
+                message: 'Incorrect username/password'
+            });
+        }
+
         const token = await jwt.sign({
             issuer: 'CROWDCORE_API',
             exp: Math.floor(Date.now() / 1000) + (SECONDS_IN_DAY),
@@ -63,9 +70,7 @@ router.post('/authenticate', async (req, res, next) => {
         return res.json({ token });
     }
     catch(e){
-        return res.status(500).json({
-            message: 'Server Error'
-        });
+        return sendError(res, e);
     }
 });
 
@@ -138,6 +143,19 @@ router.get('/users/:id/enable', async (req, res, next) => {
     }
     catch(e){
         return res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+router.get('/roles', async (req, res, next) => {
+    try{
+        const roles = await userService.getRoles();
+
+        return res.json(roles);
+    }
+    catch(e){
+        return res.json({
+            message: 'Server Error'
+        });
     }
 });
 

@@ -59,7 +59,12 @@ class UserService{
         try{
             const user = await db.q('get-user-by-username', [ username ]);
 
-            return User.from(user);
+            if(user){
+                return User.from(user);
+            }
+            else{
+                return User.from({});
+            }
         }
         catch(e){
             console.error(`Failed to get user of username ${ username }`);
@@ -76,6 +81,7 @@ class UserService{
                 hash = await this._hashPassword(newUser.password);
             }
             catch(e){
+                console.log(e);
                 return reject('Password hashing error');
             }
 
