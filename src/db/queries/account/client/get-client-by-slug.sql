@@ -11,4 +11,6 @@ FROM
     account.client
 
 WHERE
-    slug=$1;
+    slug=$1
+
+LIMTI 1;
