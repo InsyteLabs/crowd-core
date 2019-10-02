@@ -52,7 +52,10 @@ class ClientService{
 
     async getClientBySlug(slug: string): Promise<Client>{
         try{
-            const client = await db.q('get-client-by-slug', [ slug ]);
+            const client = await db.q('get-client-by-slug', [ slug ]),
+                  types  = await this.getClientTypes(client.id);
+
+            client.types = types.map(t => t.name);
 
             return Client.from(client);
         }
