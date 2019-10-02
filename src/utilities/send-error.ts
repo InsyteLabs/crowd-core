@@ -1,10 +1,10 @@
 'use strict';
 
+import { Response } from "express";
+
 const isProd = process.env['NODE_ENV'] === 'production';
 
-console.log(`isProd: ${ isProd }`);
-
-export function sendError(res: any, err: Error, message='Server Error'){
+export function sendError(res: Response, err: Error, message='Server Error'){
     console.log(err);
     console.log(message);
     if(isProd){
