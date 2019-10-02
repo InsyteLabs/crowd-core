@@ -21,6 +21,11 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
     {
+        name:     'get-client-by-slug',
+        path:     './account/client/get-client-by-slug.sql',
+        firstRow: true
+    },
+    {
         name:     'create-client',
         path:     './account/client/create-client.sql',
         firstRow: true
@@ -163,6 +168,10 @@ export const queries: IQueryDescriptor[] = [
     {
         name: 'get-events',
         path: './event/event/get-events.sql'
+    },
+    {
+        name: 'get-client-events',
+        path: './event/event/get-client-events.sql'
     },
     {
         name:     'get-event',

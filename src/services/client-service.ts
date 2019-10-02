@@ -50,6 +50,20 @@ class ClientService{
         }
     }
 
+    async getClientBySlug(slug: string): Promise<Client>{
+        try{
+            const client = await db.q('get-client-by-slug', [ slug ]);
+
+            return Client.from(client);
+        }
+        catch(e){
+            console.error(`Failed to get client of slug ${ slug }`);
+            console.error(e);
+
+            return Client.from({});
+        }
+    }
+
     async createClient(newClient: Client): Promise<Client>{
         const args = [
             newClient.name,

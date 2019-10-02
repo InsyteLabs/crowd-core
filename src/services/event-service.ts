@@ -26,6 +26,20 @@ class EventService{
         }
     }
 
+    async getClientEvents(clientId: number): Promise<Event[]>{
+        try{
+            const events: Event[] = await db.q('get-client-events', [ clientId ]);
+
+            return events.map(e => Event.from(e));
+        }
+        catch(e){
+            console.error(`Failed to get events for client of ID ${ clientId }`);
+            console.error(e);
+
+            return [];
+        }
+    }
+
     async getEvent(id: number): Promise<Event>{
         try{
             const event:     Event      = await db.q('get-event', [ id ]),
