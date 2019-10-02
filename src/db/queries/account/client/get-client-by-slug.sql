@@ -13,4 +13,4 @@ FROM
 WHERE
     slug=$1
 
-LIMTI 1;
+LIMIT 1;
