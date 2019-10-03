@@ -161,6 +161,21 @@ exports.queries = [
         firstRow: true
     },
     {
+        name: 'get-event-settings',
+        path: './setting/event/get-event-settings.sql',
+        firstRow: true
+    },
+    {
+        name: 'create-event-settings',
+        path: './setting/event/create-event-settings.sql',
+        firstRow: true
+    },
+    {
+        name: 'update-event-settings',
+        path: './setting/event/update-event-settings.sql',
+        firstRow: true
+    },
+    {
         name: 'get-questions',
         path: './event/question/get-questions.sql'
     },

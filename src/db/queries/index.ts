@@ -188,6 +188,21 @@ export const queries: IQueryDescriptor[] = [
         path:     './event/event/update-event.sql',
         firstRow: true
     },
+    {
+        name:     'get-event-settings',
+        path:     './setting/event/get-event-settings.sql',
+        firstRow: true
+    },
+    {
+        name:     'create-event-settings',
+        path:     './setting/event/create-event-settings.sql',
+        firstRow: true
+    },
+    {
+        name:     'update-event-settings',
+        path:     './setting/event/update-event-settings.sql',
+        firstRow: true
+    },
 
 
     /*
