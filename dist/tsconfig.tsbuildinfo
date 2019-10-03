@@ -338,7 +338,7 @@
         "signature": "79a32c211d5746313940f0b2bd5c9f5c2f9d9f7bd2d18ce1eac46d22d184d755"
       },
       "../src/db/queries/index.ts": {
-        "version": "ab07c1ce5e51004b9b9512c8d31e4614c2f279037a3a6b5452d9111d382e61ea",
+        "version": "b2a4b81031c6052d4b0bbaa4a5d4835332007e4d89295adbfd0ba1a788c14a0c",
         "signature": "851b04d769b19524d333c55d22ea0c9c780d49a6e768254cca4827fde2eda7cc"
       },
       "../src/db/index.ts": {
@@ -1905,7 +1905,6 @@
       "../src/interfaces/itype.ts",
       "../src/interfaces/iquestionscore.ts",
       "../src/interfaces/index.ts",
-      "../src/db/queries/index.ts",
       "../src/db/index.ts",
       "../src/models/user.ts",
       "../src/models/client.ts",
@@ -1926,6 +1925,7 @@
       "../src/utilities/send-error.ts",
       "../src/utilities/index.ts",
       "../src/services/client-service.ts",
+      "../src/services/event-service.ts",
       "../src/services/index.ts",
       "../src/db-seeder.ts",
       "../src/routes/client.ts",
@@ -1949,7 +1949,7 @@
       "../node_modules/@types/stack-utils/index.d.ts",
       "../node_modules/@types/yargs-parser/index.d.ts",
       "../node_modules/@types/yargs/index.d.ts",
-      "../src/services/event-service.ts"
+      "../src/db/queries/index.ts"
     ]
   },
   "version": "3.6.3"

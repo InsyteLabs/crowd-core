@@ -4,7 +4,6 @@ SELECT
     event_id,
     is_locked,
     require_password,
-    password,
     require_login,
     enable_chat
 
