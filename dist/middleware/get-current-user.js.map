@@ -1,0 +1,1 @@
+{"version":3,"file":"get-current-user.js","sourceRoot":"","sources":["../../src/middleware/get-current-user.ts"],"names":[],"mappings":"AAAA,YAAY,CAAC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAKb,SAAsB,cAAc,CAAC,GAAoB,EAAE,GAAqB,EAAE,IAA0B;;;;YAClG,KAAK,GAAmB,GAAG,CAAC,OAAO,CAAC,OAAO,CAAC,CAAA;;;;CACrD;AAFD,wCAEC"}
