@@ -30,6 +30,20 @@ class EventService{
         try{
             const events: Event[] = await db.q('get-client-events', [ clientId ]);
 
+            for(let i = 0, len = events.length; i < len; i++){
+                const event = events[i];
+
+                try{
+                    event.questions = await this.getEventQuestions(<number>event.id);
+                }
+                catch(e){
+                    console.error(`Failed to get questions for event of ID ${ event.id }`);
+                    console.error(e);
+
+                    event.questions = [];
+                }
+            }
+
             return events.map(e => Event.from(e));
         }
         catch(e){

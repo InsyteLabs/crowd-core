@@ -65,44 +65,66 @@ var EventService = (function () {
     };
     EventService.prototype.getClientEvents = function (clientId) {
         return __awaiter(this, void 0, void 0, function () {
-            var events, e_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var events, i, len, event_1, _a, e_2, e_3;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        _b.trys.push([0, 8, , 9]);
                         return [4, db_1.db.q('get-client-events', [clientId])];
                     case 1:
-                        events = _a.sent();
-                        return [2, events.map(function (e) { return models_1.Event.from(e); })];
+                        events = _b.sent();
+                        i = 0, len = events.length;
+                        _b.label = 2;
                     case 2:
-                        e_2 = _a.sent();
-                        console.error("Failed to get events for client of ID " + clientId);
+                        if (!(i < len)) return [3, 7];
+                        event_1 = events[i];
+                        _b.label = 3;
+                    case 3:
+                        _b.trys.push([3, 5, , 6]);
+                        _a = event_1;
+                        return [4, this.getEventQuestions(event_1.id)];
+                    case 4:
+                        _a.questions = _b.sent();
+                        return [3, 6];
+                    case 5:
+                        e_2 = _b.sent();
+                        console.error("Failed to get questions for event of ID " + event_1.id);
                         console.error(e_2);
+                        event_1.questions = [];
+                        return [3, 6];
+                    case 6:
+                        i++;
+                        return [3, 2];
+                    case 7: return [2, events.map(function (e) { return models_1.Event.from(e); })];
+                    case 8:
+                        e_3 = _b.sent();
+                        console.error("Failed to get events for client of ID " + clientId);
+                        console.error(e_3);
                         return [2, []];
-                    case 3: return [2];
+                    case 9: return [2];
                 }
             });
         });
     };
     EventService.prototype.getEvent = function (id) {
         return __awaiter(this, void 0, void 0, function () {
-            var event_1, questions, e_3;
+            var event_2, questions, e_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
                         return [4, db_1.db.q('get-event', [id])];
                     case 1:
-                        event_1 = _a.sent();
+                        event_2 = _a.sent();
                         return [4, this.getEventQuestions(id)];
                     case 2:
                         questions = _a.sent();
-                        event_1.questions = questions;
-                        return [2, models_1.Event.from(event_1)];
+                        event_2.questions = questions;
+                        return [2, models_1.Event.from(event_2)];
                     case 3:
-                        e_3 = _a.sent();
+                        e_4 = _a.sent();
                         console.error('Failed to get event from database');
-                        console.error(e_3);
+                        console.error(e_4);
                         return [2, new models_1.Event({})];
                     case 4: return [2];
                 }
@@ -111,7 +133,7 @@ var EventService = (function () {
     };
     EventService.prototype.createEvent = function (event) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, event_2, e_4;
+            var args, event_3, e_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -128,12 +150,12 @@ var EventService = (function () {
                         _a.trys.push([1, 3, , 4]);
                         return [4, db_1.db.q('create-event', args)];
                     case 2:
-                        event_2 = _a.sent();
-                        return [2, models_1.Event.from(event_2)];
+                        event_3 = _a.sent();
+                        return [2, models_1.Event.from(event_3)];
                     case 3:
-                        e_4 = _a.sent();
+                        e_5 = _a.sent();
                         console.error("Failed to create event \"" + event.title + "\"");
-                        console.error(e_4);
+                        console.error(e_5);
                         return [2, new models_1.Event({})];
                     case 4: return [2];
                 }
@@ -142,7 +164,7 @@ var EventService = (function () {
     };
     EventService.prototype.updateEvent = function (event) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, event_3, e_5;
+            var args, event_4, e_6;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -160,12 +182,12 @@ var EventService = (function () {
                         _a.trys.push([1, 3, , 4]);
                         return [4, db_1.db.q('update-event', args)];
                     case 2:
-                        event_3 = _a.sent();
-                        return [2, models_1.Event.from(event_3)];
+                        event_4 = _a.sent();
+                        return [2, models_1.Event.from(event_4)];
                     case 3:
-                        e_5 = _a.sent();
+                        e_6 = _a.sent();
                         console.error("Failed to update event \"" + event.title + "\"");
-                        console.error(e_5);
+                        console.error(e_6);
                         return [2, new models_1.Event({})];
                     case 4: return [2];
                 }
@@ -174,7 +196,7 @@ var EventService = (function () {
     };
     EventService.prototype.getQuestions = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var questions, e_6;
+            var questions, e_7;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -184,9 +206,9 @@ var EventService = (function () {
                         questions = _a.sent();
                         return [2, questions.map(function (q) { return models_1.Question.from(q); })];
                     case 2:
-                        e_6 = _a.sent();
+                        e_7 = _a.sent();
                         console.error('Failed to get questions from database');
-                        console.error(e_6);
+                        console.error(e_7);
                         return [2, []];
                     case 3: return [2];
                 }
@@ -195,7 +217,7 @@ var EventService = (function () {
     };
     EventService.prototype.getQuestion = function (id) {
         return __awaiter(this, void 0, void 0, function () {
-            var question, stats, e_7;
+            var question, stats, e_8;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -209,9 +231,9 @@ var EventService = (function () {
                         question.stats = stats;
                         return [2, models_1.Question.from(question)];
                     case 3:
-                        e_7 = _a.sent();
+                        e_8 = _a.sent();
                         console.error("Failed to get question of ID " + id + " from database");
-                        console.error(e_7);
+                        console.error(e_8);
                         return [2, new models_1.Question({})];
                     case 4: return [2];
                 }
@@ -220,7 +242,7 @@ var EventService = (function () {
     };
     EventService.prototype.getEventQuestions = function (eventId) {
         return __awaiter(this, void 0, void 0, function () {
-            var questions, i, len, question, stats, e_8;
+            var questions, i, len, question, stats, e_9;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -243,9 +265,9 @@ var EventService = (function () {
                         return [3, 2];
                     case 5: return [2, questions.map(function (q) { return models_1.Question.from(q); })];
                     case 6:
-                        e_8 = _a.sent();
+                        e_9 = _a.sent();
                         console.error("Failed to load quations for event of ID " + eventId);
-                        console.error(e_8);
+                        console.error(e_9);
                         return [2, []];
                     case 7: return [2];
                 }
@@ -254,7 +276,7 @@ var EventService = (function () {
     };
     EventService.prototype.createQuestion = function (q) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, question, e_9;
+            var args, question, e_10;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -271,9 +293,9 @@ var EventService = (function () {
                         question = _a.sent();
                         return [2, models_1.Question.from(question)];
                     case 3:
-                        e_9 = _a.sent();
+                        e_10 = _a.sent();
                         console.error("Failed to create question for event of ID " + q.eventId);
-                        console.error(e_9);
+                        console.error(e_10);
                         return [2, new models_1.Question({})];
                     case 4: return [2];
                 }
@@ -282,7 +304,7 @@ var EventService = (function () {
     };
     EventService.prototype.updateQuestion = function (q) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, question, e_10;
+            var args, question, e_11;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -301,9 +323,9 @@ var EventService = (function () {
                         question = _a.sent();
                         return [2, models_1.Question.from(question)];
                     case 3:
-                        e_10 = _a.sent();
+                        e_11 = _a.sent();
                         console.error("Failed to update question for event of ID " + q.eventId);
-                        console.error(e_10);
+                        console.error(e_11);
                         return [2, new models_1.Question({})];
                     case 4: return [2];
                 }
@@ -312,7 +334,7 @@ var EventService = (function () {
     };
     EventService.prototype.getQuestionVoteByUser = function (questionId, userId) {
         return __awaiter(this, void 0, void 0, function () {
-            var vote, e_11;
+            var vote, e_12;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -322,9 +344,9 @@ var EventService = (function () {
                         vote = _a.sent();
                         return [2, models_1.Vote.from(vote)];
                     case 2:
-                        e_11 = _a.sent();
+                        e_12 = _a.sent();
                         console.error("Error fetching vote of questionId " + questionId + " and userId " + userId);
-                        console.error(e_11);
+                        console.error(e_12);
                         return [2, models_1.Vote.from({})];
                     case 3: return [2];
                 }
@@ -333,7 +355,7 @@ var EventService = (function () {
     };
     EventService.prototype.createQuestionVote = function (vote) {
         return __awaiter(this, void 0, void 0, function () {
-            var existing, e_12, e_13, args, vote_1, e_14;
+            var existing, e_13, e_14, args, vote_1, e_15;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -343,9 +365,9 @@ var EventService = (function () {
                         existing = _a.sent();
                         return [3, 3];
                     case 2:
-                        e_12 = _a.sent();
+                        e_13 = _a.sent();
                         console.error("Error fetching existing vote of questionId " + vote.questionId + " and userId " + vote.userId);
-                        console.error(e_12);
+                        console.error(e_13);
                         return [2, models_1.Vote.from({})];
                     case 3:
                         if (!(existing && existing.id)) return [3, 7];
@@ -358,8 +380,8 @@ var EventService = (function () {
                         _a.sent();
                         return [3, 7];
                     case 6:
-                        e_13 = _a.sent();
-                        throw e_13;
+                        e_14 = _a.sent();
+                        throw e_14;
                     case 7:
                         args = [
                             vote.eventId,
@@ -375,9 +397,9 @@ var EventService = (function () {
                         vote_1 = _a.sent();
                         return [2, models_1.Vote.from(vote_1)];
                     case 10:
-                        e_14 = _a.sent();
+                        e_15 = _a.sent();
                         console.error("Error creating vote of questionId " + vote.questionId + " and userId " + vote.userId);
-                        console.error(e_14);
+                        console.error(e_15);
                         return [2, models_1.Vote.from({})];
                     case 11: return [2];
                 }
@@ -386,7 +408,7 @@ var EventService = (function () {
     };
     EventService.prototype.deleteVote = function (voteId) {
         return __awaiter(this, void 0, void 0, function () {
-            var deleted, e_15;
+            var deleted, e_16;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -396,10 +418,10 @@ var EventService = (function () {
                         deleted = _a.sent();
                         return [3, 3];
                     case 2:
-                        e_15 = _a.sent();
+                        e_16 = _a.sent();
                         console.error("Error deleting vote of ID " + voteId);
-                        console.error(e_15);
-                        throw e_15;
+                        console.error(e_16);
+                        throw e_16;
                     case 3: return [2];
                 }
             });
@@ -407,7 +429,7 @@ var EventService = (function () {
     };
     EventService.prototype.getQuestionScore = function (eventId, questionId) {
         return __awaiter(this, void 0, void 0, function () {
-            var score, e_16;
+            var score, e_17;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -417,9 +439,9 @@ var EventService = (function () {
                         score = _a.sent();
                         return [2, score];
                     case 2:
-                        e_16 = _a.sent();
+                        e_17 = _a.sent();
                         console.error("Failed to get score for questionId " + questionId);
-                        console.error(e_16);
+                        console.error(e_17);
                         return [2, {}];
                     case 3: return [2];
                 }
@@ -428,7 +450,7 @@ var EventService = (function () {
     };
     EventService.prototype.getEventMessages = function (eventId) {
         return __awaiter(this, void 0, void 0, function () {
-            var messages, e_17;
+            var messages, e_18;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -438,9 +460,9 @@ var EventService = (function () {
                         messages = _a.sent();
                         return [2, messages.map(function (m) { return models_1.Message.from(m); })];
                     case 2:
-                        e_17 = _a.sent();
+                        e_18 = _a.sent();
                         console.error("Failed to get messages for event of ID " + eventId);
-                        console.error(e_17);
+                        console.error(e_18);
                         return [2, []];
                     case 3: return [2];
                 }
@@ -449,7 +471,7 @@ var EventService = (function () {
     };
     EventService.prototype.createEventMessage = function (m) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, message, e_18;
+            var args, message, e_19;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -466,9 +488,9 @@ var EventService = (function () {
                         message = _a.sent();
                         return [2, models_1.Message.from(message)];
                     case 3:
-                        e_18 = _a.sent();
+                        e_19 = _a.sent();
                         console.error("Failed to create message for event of ID " + m.id);
-                        console.error(e_18);
+                        console.error(e_19);
                         return [2, new models_1.Message({})];
                     case 4: return [2];
                 }
@@ -477,7 +499,7 @@ var EventService = (function () {
     };
     EventService.prototype.updateEventMessage = function (m) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, message, e_19;
+            var args, message, e_20;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -494,9 +516,9 @@ var EventService = (function () {
                         message = _a.sent();
                         return [2, models_1.Message.from(message)];
                     case 3:
-                        e_19 = _a.sent();
+                        e_20 = _a.sent();
                         console.error("Failed to update message of ID " + m.id);
-                        console.error(e_19);
+                        console.error(e_20);
                         return [2, new models_1.Message({})];
                     case 4: return [2];
                 }
@@ -505,7 +527,7 @@ var EventService = (function () {
     };
     EventService.prototype.deleteEventMessage = function (id) {
         return __awaiter(this, void 0, void 0, function () {
-            var deleted, e_20;
+            var deleted, e_21;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -515,9 +537,9 @@ var EventService = (function () {
                         deleted = _a.sent();
                         return [2, deleted ? true : false];
                     case 2:
-                        e_20 = _a.sent();
+                        e_21 = _a.sent();
                         console.error("Failed to delete message of ID " + id);
-                        console.error(e_20);
+                        console.error(e_21);
                         return [2, false];
                     case 3: return [2];
                 }
