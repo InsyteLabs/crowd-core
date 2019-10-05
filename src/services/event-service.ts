@@ -1,8 +1,11 @@
 'use strict';
 
-import { db }              from '../db';
-import { Event, Question, Message, Vote } from '../models';
-import { slugify }         from '../utilities';
+import {
+    Event, EventSettings, Question, Message, Vote
+} from '../models';
+
+import { db }             from '../db';
+import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
 
 class EventService{
@@ -28,13 +31,14 @@ class EventService{
 
     async getClientEvents(clientId: number): Promise<Event[]>{
         try{
-            const events: Event[] = await db.q('get-client-events', [ clientId ]);
+            const events = await db.q('get-client-events', [ clientId ]);
 
             for(let i = 0, len = events.length; i < len; i++){
                 const event = events[i];
 
                 try{
                     event.questions = await this.getEventQuestions(<number>event.id);
+                    event.settings  = await this.getEventSettings(<number>event.id);
                 }
                 catch(e){
                     console.error(`Failed to get questions for event of ID ${ event.id }`);
@@ -44,7 +48,7 @@ class EventService{
                 }
             }
 
-            return events.map(e => Event.from(e));
+            return events.map((e: any) => Event.from(e));
         }
         catch(e){
             console.error(`Failed to get events for client of ID ${ clientId }`);
@@ -56,10 +60,12 @@ class EventService{
 
     async getEvent(id: number): Promise<Event>{
         try{
-            const event:     Event      = await db.q('get-event', [ id ]),
-                  questions: Question[] = await this.getEventQuestions(id);
+            const event:     Event         = await db.q('get-event', [ id ]),
+                  questions: Question[]    = await this.getEventQuestions(id),
+                  settings:  EventSettings = await this.getEventSettings(id);
 
             event.questions = questions;
+            event.settings  = settings;
 
             return Event.from(event);
         }
@@ -82,9 +88,22 @@ class EventService{
         ];
 
         try{
-            const event = await db.q('create-event', args);
+            const newEvent = await db.q('create-event', args);
 
-            return Event.from(event);
+            if(event.settings){
+                try{
+                    event.settings.eventId = newEvent.id;
+
+                    const settings = await this.createEventSettings(event.settings);
+
+                    newEvent.settings = settings;
+                }
+                catch(e){
+                    console.error(e);
+                }
+            }
+
+            return Event.from(newEvent);
         }
         catch(e){
             console.error(`Failed to create event "${ event.title }"`);
@@ -106,15 +125,120 @@ class EventService{
         ];
 
         try{
-            const event = await db.q('update-event', args);
+            const updatedEvent = await db.q('update-event', args);
 
-            return Event.from(event);
+            if(event.settings){
+                console.log(`Updating settings for event of ID ${ event.id }`);
+                console.log(event.settings);
+                try{
+                    event.settings.eventId = event.id;
+
+                    const settings = await this.updateEventSettings(event.settings);
+
+                    updatedEvent.settings = settings;
+                }
+                catch(e){
+                    console.error(e);
+                }
+            }
+
+            return Event.from(updatedEvent);
         }
         catch(e){
             console.error(`Failed to update event "${ event.title }"`);
             console.error(e);
 
             return new Event({});
+        }
+    }
+
+    async deleteEvent(id: number): Promise<Event>{
+        try{
+            const settings = await db.q('delete-event-settings', [ id ]),
+                  event    = await db.q('delete-event', [ id ]);
+
+            event.settings = settings;
+
+            return Event.from(event);
+        }
+        catch(e){
+            console.error(`Failed to delete event of ID ${ id }`);
+            console.error(e);
+
+            return new Event({});
+        }
+    }
+
+
+    /*
+        ================
+        SETTINGS METHODS
+        ================
+    */
+    async getEventSettings(eventId: number): Promise<EventSettings>{
+        try{
+            const settings = await db.q('get-event-settings', [ eventId ]);
+
+            return EventSettings.from(settings);
+        }
+        catch(e){
+            console.error(`Failed to get settings for event of id ${ eventId }`);
+            console.error(e);
+
+            return EventSettings.from({});
+        }
+    }
+
+    async createEventSettings(s: EventSettings){
+        try{
+            const args = [
+                s.eventId,
+                s.isLocked,
+                s.requirePassword,
+                s.password,
+                s.requireLogin,
+                s.enableChat
+            ];
+
+            const settings = await db.q('create-event-settings', args);
+
+            return EventSettings.from(settings);
+        }
+        catch(e){
+            console.error(`Failed to create settings for event of ID ${ s.eventId }`);
+            console.error(e);
+
+            return EventSettings.from({});
+        }
+    }
+
+    async updateEventSettings(s: EventSettings){
+        console.log('eventService.updateEventSettings');
+        console.log(s);
+        try{
+            const args = [
+                s.eventId,
+                s.isLocked,
+                s.requirePassword,
+                s.password,
+                s.requireLogin,
+                s.enableChat
+            ];
+
+            console.log(args);
+            console.log('-------------------');
+            
+            const settings = await db.q('update-event-settings', args);
+
+            console.log(settings);
+
+            return EventSettings.from(settings);
+        }
+        catch(e){
+            console.error(`Failed to update settings for event of ID ${ s.eventId }`);
+            console.error(e);
+
+            return EventSettings.from({});
         }
     }
 
