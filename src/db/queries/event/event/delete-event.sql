@@ -1,5 +1,10 @@
 
-SELECT
+DELETE FROM
+    event.event
+
+WHERE event.id=$1
+
+RETURNING
     id,
     client_id,
     title,
@@ -12,11 +17,4 @@ SELECT
     (
         start_time < NOW() AND end_time > NOW()
     )
-    THEN true ELSE false END AS is_active
-
-FROM event.event
-
-WHERE
-    client_id=$1
-    
-ORDER BY start_time;
+    THEN true ELSE false END AS is_active;

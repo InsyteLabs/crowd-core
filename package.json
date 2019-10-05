@@ -36,6 +36,7 @@
     "@types/pg": "^7.11.1",
     "db-migrate-pg": "^1.0.0",
     "jest": "^24.9.0",
+    "source-map-support": "^0.5.13",
     "tsc-watch": "^4.0.0",
     "typescript": "^3.6.3"
   }

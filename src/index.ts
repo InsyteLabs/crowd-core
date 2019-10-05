@@ -1,5 +1,7 @@
 'use strict';
 
+require('source-map-support').install();
+
 import Express    from 'express';
 import bodyParser from 'body-parser';
 import { router } from './routes';
