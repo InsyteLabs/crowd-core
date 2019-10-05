@@ -2,6 +2,6 @@
 src/conf
 !.gitkeep
 database.json
-build/**
+dist/**
 
 node_modules
