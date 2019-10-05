@@ -128,8 +128,6 @@ class EventService{
             const updatedEvent = await db.q('update-event', args);
 
             if(event.settings){
-                console.log(`Updating settings for event of ID ${ event.id }`);
-                console.log(event.settings);
                 try{
                     event.settings.eventId = event.id;
 
@@ -154,8 +152,9 @@ class EventService{
 
     async deleteEvent(id: number): Promise<Event>{
         try{
-            const settings = await db.q('delete-event-settings', [ id ]),
-                  event    = await db.q('delete-event', [ id ]);
+            const settings  = await db.q('delete-event-settings', [ id ]),
+                  questions = await db.q('delete-event-questions', [ id ]),
+                  event     = await db.q('delete-event', [ id ]);
 
             event.settings = settings;
 
@@ -213,8 +212,6 @@ class EventService{
     }
 
     async updateEventSettings(s: EventSettings){
-        console.log('eventService.updateEventSettings');
-        console.log(s);
         try{
             const args = [
                 s.eventId,
@@ -224,13 +221,8 @@ class EventService{
                 s.requireLogin,
                 s.enableChat
             ];
-
-            console.log(args);
-            console.log('-------------------');
             
             const settings = await db.q('update-event-settings', args);
-
-            console.log(settings);
 
             return EventSettings.from(settings);
         }
@@ -301,6 +293,20 @@ class EventService{
             console.error(e);
 
             return [];
+        }
+    }
+
+    async deleteEventQuestions(eventId: number): Promise<boolean>{
+        try{
+            const questions = await db.q('delete-event-questions', [ eventId ]);
+
+            return true;
+        }
+        catch(e){
+            console.error(`Failed to delete questions for event of ID ${ eventId }`);
+            console.error(e);
+
+            return false;
         }
     }
 

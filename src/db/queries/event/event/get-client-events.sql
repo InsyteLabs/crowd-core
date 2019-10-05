@@ -17,4 +17,6 @@ SELECT
 FROM event.event
 
 WHERE
-    client_id=$1;
+    client_id=$1
+    
+ORDER BY start_time;
