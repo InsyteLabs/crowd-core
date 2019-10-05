@@ -189,6 +189,11 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
     {
+        name:     'delete-event',
+        path:     './event/event/delete-event.sql',
+        firstRow: true
+    },
+    {
         name:     'get-event-settings',
         path:     './setting/event/get-event-settings.sql',
         firstRow: true
@@ -201,6 +206,11 @@ export const queries: IQueryDescriptor[] = [
     {
         name:     'update-event-settings',
         path:     './setting/event/update-event-settings.sql',
+        firstRow: true
+    },
+    {
+        name:     'delete-event-settings',
+        path:     './setting/event/delete-event-settings.sql',
         firstRow: true
     },
 
@@ -232,6 +242,10 @@ export const queries: IQueryDescriptor[] = [
         name:     'update-question',
         path:     './event/question/update-question.sql',
         firstRow: true
+    },
+    {
+        name:     'delete-event-questions',
+        path:     './event/question/delete-event-questions.sql'
     },
 
 
