@@ -174,6 +174,11 @@ export const queries: IQueryDescriptor[] = [
         path: './event/event/get-client-events.sql'
     },
     {
+        name:     'get-client-event-by-slug',
+        path:     './event/event/get-client-event-by-slug.sql',
+        firstRow: true
+    },
+    {
         name:     'get-event',
         path:     './event/event/get-event.sql',
         firstRow: true
