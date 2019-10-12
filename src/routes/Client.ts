@@ -40,6 +40,18 @@ router.get('/clients/:id/events', async (req, res, next) => {
     }
 });
 
+router.get('/clients/:id/events/:slug', async (req, res, next) => {
+    const { id, slug } = req.params;
+    try{
+        const event = await eventService.getClientEventBySlug(+id, slug);
+
+        return res.json(event);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 router.post('/clients', async (req, res, next) => {
     try{
         const client = await clientService.createClient(req.body);
