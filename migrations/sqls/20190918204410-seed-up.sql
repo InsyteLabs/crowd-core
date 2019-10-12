@@ -112,11 +112,11 @@ CREATE TABLE event.vote (
 CREATE SCHEMA setting;
 
 CREATE TABLE setting.event (
-    id                serial     NOT NULL PRIMARY KEY,
-    event_id          int        NOT NULL REFERENCES event.event(id),
-    is_locked         boolean    DEFAULT False,
-    require_password  boolean    DEFAULT False,
-    password          char(60),
-    require_login     boolean    DEFAULT False,
-    enable_chat       boolean    DEFAULT True
+    id                serial        NOT NULL PRIMARY KEY,
+    event_id          int           NOT NULL REFERENCES event.event(id),
+    is_locked         boolean       DEFAULT False,
+    require_password  boolean       DEFAULT False,
+    password          varchar(64),
+    require_login     boolean       DEFAULT False,
+    enable_chat       boolean       DEFAULT True
 );
