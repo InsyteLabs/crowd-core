@@ -7,6 +7,7 @@ import {
 import { db }             from '../db';
 import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
+import { clientService } from './client-service';
 
 class EventService{
 
@@ -55,6 +56,25 @@ class EventService{
             console.error(e);
 
             return [];
+        }
+    }
+
+    async getClientEventBySlug(clientId: number, eventSlug: string): Promise<Event>{
+        try{
+            const event     = await db.q('get-client-event-by-slug', [ clientId, eventSlug ]),
+                  questions = await this.getEventQuestions(<number>event.id),
+                  settings  = await this.getEventSettings(<number>event.id);
+            
+            event.questions = questions;
+            event.settings  = settings;
+
+            return Event.from(event);
+        }
+        catch(e){
+            console.error(`Failed to get event of client ID ${ clientId } and slug ${ eventSlug }`);
+            console.error(e);
+
+            return Event.from({});
         }
     }
 
