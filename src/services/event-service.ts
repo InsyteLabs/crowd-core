@@ -316,6 +316,20 @@ class EventService{
         }
     }
 
+    async deleteQuestion(id: number): Promise<boolean>{
+        try{
+            const question = await db.q('delete-question', [ id ]);
+
+            return true;
+        }
+        catch(e){
+            console.error(`Failed to delete question of ID ${ id }`);
+            console.error(e);
+
+            return false;
+        }
+    }
+
     async deleteEventQuestions(eventId: number): Promise<boolean>{
         try{
             const questions = await db.q('delete-event-questions', [ eventId ]);
@@ -340,7 +354,7 @@ class EventService{
         try{
             const question = await db.q('create-question', args);
 
-            return Question.from(question);
+            return this.getQuestion(question.id);
         }
         catch(e){
             console.error(`Failed to create question for event of ID ${ q.eventId }`);

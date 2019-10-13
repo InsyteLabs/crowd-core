@@ -249,8 +249,13 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
     {
-        name:     'delete-event-questions',
-        path:     './event/question/delete-event-questions.sql'
+        name: 'delete-event-questions',
+        path: './event/question/delete-event-questions.sql'
+    },
+    {
+        name:     'delete-question',
+        path:     './event/question/delete-question.sql',
+        firstRow: true
     },
 
 

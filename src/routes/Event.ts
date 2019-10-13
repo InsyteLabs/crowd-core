@@ -105,6 +105,17 @@ router.put('/events/:id/questions/:questionId', async (req, res, next) => {
     }
 });
 
+router.delete('/events/:id/questions/:questionId', async (req, res, next) => {
+    try{
+        const deleted = await eventService.deleteQuestion(+req.params.questionId);
+
+        return res.json({ deleted });
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 
 /*
     ======================
