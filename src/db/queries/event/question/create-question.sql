@@ -14,6 +14,8 @@ VALUES
 )
 
 RETURNING
+    id,
     event_id,
     user_id,
-    text;
+    text,
+    hidden;
