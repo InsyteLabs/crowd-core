@@ -83,6 +83,17 @@ router.get('/events/:id/questions', async (req, res, next) => {
     }
 });
 
+router.get('/events/:id/questions/:questionId', async (req, res, next) => {
+    try{
+        const question = await eventService.getQuestion(+req.params.questionId);
+
+        return res.json(question);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 router.post('/events/:id/questions', async (req, res, next) => {
     try{
         const question = await eventService.createQuestion(req.body);

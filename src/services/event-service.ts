@@ -277,7 +277,7 @@ class EventService{
     async getQuestion(id: number): Promise<Question>{
         try{
             const question = await db.q('get-question', [ id ]),
-                  stats    = await this.getQuestionScore(question.eventId, id);
+                  stats    = await this.getQuestionScore(question.event_id, id);
 
             question.stats = stats;
 
