@@ -198,7 +198,7 @@ class EventService{
         try{
             const settings = await db.q('get-event-settings', [ eventId ]);
 
-            return EventSettings.from(settings);
+            return EventSettings.from(settings || {});
         }
         catch(e){
             console.error(`Failed to get settings for event of id ${ eventId }`);
@@ -318,6 +318,12 @@ class EventService{
 
     async deleteQuestion(id: number): Promise<boolean>{
         try{
+            const votesDeleted = await this.deleteQuestionVotes(id);
+
+            if(!votesDeleted){
+                throw new Error(`Error deleting votes for question of ID ${ id }, cannot delete question`);
+            }
+
             const question = await db.q('delete-question', [ id ]);
 
             return true;
@@ -396,7 +402,7 @@ class EventService{
         try{
             let vote = await db.q('get-question-vote-by-user', [ questionId, userId ]);
 
-            return Vote.from(vote);
+            return Vote.from(vote || {});
         }
         catch(e){
             console.error(`Error fetching vote of questionId ${ questionId } and userId ${ userId }`);
@@ -449,6 +455,20 @@ class EventService{
             console.error(e);
 
             return Vote.from({});
+        }
+    }
+
+    async deleteQuestionVotes(questionId: number): Promise<boolean>{
+        try{
+            const deleted = await db.q('delete-question-votes', [ questionId ]);
+
+            return true;
+        }
+        catch(e){
+            console.error(`Failed to delete votes for question of ID ${ questionId }`);
+            console.error(e);
+
+            return false;
         }
     }
 
