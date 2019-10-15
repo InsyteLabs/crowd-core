@@ -382,7 +382,7 @@ class EventService{
         try{
             const question = await db.q('update-question', args);
 
-            return Question.from(question);
+            return this.getQuestion(question.id);
         }
         catch(e){
             console.error(`Failed to update question for event of ID ${ q.eventId }`);
@@ -472,15 +472,17 @@ class EventService{
         }
     }
 
-    async deleteVote(voteId: number): Promise<void>{
+    async deleteVote(voteId: number): Promise<boolean>{
         try{
             const deleted = await db.q('delete-vote', [ voteId ]);
+
+            return true;
         }
         catch(e){
             console.error(`Error deleting vote of ID ${ voteId }`);
             console.error(e);
 
-            throw e;
+            return false;
         }
     }
 
