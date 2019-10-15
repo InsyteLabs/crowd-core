@@ -1,5 +1,6 @@
 'use strict';
 
+import * as WebSocket   from 'ws';
 import { Router }       from 'express';
 import { eventService } from '../services';
 import { sendError }    from '../utilities';
@@ -37,7 +38,17 @@ router.post('/events', async (req, res, next) => {
     try{
         const event = await eventService.createEvent(req.body);
 
-        return res.json(event);
+        res.json(event);
+
+        let wss: WebSocket.Server = res.locals.wss;
+        if(wss){
+            wss.clients.forEach((client) => {
+                client.send(JSON.stringify({
+                    type: 'new-event',
+                    data: event
+                }));
+            });
+        }
     }
     catch(e){
         return sendError(res, e);
