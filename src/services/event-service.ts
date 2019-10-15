@@ -7,7 +7,6 @@ import {
 import { db }             from '../db';
 import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
-import { clientService } from './client-service';
 
 class EventService{
 
@@ -172,11 +171,7 @@ class EventService{
 
     async deleteEvent(id: number): Promise<Event>{
         try{
-            const settings  = await db.q('delete-event-settings', [ id ]),
-                  questions = await db.q('delete-event-questions', [ id ]),
-                  event     = await db.q('delete-event', [ id ]);
-
-            event.settings = settings;
+            const event = await db.q('delete-event', [ id ]);
 
             return Event.from(event);
         }
@@ -564,7 +559,7 @@ class EventService{
         try{
             const deleted = await db.q('delete-event-message', [ id ]);
 
-            return deleted ? true : false;
+            return true
         }
         catch(e){
             console.error(`Failed to delete message of ID ${ id }`);
