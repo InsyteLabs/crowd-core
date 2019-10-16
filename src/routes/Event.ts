@@ -1,11 +1,14 @@
 'use strict';
 
-import * as WebSocket   from 'ws';
-import { Router }       from 'express';
-import { eventService } from '../services';
-import { sendError }    from '../utilities';
+import * as WebSocket     from 'ws';
+import { Router }         from 'express';
+import { eventService }   from '../services';
+import { sendError }      from '../utilities';
+import { getCurrentUser } from '../middleware';
 
 const router = Router();
+
+router.use(getCurrentUser);
 
 /*
     ============
