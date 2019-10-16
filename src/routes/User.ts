@@ -6,8 +6,11 @@ import conf               from '../conf';
 import { SECONDS_IN_DAY } from '../constants';
 import { userService }    from '../services';
 import { sendError }      from '../utilities';
+import { getCurrentUser } from '../middleware';
 
 const router = Router();
+
+router.use(getCurrentUser);
 
 router.get('/users', async (req, res, next) => {
     try{

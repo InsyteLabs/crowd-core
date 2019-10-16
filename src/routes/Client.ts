@@ -3,8 +3,11 @@
 import { Router }                      from 'express';
 import { clientService, eventService } from '../services';
 import { sendError }                   from '../utilities';
+import { getCurrentUser }              from '../middleware';
 
 const router = Router();
+
+router.use(getCurrentUser);
 
 router.get('/clients', async (req, res, next) => {
     const clients = await clientService.getClients();
