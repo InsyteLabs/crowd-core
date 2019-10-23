@@ -1,9 +1,10 @@
 'use strict';
 
-import { Router }                      from 'express';
-import { clientService, eventService } from '../services';
-import { sendError }                   from '../utilities';
-import { getCurrentUser }              from '../middleware';
+import { Router }         from 'express';
+import { sendError }      from '../utilities';
+import { getCurrentUser } from '../middleware';
+
+import { clientService, eventService, userService } from '../services';
 
 const router = Router();
 
@@ -55,6 +56,19 @@ router.get('/clients/:id/events/:slug', async (req, res, next) => {
     }
 });
 
+router.get('/clients/:id/users', async (req, res, next) => {
+    const { id } = req.params;
+
+    try{
+        const users = await userService.getUsersByClient(+id);
+
+        return res.json(users);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 router.post('/clients', async (req, res, next) => {
     try{
         const client = await clientService.createClient(req.body);
@@ -68,7 +82,6 @@ router.post('/clients', async (req, res, next) => {
 
 router.put('/clients/:id', async (req, res, next) => {
     try{
-        console.log(req.body);
         const client = await clientService.updateClient(req.body);
 
         return res.json(client);

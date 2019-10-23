@@ -90,6 +90,10 @@ export const queries: IQueryDescriptor[] = [
         path: './account/user/get-users.sql'
     },
     {
+        name: 'get-users-by-client',
+        path: './account/user/get-users-by-client.sql'
+    },
+    {
         name:     'get-user',
         path:     './account/user/get-user.sql',
         firstRow: true

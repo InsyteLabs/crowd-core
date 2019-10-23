@@ -38,6 +38,28 @@ class UserService{
         }
     }
 
+    async getUsersByClient(clientId: number): Promise<User[]>{
+        try{
+            const users = await db.q('get-users-by-client', [ clientId ]);
+
+            for(let i = 0, len = users.length; i < len; i++){
+                const user = users[i];
+
+                const roles: IRole[] = await this.getUserRoles(user.id);
+
+                user.roles = roles.map(r => r.name);
+            }
+
+            return users.map((u: any) => User.from(u));
+        }
+        catch(e){
+            console.error(`Failed to get users of clientId ${ clientId }`);
+            console.error(e);
+
+            return [];
+        }
+    }
+
     async getUser(id: number): Promise<User>{
         try{
             const user  = await db.query('get-user', [ id ]),
