@@ -250,6 +250,23 @@ class UserService{
         return this.updateUser(user);
     }
 
+    async deleteUser(id: number): Promise<User>{
+        let user;
+        try{
+            user = await db.q('delete-user', [ id ]);
+
+            user.roles = [];
+
+            return User.from(user);
+        }
+        catch(e){
+            console.error(`Error deleting user of Id ${ id }`);
+            console.error(e);
+
+            return User.from({});
+        }
+    }
+
 
     /*
         ============

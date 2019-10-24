@@ -127,6 +127,17 @@ router.put('/users/:id', async (req, res, next) => {
     }
 });
 
+router.delete('/users/:id', async (req, res, next) => {
+    try{
+        const user = await userService.deleteUser(+req.params.id);
+
+        return res.json(user);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 router.get('/users/:id/disable', async (req, res, next) => {
     try{
         const user = await userService.disableUser(+req.params.id, 'Disabled via API');
