@@ -8,15 +8,12 @@ import bodyParser     from 'body-parser';
 import * as WebSocket from 'ws';
 import { router }     from './routes';
 
+import { createSocketServer, wsClients } from './web-sockets';
 
 const app    = Express(),
       server = http.createServer(app);
 
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', (ws: WebSocket) => {
-    ws.send('{"message": "connection-accepted"}');
-});
+const wss: WebSocket.Server = createSocketServer(server);
 
 app.set('case sensitive routing', true);
 app.enable('trust proxy'); // If running behind Nginx proxy
@@ -29,7 +26,8 @@ app.use(jsonBody, urlBody);
 // Remove "X-Powered-By" header
 app.use((req, res, next) => {
     // Attach reference to websocket server for route handlers
-    res.locals.wss = wss;
+    res.locals.wss        = wss;
+    res.locals.wsClients = wsClients;
 
     res.removeHeader('X-Powered-By');
 
