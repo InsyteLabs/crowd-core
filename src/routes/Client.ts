@@ -2,9 +2,10 @@
 
 import { Router }         from 'express';
 import { sendError }      from '../utilities';
-import { getCurrentUser } from '../middleware';
+import { getCurrentUser, getClient } from '../middleware';
 
 import { clientService, eventService, userService } from '../services';
+import { ISocketClientsMap } from '../interfaces';
 
 const router = Router();
 
@@ -33,6 +34,34 @@ router.get('/clients/slug/:slug', async (req, res, next) => {
     }
 });
 
+router.post('/clients', async (req, res, next) => {
+    try{
+        const client = await clientService.createClient(req.body);
+
+        return res.json(client);
+    }
+    catch(e){
+        return res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+router.put('/clients/:id', async (req, res, next) => {
+    try{
+        const client = await clientService.updateClient(req.body);
+
+        return res.json(client);
+    }
+    catch(e){
+        return res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+
+/*
+    =============
+    CLIENT EVENTS
+    =============
+*/
 router.get('/clients/:id/events', async (req, res, next) => {
     try{
         const events = await eventService.getClientEvents(+req.params.id);
@@ -56,6 +85,39 @@ router.get('/clients/:id/events/:slug', async (req, res, next) => {
     }
 });
 
+router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const event = await eventService.createEvent(req.body);
+
+        res.json(event);
+
+        let clientSlug: string      = res.locals.client.slug,
+            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+
+        if(wsClients && wsClients.length){
+            wsClients.forEach((c: WebSocket) => {
+                c.send(JSON.stringify({
+                    type: 'new-event',
+                    data: event
+                }));
+            });
+        }
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+
+/*
+    ============
+    CLIENT USERS
+    ============
+*/
 router.get('/clients/:id/users', async (req, res, next) => {
     const { id } = req.params;
 
@@ -69,26 +131,5 @@ router.get('/clients/:id/users', async (req, res, next) => {
     }
 });
 
-router.post('/clients', async (req, res, next) => {
-    try{
-        const client = await clientService.createClient(req.body);
-
-        return res.json(client);
-    }
-    catch(e){
-        return res.status(500).json({ message: 'Server Error' });
-    }
-});
-
-router.put('/clients/:id', async (req, res, next) => {
-    try{
-        const client = await clientService.updateClient(req.body);
-
-        return res.json(client);
-    }
-    catch(e){
-        return res.status(500).json({ message: 'Server Error' });
-    }
-});
 
 export default router;
