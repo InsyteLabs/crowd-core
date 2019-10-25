@@ -147,10 +147,9 @@ class UserService{
             user = await db.q('get-user-by-username', [ username ]);
         }
         catch(e){
-            return Promise.reject(false);
+            return false
         }
-
-        if(!user) return Promise.reject(false);
+        if(!user) return false
 
         return this._checkPassword(password, user.password);
     }

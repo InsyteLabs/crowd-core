@@ -59,7 +59,7 @@ router.post('/authenticate', async (req, res, next) => {
               valid = await userService.checkUserPassword(username, password);
 
         if(!valid){
-            return res.status(400).json({
+            return res.status(401).json({
                 message: 'Incorrect username/password'
             });
         }
