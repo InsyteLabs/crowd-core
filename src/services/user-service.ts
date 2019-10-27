@@ -38,6 +38,28 @@ class UserService{
         }
     }
 
+    async getUsersByClient(clientId: number): Promise<User[]>{
+        try{
+            const users = await db.q('get-users-by-client', [ clientId ]);
+
+            for(let i = 0, len = users.length; i < len; i++){
+                const user = users[i];
+
+                const roles: IRole[] = await this.getUserRoles(user.id);
+
+                user.roles = roles.map(r => r.name);
+            }
+
+            return users.map((u: any) => User.from(u));
+        }
+        catch(e){
+            console.error(`Failed to get users of clientId ${ clientId }`);
+            console.error(e);
+
+            return [];
+        }
+    }
+
     async getUser(id: number): Promise<User>{
         try{
             const user  = await db.query('get-user', [ id ]),
@@ -125,10 +147,9 @@ class UserService{
             user = await db.q('get-user-by-username', [ username ]);
         }
         catch(e){
-            return Promise.reject(false);
+            return false
         }
-
-        if(!user) return Promise.reject(false);
+        if(!user) return false
 
         return this._checkPassword(password, user.password);
     }
@@ -226,6 +247,23 @@ class UserService{
         user.disabledComment = null;
 
         return this.updateUser(user);
+    }
+
+    async deleteUser(id: number): Promise<User>{
+        let user;
+        try{
+            user = await db.q('delete-user', [ id ]);
+
+            user.roles = [];
+
+            return User.from(user);
+        }
+        catch(e){
+            console.error(`Error deleting user of Id ${ id }`);
+            console.error(e);
+
+            return User.from({});
+        }
     }
 
 

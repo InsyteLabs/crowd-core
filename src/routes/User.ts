@@ -6,8 +6,11 @@ import conf               from '../conf';
 import { SECONDS_IN_DAY } from '../constants';
 import { userService }    from '../services';
 import { sendError }      from '../utilities';
+import { getCurrentUser } from '../middleware';
 
 const router = Router();
+
+router.use(getCurrentUser);
 
 router.get('/users', async (req, res, next) => {
     try{
@@ -56,7 +59,7 @@ router.post('/authenticate', async (req, res, next) => {
               valid = await userService.checkUserPassword(username, password);
 
         if(!valid){
-            return res.status(400).json({
+            return res.status(401).json({
                 message: 'Incorrect username/password'
             });
         }
@@ -121,6 +124,17 @@ router.put('/users/:id', async (req, res, next) => {
     }
     catch(e){
         return res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+router.delete('/users/:id', async (req, res, next) => {
+    try{
+        const user = await userService.deleteUser(+req.params.id);
+
+        return res.json(user);
+    }
+    catch(e){
+        return sendError(res, e);
     }
 });
 

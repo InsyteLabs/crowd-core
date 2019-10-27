@@ -1,11 +1,21 @@
 'use strict';
 
-import { Router }                      from 'express';
-import { clientService, eventService } from '../services';
-import { sendError }                   from '../utilities';
+import { Router }                                   from 'express';
+import { sendError }                                from '../utilities';
+import { getCurrentUser, getClient }                from '../middleware';
+import { SocketServer }                             from '../web-sockets';
+import { clientService, eventService, userService } from '../services';
 
 const router = Router();
 
+router.use(getCurrentUser);
+
+
+/*
+    =======
+    CLIENTS
+    =======
+*/
 router.get('/clients', async (req, res, next) => {
     const clients = await clientService.getClients();
     
@@ -29,6 +39,113 @@ router.get('/clients/slug/:slug', async (req, res, next) => {
     }
 });
 
+router.post('/clients', async (req, res, next) => {
+    try{
+        const client = await clientService.createClient(req.body);
+
+        return res.json(client);
+    }
+    catch(e){
+        return res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+router.put('/clients/:id', async (req, res, next) => {
+    try{
+        const client = await clientService.updateClient(req.body);
+
+        return res.json(client);
+    }
+    catch(e){
+        return res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+
+/*
+    ============
+    CLIENT USERS
+    ============
+*/
+router.get('/clients/:id/users', async (req, res, next) => {
+    const { id } = req.params;
+
+    try{
+        const users = await userService.getUsersByClient(+id);
+
+        return res.json(users);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+    
+    try{
+        const user = await userService.createUser(req.body);
+
+        res.json(user);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'user-created', user);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const user = await userService.updateUser(req.body);
+
+        res.json(user);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'user-updated', user);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const user = await userService.deleteUser(+req.params.userId);
+
+        res.json(user);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'user-deleted', user);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+
+/*
+    =============
+    CLIENT EVENTS
+    =============
+*/
 router.get('/clients/:id/events', async (req, res, next) => {
     try{
         const events = await eventService.getClientEvents(+req.params.id);
@@ -52,26 +169,63 @@ router.get('/clients/:id/events/:slug', async (req, res, next) => {
     }
 });
 
-router.post('/clients', async (req, res, next) => {
-    try{
-        const client = await clientService.createClient(req.body);
+router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
 
-        return res.json(client);
+    try{
+        const event = await eventService.createEvent(req.body);
+
+        res.json(event);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'event-created', event);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return sendError(res, e);
     }
 });
 
-router.put('/clients/:id', async (req, res, next) => {
-    try{
-        console.log(req.body);
-        const client = await clientService.updateClient(req.body);
+router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
 
-        return res.json(client);
+    try{
+        const event = await eventService.updateEvent(req.body);
+
+        res.json(event);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'event-updated', event);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return sendError(res, e);
+    }
+});
+
+router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const event = await eventService.deleteEvent(+req.params.eventId);
+
+        res.json(event);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'event-deleted', event);
+    }
+    catch(e){
+        return sendError(res, e);
     }
 });
 

@@ -2,38 +2,45 @@
 
 require('source-map-support').install();
 
-import Express    from 'express';
-import bodyParser from 'body-parser';
-import { router } from './routes';
+import * as http        from 'http';
+import Express          from 'express';
+import bodyParser       from 'body-parser';
+import { router }       from './routes';
+import { SocketServer } from './web-sockets';
 
-const server = Express();
+const app:          Express.Express = Express(),
+      server:       http.Server     = http.createServer(app),
+      socketServer: SocketServer    = new SocketServer(server);
 
-server.set('case sensitive routing', true);
-server.enable('trust proxy'); // If running behind Nginx proxy
+app.set('case sensitive routing', true);
+app.enable('trust proxy'); // If running behind Nginx proxy
 
 // Accept form data
 const jsonBody = bodyParser.json(),
       urlBody  = bodyParser.urlencoded({ extended: true });
-server.use(jsonBody, urlBody);
+app.use(jsonBody, urlBody);
 
 // Remove "X-Powered-By" header
-server.use((req, res, next) => {
+app.use((req, res, next) => {
+    // Attach reference to websocket server for route handlers
+    res.locals.socketServer = socketServer;
+
     res.removeHeader('X-Powered-By');
 
     res.header({
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Origin':  '*',
-        'Access-Control-Allow-Headers': 'Content-Type'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
     });
 
     next();
 });
 
-server.get('/', (req, res, next) => {
+app.get('/', (req, res, next) => {
     return res.send({ message: 'OK' });
 });
 
-server.use(router);
+app.use(router);
 
 server.listen(8080, () => {
     console.log('Server listening on 8080');
