@@ -108,6 +108,60 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
     }
 });
 
+router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const user = await userService.updateUser(req.body);
+
+        res.json(user);
+
+        let clientSlug: string      = res.locals.client.slug,
+            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+
+        if(wsClients && wsClients.length){
+            wsClients.forEach((c: WebSocket) => {
+                c.send(JSON.stringify({
+                    type: 'user-updated',
+                    data: user
+                }));
+            });
+        }
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const user = await userService.deleteUser(+req.params.userId);
+
+        res.json(user);
+
+        let clientSlug: string      = res.locals.client.slug,
+            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+
+        if(wsClients && wsClients.length){
+            wsClients.forEach((c: WebSocket) => {
+                c.send(JSON.stringify({
+                    type: 'user-deleted',
+                    data: user
+                }));
+            });
+        }
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 
 /*
     =============
