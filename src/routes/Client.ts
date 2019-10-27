@@ -11,6 +11,12 @@ const router = Router();
 
 router.use(getCurrentUser);
 
+
+/*
+    =======
+    CLIENTS
+    =======
+*/
 router.get('/clients', async (req, res, next) => {
     const clients = await clientService.getClients();
     
@@ -53,6 +59,52 @@ router.put('/clients/:id', async (req, res, next) => {
     }
     catch(e){
         return res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+
+/*
+    ============
+    CLIENT USERS
+    ============
+*/
+router.get('/clients/:id/users', async (req, res, next) => {
+    const { id } = req.params;
+
+    try{
+        const users = await userService.getUsersByClient(+id);
+
+        return res.json(users);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+    
+    try{
+        const user = await userService.createUser(req.body);
+
+        res.json(user);
+
+        let clientSlug: string      = res.locals.client.slug,
+            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+
+        if(wsClients && wsClients.length){
+            wsClients.forEach((c: WebSocket) => {
+                c.send(JSON.stringify({
+                    type: 'user-created',
+                    data: user
+                }));
+            });
+        }
+    }
+    catch(e){
+        return sendError(res, e);
     }
 });
 
@@ -164,26 +216,6 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
     catch(e){
         return sendError(res, e);
     }
-})
-
-
-/*
-    ============
-    CLIENT USERS
-    ============
-*/
-router.get('/clients/:id/users', async (req, res, next) => {
-    const { id } = req.params;
-
-    try{
-        const users = await userService.getUsersByClient(+id);
-
-        return res.json(users);
-    }
-    catch(e){
-        return sendError(res, e);
-    }
 });
-
 
 export default router;
