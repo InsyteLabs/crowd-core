@@ -5,25 +5,88 @@ import * as WS   from 'ws';
 
 import { ISocketClientsMap } from '../interfaces';
 
-export const wsClients: ISocketClientsMap = {}
+export class SocketServer{
+    private INTERVAL: number = 5000; // 5 seconds
 
-export function createSocketServer(server: http.Server): WS.Server{
-    const wss = new WS.Server({ server });
+    private _server!: WS.Server;
+    private _clients: ISocketClientsMap = {};
 
-    wss.on('connection', (ws: WebSocket, req: Request): void => {
-        if(!req.url.includes('/client/')) return ws.close();
+    constructor(server: http.Server){
+        this._server = new WS.Server({ server });
 
-        const slug: string = req.url.replace('/client/', '');
+        this._server.on('connection', (ws: WS, req: Request): void => {
+            // Socket clients must provide a client slug for channel notifications
+            if(!req.url.includes('/client/')) return ws.close();
 
-        if(wsClients.hasOwnProperty(slug) && Array.isArray(wsClients[slug])){
-            wsClients[slug].push(ws);
+            const slug: string = req.url.replace('/client/', '');
+    
+            if(this._clients.hasOwnProperty(slug) && Array.isArray(this._clients[slug])){
+                this._clients[slug].push(ws);
+            }
+            else{
+                this._clients[slug] = [ws];
+            }
+
+            ws.send('{"message": "connection-accepted"}');
+
+            /*
+                =========
+                HEARTBEAT
+                =========
+            */
+            (<any>ws).isAlive = true;
+
+            ws.on('pong', () => (<any>ws).isAlive = true);
+        });
+
+        setInterval(this._pruneClients.bind(this), this.INTERVAL);
+
+        return this;
+    }
+
+    messageClients(clientSlug: string, type: string, data: any): void{
+        if(!this._clients[clientSlug] || !Array.isArray(this._clients[clientSlug])) return;
+
+        const clients: WS[] = this._clients[clientSlug];
+
+        const msg = JSON.stringify({ type, data });
+
+        clients.forEach(c => c.send(msg));
+    }
+    
+
+    /*
+        ===============
+        PRIVATE METHODS
+        ===============
+    */
+    private _pruneClients(): void{
+
+        let clientCount: number = 0;
+
+        // Filter out clients that have died
+        for(const key in this._clients){
+            this._clients[key] = this._clients[key].filter((c: WS) => [c.CONNECTING, c.OPEN].includes(c.readyState));
+
+            clientCount += this._clients[key].length;
         }
-        else{
-            wsClients[slug] = [ws];
+
+        if(clientCount !== this._server.clients.size){
+            console.log('SocketServer._clients.length !== SocketServer._server.clients.length');
+            console.log(`SocketServer._clients.length: ${ clientCount }`);
+            console.log(`SocketServer._server.clients.length: ${ this._server.clients.size }`);
+
+            throw new Error('Socket clients out of sync, maybe failed to prune?');
         }
 
-        ws.send('{"message": "connection-accepted"}');
-    });
+        this._server.clients.forEach(c => {
+            if(!(<any>c).isAlive){
+                return c.terminate();
+            }
 
-    return wss;
+            (<any>c).isAlive = false;
+            
+            c.ping(null, false);
+        });
+    }
 }

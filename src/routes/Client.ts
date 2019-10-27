@@ -1,11 +1,10 @@
 'use strict';
 
-import { Router }         from 'express';
-import { sendError }      from '../utilities';
-import { getCurrentUser, getClient } from '../middleware';
-
+import { Router }                                   from 'express';
+import { sendError }                                from '../utilities';
+import { getCurrentUser, getClient }                from '../middleware';
+import { SocketServer }                             from '../web-sockets';
 import { clientService, eventService, userService } from '../services';
-import { ISocketClientsMap } from '../interfaces';
 
 const router = Router();
 
@@ -91,17 +90,10 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
 
         res.json(user);
 
-        let clientSlug: string      = res.locals.client.slug,
-            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
 
-        if(wsClients && wsClients.length){
-            wsClients.forEach((c: WebSocket) => {
-                c.send(JSON.stringify({
-                    type: 'user-created',
-                    data: user
-                }));
-            });
-        }
+        socketServer.messageClients(clientSlug, 'user-created', user);
     }
     catch(e){
         return sendError(res, e);
@@ -118,17 +110,10 @@ router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next)
 
         res.json(user);
 
-        let clientSlug: string      = res.locals.client.slug,
-            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
 
-        if(wsClients && wsClients.length){
-            wsClients.forEach((c: WebSocket) => {
-                c.send(JSON.stringify({
-                    type: 'user-updated',
-                    data: user
-                }));
-            });
-        }
+        socketServer.messageClients(clientSlug, 'user-updated', user);
     }
     catch(e){
         return sendError(res, e);
@@ -145,17 +130,10 @@ router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, ne
 
         res.json(user);
 
-        let clientSlug: string      = res.locals.client.slug,
-            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
 
-        if(wsClients && wsClients.length){
-            wsClients.forEach((c: WebSocket) => {
-                c.send(JSON.stringify({
-                    type: 'user-deleted',
-                    data: user
-                }));
-            });
-        }
+        socketServer.messageClients(clientSlug, 'user-deleted', user);
     }
     catch(e){
         return sendError(res, e);
@@ -201,17 +179,10 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
 
         res.json(event);
 
-        let clientSlug: string      = res.locals.client.slug,
-            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
 
-        if(wsClients && wsClients.length){
-            wsClients.forEach((c: WebSocket) => {
-                c.send(JSON.stringify({
-                    type: 'event-created',
-                    data: event
-                }));
-            });
-        }
+        socketServer.messageClients(clientSlug, 'event-created', event);
     }
     catch(e){
         return sendError(res, e);
@@ -228,17 +199,10 @@ router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, nex
 
         res.json(event);
 
-        let clientSlug: string      = res.locals.client.slug,
-            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
 
-        if(wsClients && wsClients.length){
-            wsClients.forEach((c: WebSocket) => {
-                c.send(JSON.stringify({
-                    type: 'event-updated',
-                    data: event
-                }));
-            });
-        }
+        socketServer.messageClients(clientSlug, 'event-updated', event);
     }
     catch(e){
         return sendError(res, e);
@@ -255,17 +219,10 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
 
         res.json(event);
 
-        let clientSlug: string      = res.locals.client.slug,
-            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
-        
-        if(wsClients && wsClients.length){
-            wsClients.forEach((c: WebSocket) => {
-                c.send(JSON.stringify({
-                    type: 'event-deleted',
-                    data: event
-                }));
-            });
-        }
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'event-deleted', event);
     }
     catch(e){
         return sendError(res, e);
