@@ -144,7 +144,10 @@ class EventService{
         ];
 
         try{
-            const updatedEvent = await db.q('update-event', args);
+            const updatedEvent = await db.q('update-event', args),
+                  questions    = await this.getEventQuestions(updatedEvent.id);
+
+            updatedEvent.questions = questions;
 
             if(event.settings){
                 try{

@@ -112,6 +112,60 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
     }
 });
 
+router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const event = await eventService.updateEvent(req.body);
+
+        res.json(event);
+
+        let clientSlug: string      = res.locals.client.slug,
+            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+
+        if(wsClients && wsClients.length){
+            wsClients.forEach((c: WebSocket) => {
+                c.send(JSON.stringify({
+                    type: 'event-updated',
+                    data: event
+                }));
+            });
+        }
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const event = await eventService.deleteEvent(+req.params.eventId);
+
+        res.json(event);
+
+        let clientSlug: string      = res.locals.client.slug,
+            wsClients:  WebSocket[] = res.locals.wsClients[clientSlug];
+        
+        if(wsClients && wsClients.length){
+            wsClients.forEach((c: WebSocket) => {
+                c.send(JSON.stringify({
+                    type: 'event-deleted',
+                    data: event
+                }));
+            });
+        }
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+})
+
 
 /*
     ============
