@@ -101,7 +101,7 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
         if(wsClients && wsClients.length){
             wsClients.forEach((c: WebSocket) => {
                 c.send(JSON.stringify({
-                    type: 'new-event',
+                    type: 'event-created',
                     data: event
                 }));
             });
