@@ -27,7 +27,7 @@ export class SocketServer{
                 this._clients[slug] = [ws];
             }
 
-            ws.send('{"message": "connection-accepted"}');
+            ws.send('{"type": "connection-accepted"}');
 
             /*
                 =========
