@@ -306,4 +306,43 @@ router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getCli
     }
 });
 
+
+/*
+    ==================================
+    CLIENT EVENT QUESTION VOTE METHODS
+    ==================================
+*/
+router.get('/clients/:clientId/events/:eventId/questions/:questionId/votes', async (req, res, next) => {
+    try{
+        const { eventId, questionId } = req.params;
+
+        const score = await eventService.getQuestionScore(+eventId, +questionId);
+
+        return res.json(score);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const vote = await eventService.createQuestionVote(req.body);
+        
+        res.json(vote);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'vote-created', vote);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 export default router;
