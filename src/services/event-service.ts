@@ -423,16 +423,16 @@ class EventService{
         }
 
         if(existing && existing.id){
-            if(existing.value === vote.value){
-                return existing;
+            try{
+                const deleted = await this.deleteVote(existing.id);
+
+                // If vote was the same, do not write new vote (un-vote)
+                if(existing.value === vote.value){
+                    return Vote.from({});
+                }
             }
-            else{
-                try{
-                    await this.deleteVote(existing.id);
-                }
-                catch(e){
-                    throw e;
-                }
+            catch(e){
+                throw e;
             }
         }
 
