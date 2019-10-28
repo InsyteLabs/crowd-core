@@ -229,4 +229,81 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
     }
 });
 
+
+/*
+    ============================
+    CLIENT EVENT QUESTION ROUTES
+    ============================
+*/
+router.get('/clients/:clientId/events/:eventId/questions', async (req, res, next) => {
+    try{
+        const questions = await eventService.getEventQuestions(+req.params.eventId);
+
+        return res.json(questions);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.post('/clients/:clientId/events/:eventId/questions', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const question = await eventService.createQuestion(req.body);
+
+        res.json(question);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'question-created', question);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const question = await eventService.updateQuestion(req.body);
+
+        res.json(question);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'question-updated', question);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
+router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const deleted = await eventService.deleteQuestion(+req.params.questionId);
+
+        res.json({ deleted });
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'question-deleted', deleted);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 export default router;
