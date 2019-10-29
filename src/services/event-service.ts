@@ -43,7 +43,7 @@ class EventService{
                 catch(e){
                     console.error(`Failed to get questions for event of ID ${ event.id }`);
                     console.error(e);
-
+                    
                     event.questions = [];
                 }
             }
@@ -314,37 +314,31 @@ class EventService{
         }
     }
 
-    async deleteQuestion(id: number): Promise<boolean>{
+    async deleteQuestion(id: number): Promise<Question>{
         try{
-            const votesDeleted = await this.deleteQuestionVotes(id);
-
-            if(!votesDeleted){
-                throw new Error(`Error deleting votes for question of ID ${ id }, cannot delete question`);
-            }
-
             const question = await db.q('delete-question', [ id ]);
 
-            return true;
+            return Question.from(question || {});
         }
         catch(e){
             console.error(`Failed to delete question of ID ${ id }`);
             console.error(e);
 
-            return false;
+            return Question.from({});
         }
     }
 
-    async deleteEventQuestions(eventId: number): Promise<boolean>{
+    async deleteEventQuestions(eventId: number): Promise<Question[]>{
         try{
             const questions = await db.q('delete-event-questions', [ eventId ]);
 
-            return true;
+            return questions.map(Question.from);
         }
         catch(e){
             console.error(`Failed to delete questions for event of ID ${ eventId }`);
             console.error(e);
 
-            return false;
+            return [];
         }
     }
 
@@ -410,7 +404,7 @@ class EventService{
         }
     }
 
-    async createQuestionVote(vote: Vote): Promise<Vote>{
+    async createQuestionVote(vote: Vote): Promise<Question>{
         let existing
         try{
             existing = await this.getQuestionVoteByUser(vote.questionId, vote.userId);
@@ -419,7 +413,7 @@ class EventService{
             console.error(`Error fetching existing vote of questionId ${ vote.questionId } and userId ${ vote.userId }`);
             console.error(e);
 
-            return Vote.from({});
+            return this.getQuestion(vote.questionId);
         }
 
         if(existing && existing.id){
@@ -428,7 +422,7 @@ class EventService{
 
                 // If vote was the same, do not write new vote (un-vote)
                 if(existing.value === vote.value){
-                    return Vote.from({});
+                    return this.getQuestion(vote.questionId);
                 }
             }
             catch(e){
@@ -445,14 +439,15 @@ class EventService{
 
         try{
             let vote = await db.q('create-question-vote', args);
+                vote = Vote.from(vote);
             
-            return Vote.from(vote);
+            return this.getQuestion(vote.questionId);
         }
         catch(e){
             console.error(`Error creating vote of questionId ${ vote.questionId } and userId ${ vote.userId }`);
             console.error(e);
 
-            return Vote.from({});
+            return this.getQuestion(vote.questionId);
         }
     }
 

@@ -26,7 +26,7 @@ export class Question{
             userId:  q.user_id,
             text:    q.text,
             hidden:  q.hidden,
-            stats:   q.stats
+            stats:   q.stats || {}
         });
     }
 }

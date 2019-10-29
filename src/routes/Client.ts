@@ -331,14 +331,14 @@ router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', ge
     }
 
     try{
-        const vote = await eventService.createQuestionVote(req.body);
+        const question = await eventService.createQuestionVote(req.body);
         
-        res.json(vote);
+        res.json(question);
 
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'vote-created', vote);
+        socketServer.messageClients(clientSlug, 'question-updated', question);
     }
     catch(e){
         return sendError(res, e);
