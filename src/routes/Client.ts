@@ -100,6 +100,26 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
     }
 });
 
+router.post('/clients/:clientId/users/anonymous', getClient, async (req, res, next) => {
+    if(!res.locals.client){
+        return sendError(res, new Error('Client account not identified'));
+    }
+
+    try{
+        const user = await userService.createAnonymousUser(res.locals.client.id);
+
+        res.json(user);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'user-created', user);
+    }
+    catch(e){
+        return sendError(res, e);
+    }
+});
+
 router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
     if(!res.locals.client){
         return sendError(res, new Error('Client account not identified'));

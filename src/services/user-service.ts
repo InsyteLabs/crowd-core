@@ -1,6 +1,7 @@
 'use strict';
 
 import * as bcrypt from 'bcrypt';
+import uuid        from 'uuid/v4';
 
 import { db }    from '../db';
 import { User }  from '../models';
@@ -97,48 +98,66 @@ class UserService{
     }
 
     async createUser(newUser: User): Promise<User>{
-        return new Promise(async (resolve, reject) => {
-            let hash;
+        let hash;
+        try{
+            hash = await this._hashPassword(newUser.password);
+        }
+        catch(e){
+            console.error(`Error hashing password for new user "${ newUser.username || newUser.email }"`);
+            console.error(e);
+
+            throw e
+        }
+
+        const args = [
+            newUser.clientId || null,
+            newUser.firstName,
+            newUser.lastName,
+            newUser.email,
+            newUser.username,
+            hash
+        ];
+
+        let user;
+        try{
+            user = await db.query('create-user', args);
+        }
+        catch(e){
+            console.error(`Error saving new user "${ newUser.username || newUser.email }"`);
+            console.error(e);
+
+            throw e
+        }
+
+        if(newUser.roles && newUser.roles.length){
             try{
-                hash = await this._hashPassword(newUser.password);
+                const roles = await this.updateUserRoles(user.id, <number[]>newUser.roles);
             }
             catch(e){
-                console.log(e);
-                return reject('Password hashing error');
-            }
-
-            const args = [
-                newUser.clientId || null,
-                newUser.firstName,
-                newUser.lastName,
-                newUser.email,
-                newUser.username,
-                hash
-            ];
-
-            let user;
-            try{
-                user = await db.query('create-user', args);
-            }
-            catch(e){
+                console.error(`Error setting roles for new user "${ newUser.username || newUser.email }"`);
                 console.error(e);
 
-                reject('Error saving user to database');
+                throw e;
             }
+        }
 
-            if(newUser.roles && newUser.roles.length){
-                try{
-                    const roles = await this.updateUserRoles(user.id, <number[]>newUser.roles);
-                }
-                catch(e){
-                    return reject(e);
-                }
-            }
+        user = await this.getUser(user.id);
 
-            user = await this.getUser(user.id);
+        return user;
+    }
 
-            resolve(user);
-        });
+    async createAnonymousUser(clientId: number): Promise<User>{
+        try{
+            const user = await db.q('create-anonymous-user', [ clientId, uuid() ]);
+
+            return this.getUser(user.id);
+        }
+        catch(e){
+            console.error('Error creating anonymous user');
+            console.error(e);
+
+            throw e;
+        }
     }
 
     async checkUserPassword(username: string, password: string): Promise<boolean>{

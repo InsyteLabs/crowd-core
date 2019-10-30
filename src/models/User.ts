@@ -11,6 +11,7 @@ export class User{
     username:         string;
     password:         string;
     roles:            (string|number)[];
+    isAnonymous?:     boolean;
     isDisabled?:      boolean;
     disabledComment?: string|null;
 
@@ -23,6 +24,7 @@ export class User{
         this.username        = user.username
         this.password        = user.password
         this.roles           = user.roles ||[];
+        this.isAnonymous     = user.isAnonymous;
         this.isDisabled      = user.isDisabled
         this.disabledComment = user.disabledComment
     }
@@ -37,8 +39,9 @@ export class User{
             username:        u.username,
             password:        u.password,
             roles:           u.roles,
+            isAnonymous:     u.is_anonymous,
             isDisabled:      u.is_disabled,
             disabledComment: u.disabled_comment
-        })
+        });
     }
 }

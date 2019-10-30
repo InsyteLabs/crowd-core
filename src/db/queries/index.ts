@@ -109,6 +109,11 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
     {
+        name:     'create-anonymous-user',
+        path:     './account/user/create-anonymous-user.sql',
+        firstRow: true
+    },
+    {
         name:     'update-user',
         path:     './account/user/update-user.sql',
         firstRow: true

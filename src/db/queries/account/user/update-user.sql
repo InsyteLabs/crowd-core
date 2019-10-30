@@ -19,5 +19,6 @@ RETURNING
     email,
     username,
     password,
+    is_anonymous,
     is_disabled,
     disabled_comment;
