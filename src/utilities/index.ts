@@ -1,4 +1,4 @@
 'use strict';
 
-export { slugify }   from './slugify';
-export { sendError } from './send-error';
+export * from './slugify';
+export * from './http';

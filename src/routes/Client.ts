@@ -1,8 +1,8 @@
 'use strict';
 
 import { Router }                                   from 'express';
-import { sendError }                                from '../utilities';
 import { getCurrentUser, getClient }                from '../middleware';
+import { http }                                     from '../utilities';
 import { SocketServer }                             from '../web-sockets';
 import { clientService, eventService, userService } from '../services';
 
@@ -17,15 +17,25 @@ router.use(getCurrentUser);
     =======
 */
 router.get('/clients', async (req, res, next) => {
-    const clients = await clientService.getClients();
-    
-    return res.json(clients);
+    try{
+        const clients = await clientService.getClients();
+        
+        return res.json(clients);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
 });
 
 router.get('/clients/:id', async (req, res, next) => {
-    const client = await clientService.getClient(+req.params.id);
-
-    return res.json(client);
+    try{
+        const client = await clientService.getClient(+req.params.id);
+        
+        return res.json(client);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
 });
 
 router.get('/clients/slug/:slug', async (req, res, next) => {
@@ -35,7 +45,7 @@ router.get('/clients/slug/:slug', async (req, res, next) => {
         return res.json(client);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -46,7 +56,7 @@ router.post('/clients', async (req, res, next) => {
         return res.json(client);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -57,7 +67,7 @@ router.put('/clients/:id', async (req, res, next) => {
         return res.json(client);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -76,15 +86,11 @@ router.get('/clients/:id/users', async (req, res, next) => {
         return res.json(users);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-    
     try{
         const user = await userService.createUser(req.body);
 
@@ -96,15 +102,11 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
         socketServer.messageClients(clientSlug, 'user-created', user);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.post('/clients/:clientId/users/anonymous', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const user = await userService.createAnonymousUser(res.locals.client.id);
 
@@ -116,15 +118,11 @@ router.post('/clients/:clientId/users/anonymous', getClient, async (req, res, ne
         socketServer.messageClients(clientSlug, 'user-created', user);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const user = await userService.updateUser(req.body);
 
@@ -136,15 +134,11 @@ router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next)
         socketServer.messageClients(clientSlug, 'user-updated', user);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const user = await userService.deleteUser(+req.params.userId);
 
@@ -156,7 +150,7 @@ router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, ne
         socketServer.messageClients(clientSlug, 'user-deleted', user);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -173,7 +167,7 @@ router.get('/clients/:id/events', async (req, res, next) => {
         return res.json(events);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -185,15 +179,11 @@ router.get('/clients/:id/events/:slug', async (req, res, next) => {
         return res.json(event);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const event = await eventService.createEvent(req.body);
 
@@ -205,15 +195,11 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
         socketServer.messageClients(clientSlug, 'event-created', event);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const event = await eventService.updateEvent(req.body);
 
@@ -225,15 +211,11 @@ router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, nex
         socketServer.messageClients(clientSlug, 'event-updated', event);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const event = await eventService.deleteEvent(+req.params.eventId);
 
@@ -245,7 +227,7 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
         socketServer.messageClients(clientSlug, 'event-deleted', event);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -262,15 +244,11 @@ router.get('/clients/:clientId/events/:eventId/questions', async (req, res, next
         return res.json(questions);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.post('/clients/:clientId/events/:eventId/questions', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const question = await eventService.createQuestion(req.body);
 
@@ -282,15 +260,11 @@ router.post('/clients/:clientId/events/:eventId/questions', getClient, async (re
         socketServer.messageClients(clientSlug, 'question-created', question);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const question = await eventService.updateQuestion(req.body);
 
@@ -302,15 +276,11 @@ router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient
         socketServer.messageClients(clientSlug, 'question-updated', question);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const deleted = await eventService.deleteQuestion(+req.params.questionId);
 
@@ -322,7 +292,7 @@ router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getCli
         socketServer.messageClients(clientSlug, 'question-deleted', deleted);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -341,15 +311,11 @@ router.get('/clients/:clientId/events/:eventId/questions/:questionId/votes', asy
         return res.json(score);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
 router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', getClient, async (req, res, next) => {
-    if(!res.locals.client){
-        return sendError(res, new Error('Client account not identified'));
-    }
-
     try{
         const question = await eventService.createQuestionVote(req.body);
         
@@ -361,7 +327,7 @@ router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', ge
         socketServer.messageClients(clientSlug, 'question-updated', question);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 

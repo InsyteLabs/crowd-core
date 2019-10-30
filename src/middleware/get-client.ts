@@ -2,7 +2,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { clientService }                   from '../services';
-import { sendError }                       from '../utilities';
+import { http }                            from '../utilities';
 
 export async function getClient(req: Request, res: Response, next: NextFunction){
     const clientId   = req.params.clientId || req.query.clientId,
@@ -16,7 +16,7 @@ export async function getClient(req: Request, res: Response, next: NextFunction)
             console.error(`Error loading client of ID ${ clientId }`);
             console.error(e);
 
-            return sendError(res, e);
+            return http.serverError(res, e);
         }
     }
 
@@ -28,9 +28,11 @@ export async function getClient(req: Request, res: Response, next: NextFunction)
             console.error(`Error loading client of slug ${ clientSlug }`);
             console.error(e);
             
-            return sendError(res, e);
+            return http.serverError(res, e);
         }
     }
+
+    if(!res.locals.client) return http.notFound(res, 'Client account not found');
 
     next();
 }

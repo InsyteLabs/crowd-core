@@ -1,10 +1,10 @@
 'use strict';
 
-import * as WebSocket        from 'ws';
-import { Router }            from 'express';
-import { eventService }      from '../services';
-import { sendError }         from '../utilities';
-import { getCurrentUser }    from '../middleware';
+import * as WebSocket     from 'ws';
+import { Router }         from 'express';
+import { eventService }   from '../services';
+import { http }           from '../utilities';
+import { getCurrentUser } from '../middleware';
 
 const router = Router();
 
@@ -22,7 +22,7 @@ router.get('/events', async (req, res, next) => {
         return res.json(events);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -33,7 +33,7 @@ router.get('/events/:id', async (req, res, next) => {
         return res.json(event);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -54,7 +54,7 @@ router.post('/events', async (req, res, next) => {
         }
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -65,7 +65,7 @@ router.put('/events/:id', async (req, res, next) => {
         return res.json(event);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -76,7 +76,7 @@ router.delete('/events/:id', async (req, res, next) => {
         return res.json(event);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -93,7 +93,7 @@ router.get('/events/:id/questions', async (req, res, next) => {
         return res.json(questions);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -104,7 +104,7 @@ router.get('/events/:id/questions/:questionId', async (req, res, next) => {
         return res.json(question);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -115,7 +115,7 @@ router.post('/events/:id/questions', async (req, res, next) => {
         return res.json(question);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -126,7 +126,7 @@ router.put('/events/:id/questions/:questionId', async (req, res, next) => {
         return res.json(question);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -137,7 +137,7 @@ router.delete('/events/:id/questions/:questionId', async (req, res, next) => {
         return res.json({ deleted });
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -156,7 +156,7 @@ router.get('/events/:id/questions/:questionId/votes', async (req, res, next) => 
         return res.json(score);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -167,7 +167,7 @@ router.post('/events/:id/questions/:id/votes', async (req, res, next) => {
         return res.json(vote);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -185,7 +185,7 @@ router.get('/events/:id/messages', async (req, res, next) => {
         return res.json(messages);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -196,7 +196,7 @@ router.post('/events/:id/messages', async (req, res, next) => {
         return res.json(message);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -207,7 +207,7 @@ router.put('/events/:id/messages/:messageId', async (req, res, next) => {
         return res.json(message);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -218,7 +218,7 @@ router.delete('/events/:id/messages/:messageId', async (req, res, next) => {
         return res.json({ success: deleted });
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 

@@ -5,7 +5,7 @@ import * as jwt           from 'jsonwebtoken';
 import conf               from '../conf';
 import { SECONDS_IN_DAY } from '../constants';
 import { userService }    from '../services';
-import { sendError }      from '../utilities';
+import { http }           from '../utilities';
 import { getCurrentUser } from '../middleware';
 
 const router = Router();
@@ -19,7 +19,7 @@ router.get('/users', async (req, res, next) => {
         return res.json(users);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -30,7 +30,7 @@ router.get('/users/:id', async (req, res, next) => {
         return res.json(user);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -41,7 +41,7 @@ router.post('/users', async (req, res, next) => {
         return res.json(user);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -49,9 +49,7 @@ router.post('/authenticate', async (req, res, next) => {
     const { username, password } = req.body;
 
     if(!(username && password)){
-        return res.status(400).json({
-            message: 'User and password fields required'
-        });
+        return http.clientError(res, 'User and password fields required');
     }
 
     try{
@@ -59,9 +57,7 @@ router.post('/authenticate', async (req, res, next) => {
               valid = await userService.checkUserPassword(username, password);
 
         if(!valid){
-            return res.status(401).json({
-                message: 'Incorrect username/password'
-            });
+            return http.unauthorized(res, 'Incorrect username/password');
         }
 
         const token = await jwt.sign({
@@ -73,7 +69,7 @@ router.post('/authenticate', async (req, res, next) => {
         return res.json({ token });
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -82,21 +78,19 @@ router.post('/users/:id/password', async (req, res, next) => {
         const { password, newPassword } = req.body;
 
         if(!(password && newPassword)){
-            return res.status(400).json({ message: '"password" and "newPassword" fields required' });
+            return http.clientError(res, '"password" and "newPassword" fields required')
         }
 
         const user = await userService.getUser(+req.params.id);
 
         if(!(user && user.id)){
-            return res.status(404).json({
-                message: 'Not Found'
-            });
+            return http.notFound(res);
         }
 
         const valid = await userService.checkUserPassword(user.username, password);
 
         if(!valid){
-            return res.status(400).json({ message: 'Incorrect password' });
+            return http.unauthorized(res, 'Incorrect username/password');
         }
 
         try{
@@ -105,14 +99,12 @@ router.post('/users/:id/password', async (req, res, next) => {
             return res.json(updated);
         }
         catch(e){
-            return res.status(500).json({
-                message: 'Server Error'
-            });
+            return http.serverError(res, e);
         }
 
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -123,7 +115,7 @@ router.put('/users/:id', async (req, res, next) => {
         return res.json(user);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -134,7 +126,7 @@ router.delete('/users/:id', async (req, res, next) => {
         return res.json(user);
     }
     catch(e){
-        return sendError(res, e);
+        return http.serverError(res, e);
     }
 });
 
@@ -145,7 +137,7 @@ router.get('/users/:id/disable', async (req, res, next) => {
         return res.json(user);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -156,7 +148,7 @@ router.get('/users/:id/enable', async (req, res, next) => {
         return res.json(user);
     }
     catch(e){
-        return res.status(500).json({ message: 'Server Error' });
+        return http.serverError(res, e);
     }
 });
 
@@ -167,9 +159,7 @@ router.get('/roles', async (req, res, next) => {
         return res.json(roles);
     }
     catch(e){
-        return res.json({
-            message: 'Server Error'
-        });
+        return http.serverError(res, e);
     }
 });
 
