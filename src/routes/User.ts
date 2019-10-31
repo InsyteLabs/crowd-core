@@ -73,6 +73,29 @@ router.post('/authenticate', async (req, res, next) => {
     }
 });
 
+router.post('/authenticate/anonymous', async (req, res, next) => {
+    const { username } = req.body;
+
+    if(!username){
+        return http.clientError(res, 'Username field required');
+    }
+
+    try{
+        const user = await userService.getUserByUsername(username);
+
+        const token = await jwt.sign({
+            issuer: 'CROWDCORE_API',
+            exp: Math.floor(Date.now() / 1000) + (SECONDS_IN_DAY),
+            data: user
+        }, conf.SECRET);
+
+        return res.json({ token });
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
 router.post('/users/:id/password', async (req, res, next) => {
     try{
         const { password, newPassword } = req.body;

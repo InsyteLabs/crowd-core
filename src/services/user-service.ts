@@ -65,10 +65,12 @@ class UserService{
         try{
             const user  = await db.query('get-user', [ id ]),
                   roles = await this.getUserRoles(id);
-            
-            user.roles = roles.map(r => r.name);
+
+            if(user){
+                user.roles = roles.map(r => r.name);
+            }
     
-            return User.from(user);
+            return User.from(user || {});
         }
         catch(e){
             console.error(`Failed to get user of ID "${ id }"`);
