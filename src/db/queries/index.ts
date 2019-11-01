@@ -329,8 +329,9 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
     {
-        name: 'delete-event-message',
-        path: './event/chat/delete-event-message.sql'
+        name:     'delete-event-message',
+        path:     './event/chat/delete-event-message.sql',
+        firstRow: true
     }
 ].map((q: any) => {
     try{

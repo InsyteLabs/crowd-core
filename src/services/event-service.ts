@@ -567,17 +567,17 @@ class EventService{
         }
     }
 
-    async deleteEventMessage(id: number): Promise<boolean>{
+    async deleteEventMessage(id: number): Promise<Message>{
         try{
             const deleted = await db.q('delete-event-message', [ id ]);
 
-            return true
+            return Message.from(deleted);
         }
         catch(e){
             console.error(`Failed to delete message of ID ${ id }`);
             console.error(e);
 
-            return false;
+            return Message.from({});
         }
     }
 }

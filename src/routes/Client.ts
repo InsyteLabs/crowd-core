@@ -372,4 +372,20 @@ router.post('/clients/:clientId/events/:eventId/chat', getClient, async (req, re
     }
 });
 
+router.delete('/clients/:clientId/events/:eventId/chat/:messageId', getClient, async (req, res, next) => {
+    try{
+        const deletedMessage = await eventService.deleteEventMessage(+req.params.messageId);
+
+        res.json(deletedMessage);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'message-deleted', deletedMessage);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
 export default router;
