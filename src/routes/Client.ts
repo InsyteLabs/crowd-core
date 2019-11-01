@@ -8,7 +8,15 @@ import { clientService, eventService, userService } from '../services';
 
 const router = Router();
 
-router.use(getCurrentUser);
+router.use(getCurrentUser, (req, res, next) => {
+    const fullUrl: string = req.protocol + '://' + req.get('host') + req.originalUrl;
+
+    if(req.method.toLowerCase() !== 'options'){
+        console.log(`${ fullUrl }: ${ res.locals.user ? res.locals.user.username : 'UNKNOWN' }`);
+    }
+
+    next();
+});
 
 
 /*
