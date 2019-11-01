@@ -356,4 +356,20 @@ router.get('/clients/:clientId/events/:eventId/chat', getClient, async (req, res
     }
 });
 
+router.post('/clients/:clientId/events/:eventId/chat', getClient, async (req, res, next) => {
+    try{
+        const newMessage = await eventService.createEventMessage(req.body);
+
+        res.json(newMessage);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'message-added', newMessage);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
 export default router;

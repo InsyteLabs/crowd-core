@@ -513,6 +513,20 @@ class EventService{
         }
     }
 
+    async getEventMessage(id: number): Promise<Message>{
+        try{
+            const message = await db.q('get-message', [ id ]);
+
+            return Message.from(message);
+        }
+        catch(e){
+            console.error(`Failed to get message of ID ${ id }`);
+            console.error(e);
+
+            return Message.from({});
+        }
+    }
+
     async createEventMessage(m: Message): Promise<Message>{
         const args = [
             m.eventId,
@@ -523,7 +537,7 @@ class EventService{
         try{
             const message = await db.q('create-event-message', args);
 
-            return Message.from(message);
+            return this.getEventMessage(message.id);
         }
         catch(e){
             console.error(`Failed to create message for event of ID ${ m.id }`);

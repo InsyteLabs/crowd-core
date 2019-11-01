@@ -314,6 +314,11 @@ export const queries: IQueryDescriptor[] = [
         path: './event/chat/get-event-messages.sql'
     },
     {
+        name:     'get-message',
+        path:     './event/chat/get-message.sql',
+        firstRow: true
+    },
+    {
         name:    'create-event-message',
         path:    './event/chat/create-event-message.sql',
         firstRow: true

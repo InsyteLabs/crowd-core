@@ -16,9 +16,5 @@ FROM
 	
 LEFT JOIN account.user AS user_table ON chat.user_id = user_table.id
 	
-
 WHERE
-    event_id=$1
-
-ORDER BY
-    chat.id ASC;
+    chat.id=$1;
