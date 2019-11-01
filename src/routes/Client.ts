@@ -339,4 +339,21 @@ router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', ge
     }
 });
 
+
+/*
+    =========================
+    CLIENT EVENT CHAT METHODS
+    =========================
+*/
+router.get('/clients/:clientId/events/:eventId/chat', getClient, async (req, res, next) => {
+    try{
+        const messages = await eventService.getEventMessages(+req.params.eventId);
+
+        res.json(messages);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
 export default router;
