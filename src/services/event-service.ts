@@ -557,7 +557,7 @@ class EventService{
         try{
             const message = await db.q('update-event-message', args);
 
-            return Message.from(message);
+            return this.getEventMessage(message.id);
         }
         catch(e){
             console.error(`Failed to update message of ID ${ m.id }`);
@@ -569,9 +569,11 @@ class EventService{
 
     async deleteEventMessage(id: number): Promise<Message>{
         try{
-            const deleted = await db.q('delete-event-message', [ id ]);
+            const messageOriginal = await this.getEventMessage(id);
 
-            return Message.from(deleted);
+            await db.q('delete-event-message', [ id ]);
+
+            return messageOriginal;
         }
         catch(e){
             console.error(`Failed to delete message of ID ${ id }`);

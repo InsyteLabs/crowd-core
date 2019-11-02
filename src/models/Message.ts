@@ -20,7 +20,8 @@ export class Message{
         this.eventId = message.eventId;
         this.text    = message.text;
         this.hidden  = message.hidden;
-        this.user    = message.user;
+        this.userId  = message.userId;
+        this.user    = message.user || {}
     }
 
     static from(m: any): Message{

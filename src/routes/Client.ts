@@ -365,7 +365,23 @@ router.post('/clients/:clientId/events/:eventId/chat', getClient, async (req, re
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'message-added', newMessage);
+        socketServer.messageClients(clientSlug, 'message-created', newMessage);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
+router.put('/clients/:clientId/events/:eventId/chat/:messageId', getClient, async (req, res, next) => {
+    try{
+        const updatedMessage = await eventService.updateEventMessage(req.body);
+
+        res.json(updatedMessage);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'message-updated', updatedMessage);
     }
     catch(e){
         return http.serverError(res, e);
