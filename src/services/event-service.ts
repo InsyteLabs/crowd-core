@@ -37,7 +37,6 @@ class EventService{
                 const event = events[i];
 
                 try{
-                    event.questions = await this.getEventQuestions(<number>event.id);
                     event.settings  = await this.getEventSettings(<number>event.id);
                 }
                 catch(e){
@@ -61,10 +60,8 @@ class EventService{
     async getClientEventBySlug(clientId: number, eventSlug: string): Promise<Event>{
         try{
             const event     = await db.q('get-client-event-by-slug', [ clientId, eventSlug ]),
-                  questions = await this.getEventQuestions(<number>event.id),
                   settings  = await this.getEventSettings(<number>event.id);
             
-            event.questions = questions;
             event.settings  = settings;
 
             return Event.from(event);
@@ -80,10 +77,8 @@ class EventService{
     async getEvent(id: number): Promise<Event>{
         try{
             const event:     Event         = await db.q('get-event', [ id ]),
-                  questions: Question[]    = await this.getEventQuestions(id),
                   settings:  EventSettings = await this.getEventSettings(id);
 
-            event.questions = questions;
             event.settings  = settings;
 
             return Event.from(event);
@@ -144,10 +139,7 @@ class EventService{
         ];
 
         try{
-            const updatedEvent = await db.q('update-event', args),
-                  questions    = await this.getEventQuestions(updatedEvent.id);
-
-            updatedEvent.questions = questions;
+            const updatedEvent = await db.q('update-event', args);
 
             if(event.settings){
                 try{

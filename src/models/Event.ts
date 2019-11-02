@@ -1,6 +1,5 @@
 'use strict';
 
-import { Question }      from "./Question";
 import { EventSettings } from "./EventSettings";
 
 export class Event{
@@ -12,7 +11,6 @@ export class Event{
     startTime:   Date;
     endTime:     Date;
     active?:     boolean;
-    questions?:  Question[];
     settings:    EventSettings;
 
     constructor(event: any){
@@ -24,7 +22,6 @@ export class Event{
         this.startTime   = new Date(event.startTime);
         this.endTime     = new Date(event.endTime);
         this.active      = event.active;
-        this.questions   = event.questions || [];
         this.settings    = event.settings;
     }
 
@@ -38,7 +35,6 @@ export class Event{
             startTime:   new Date(event.start_time),
             endTime:     new Date(event.end_time),
             active:      event.is_active,
-            questions:   event.questions,
             settings:    event.settings
         });
     }
