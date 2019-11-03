@@ -2,15 +2,17 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { clientService }                   from '../services';
+import { Client }                          from '../models';
 import { http }                            from '../utilities';
 
 export async function getClient(req: Request, res: Response, next: NextFunction){
-    const clientId   = req.params.clientId || req.query.clientId,
+    const clientId   = req.params.clientId   || req.query.clientId,
           clientSlug = req.params.clientSlug || req.query.clientSlug;
 
+    let client: Client|null = null;
     if(clientId){
         try{
-            res.locals.client = await clientService.getClient(+clientId);
+            client = await clientService.getClient(+clientId);
         }
         catch(e){
             console.error(`Error loading client of ID ${ clientId }`);
@@ -22,7 +24,7 @@ export async function getClient(req: Request, res: Response, next: NextFunction)
 
     if(clientSlug){
         try{
-            res.locals.client = await clientService.getClientBySlug(clientSlug);
+            client = await clientService.getClientBySlug(clientSlug);
         }
         catch(e){
             console.error(`Error loading client of slug ${ clientSlug }`);
@@ -31,6 +33,10 @@ export async function getClient(req: Request, res: Response, next: NextFunction)
             return http.serverError(res, e);
         }
     }
+
+    res.locals.client = client && client.id
+        ? client
+        : null;
 
     if(!res.locals.client) return http.notFound(res, 'Client account not found');
 

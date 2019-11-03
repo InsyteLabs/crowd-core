@@ -46,9 +46,13 @@ router.get('/clients/:id', async (req, res, next) => {
     }
 });
 
-router.get('/clients/slug/:slug', async (req, res, next) => {
+router.get('/clients/slug/:slug', getCurrentUser, async (req, res, next) => {
+    if(!(res.locals.user && res.locals.user.id)) return http.unauthorized(res, 'Unauthorized');
+
     try{
         const client = await clientService.getClientBySlug(req.params.slug);
+
+        if(!(client && client.id)) return http.notFound(res);
 
         return res.json(client);
     }
@@ -115,6 +119,22 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
 });
 
 router.post('/clients/:clientId/users/anonymous', getClient, async (req, res, next) => {
+    try{
+        const user = await userService.createAnonymousUser(res.locals.client.id);
+
+        res.json(user);
+
+        const clientSlug:   string       = res.locals.client.slug,
+              socketServer: SocketServer = res.locals.socketServer;
+
+        socketServer.messageClients(clientSlug, 'user-created', user);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
+router.post('/clients/:clientSlug/users/anonymous', getClient, async (req, res, next) => {
     try{
         const user = await userService.createAnonymousUser(res.locals.client.id);
 
