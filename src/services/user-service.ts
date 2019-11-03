@@ -85,6 +85,10 @@ class UserService{
             const user = await db.q('get-user-by-username', [ username ]);
 
             if(user){
+                const roles = await this.getUserRoles(user.id);
+
+                user.roles = roles.map(r => r.name);
+                
                 return User.from(user);
             }
             else{

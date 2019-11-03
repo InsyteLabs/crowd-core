@@ -12,7 +12,7 @@ router.use(getCurrentUser, (req, res, next) => {
     const fullUrl: string = req.protocol + '://' + req.get('host') + req.originalUrl;
 
     if(req.method.toLowerCase() !== 'options'){
-        console.log(`${ fullUrl }: ${ res.locals.user ? res.locals.user.username : 'UNKNOWN' }`);
+        console.log(`${ req.method.toUpperCase() } ${ fullUrl }: ${ res.locals.user ? res.locals.user.username : 'UNKNOWN' }`);
     }
 
     next();
@@ -105,22 +105,6 @@ router.get('/clients/:id/users', async (req, res, next) => {
 router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
     try{
         const user = await userService.createUser(req.body);
-
-        res.json(user);
-
-        const clientSlug:   string       = res.locals.client.slug,
-              socketServer: SocketServer = res.locals.socketServer;
-
-        socketServer.messageClients(clientSlug, 'user-created', user);
-    }
-    catch(e){
-        return http.serverError(res, e);
-    }
-});
-
-router.post('/clients/:clientId/users/anonymous', getClient, async (req, res, next) => {
-    try{
-        const user = await userService.createAnonymousUser(res.locals.client.id);
 
         res.json(user);
 

@@ -10,7 +10,7 @@ import { getCurrentUser } from '../middleware';
 
 const router = Router();
 
-router.use(getCurrentUser);
+// router.use(getCurrentUser);
 
 router.get('/users', async (req, res, next) => {
     try{
