@@ -3,6 +3,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt                            from 'jsonwebtoken';
 import { userService }                     from '../services';
+import { User }                            from '../models';
 import conf                                from '../conf';
 import { http }                            from '../utilities';
 
@@ -34,10 +35,16 @@ export async function getCurrentUser(req: Request, res: Response, next: NextFunc
     }
 
     try{
-        res.locals.user = await userService.getUser(validToken.data.id);
+        const user: User = await userService.getUser(validToken.data.id);
+
+        if(!(user && user.id)){
+            return http.unauthorized(res, 'Token valid, user not found. Maybe the user was deleted?');
+        }
+
+        res.locals.user = user;
     }
     catch(e){
-        return http.notFound(res, 'Token valid, user not found. Maybe the user was deleted?');
+        return http.serverError(res, e);
     }
     
     next();
