@@ -41,6 +41,10 @@ export async function getCurrentUser(req: Request, res: Response, next: NextFunc
             return http.unauthorized(res, 'Token valid, user not found. Maybe the user was deleted?');
         }
 
+        if(user.isDisabled){
+            return http.forbidden(res);
+        }
+
         res.locals.user = user;
     }
     catch(e){
