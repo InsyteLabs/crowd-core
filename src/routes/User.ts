@@ -1,12 +1,8 @@
 'use strict';
 
 import { Router }         from 'express';
-import * as jwt           from 'jsonwebtoken';
-import conf               from '../conf';
-import { SECONDS_IN_DAY } from '../constants';
 import { userService }    from '../services';
 import { http }           from '../utilities';
-import { getCurrentUser } from '../middleware';
 
 const router = Router();
 
@@ -39,57 +35,6 @@ router.post('/users', async (req, res, next) => {
         const user = await userService.createUser(req.body);
 
         return res.json(user);
-    }
-    catch(e){
-        return http.serverError(res, e);
-    }
-});
-
-router.post('/authenticate', async (req, res, next) => {
-    const { username, password } = req.body;
-
-    if(!(username && password)){
-        return http.clientError(res, 'User and password fields required');
-    }
-
-    try{
-        const user  = await userService.getUserByUsername(username),
-              valid = await userService.checkUserPassword(username, password);
-
-        if(!valid){
-            return http.unauthorized(res, 'Incorrect username/password');
-        }
-
-        const token = await jwt.sign({
-            issuer: 'CROWDCORE_API',
-            exp: Math.floor(Date.now() / 1000) + (SECONDS_IN_DAY),
-            data: user
-        }, conf.SECRET);
-        
-        return res.json({ token });
-    }
-    catch(e){
-        return http.serverError(res, e);
-    }
-});
-
-router.post('/authenticate/anonymous', async (req, res, next) => {
-    const { username } = req.body;
-
-    if(!username){
-        return http.clientError(res, 'Username field required');
-    }
-
-    try{
-        const user = await userService.getUserByUsername(username);
-
-        const token = await jwt.sign({
-            issuer: 'CROWDCORE_API',
-            exp: Math.floor(Date.now() / 1000) + (SECONDS_IN_DAY),
-            data: user
-        }, conf.SECRET);
-
-        return res.json({ token });
     }
     catch(e){
         return http.serverError(res, e);
