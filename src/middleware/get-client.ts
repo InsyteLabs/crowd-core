@@ -9,7 +9,7 @@ export async function getClient(req: Request, res: Response, next: NextFunction)
     const clientId   = req.params.clientId   || req.query.clientId,
           clientSlug = req.params.clientSlug || req.query.clientSlug;
 
-    let client: Client|null = null;
+    let client: Client|undefined;
     if(clientId){
         try{
             client = await clientService.getClient(+clientId);

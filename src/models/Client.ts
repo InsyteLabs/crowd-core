@@ -1,5 +1,7 @@
 'use strict';
 
+import { IDBClient } from "../db/interfaces";
+
 export class Client{
     [key: string]:    any;
 
@@ -21,7 +23,7 @@ export class Client{
         this.disabledComment = c.disabledComment;
     }
 
-    static from(c: any): Client{
+    static from(c: IDBClient): Client{
         return new Client({
             id:              c.id,
             name:            c.name,

@@ -1,9 +1,17 @@
 'use strict';
 
-import { db }      from '../db';
-import { Client }  from '../models';
-import { IType }   from '../interfaces';
-import { slugify } from '../utilities';
+import { db }        from '../db';
+import { Client }    from '../models';
+import { IType }     from '../interfaces';
+import { slugify }   from '../utilities';
+import { IDBClient } from '../db/interfaces';
+
+/*
+    TODO
+    ----
+
+    Join client types in the client queries as JSON to avoid excessive lookups
+*/
 
 class ClientService{
 
@@ -14,7 +22,7 @@ class ClientService{
     */
     async getClients(): Promise<Client[]>{
         try{
-            const clients = await db.q('get-clients');
+            const clients: IDBClient[] = await db.q('get-clients');
 
             for(let i = 0, len = clients.length; i < len; i++){
                 const client = clients[i];
@@ -29,14 +37,15 @@ class ClientService{
         catch(e){
             console.error('Failed to get clients from database');
             console.error(e);
+
             return [];
         }
     }
 
-    async getClient(id: number): Promise<Client>{
+    async getClient(id: number): Promise<Client|undefined>{
         try{
-            const client = await db.q('get-client', [ id ]),
-                  types  = await this.getClientTypes(id);
+            const client: IDBClient = await db.q('get-client', [ id ]),
+                  types             = await this.getClientTypes(id);
             
             client.types = types.map(t => t.name);
 
@@ -46,14 +55,14 @@ class ClientService{
             console.error(`Failed to get client of ID "${ id }"`);
             console.error(e);
             
-            return new Client({});
+            return;
         }
     }
 
-    async getClientBySlug(slug: string): Promise<Client>{
+    async getClientBySlug(slug: string): Promise<Client|undefined>{
         try{
-            const client = await db.q('get-client-by-slug', [ slug ]),
-                  types  = await this.getClientTypes(client.id);
+            const client: IDBClient = await db.q('get-client-by-slug', [ slug ]),
+                  types             = await this.getClientTypes(client.id);
 
             client.types = types.map(t => t.name);
 
@@ -63,18 +72,18 @@ class ClientService{
             console.error(`Failed to get client of slug ${ slug }`);
             console.error(e);
 
-            return Client.from({});
+            return;
         }
     }
 
-    async createClient(newClient: Client): Promise<Client>{
+    async createClient(newClient: Client): Promise<Client|undefined>{
         const args = [
             newClient.name,
             newClient.slug || slugify(newClient.name),
             newClient.ownerId
         ];
 
-        let client;
+        let client: IDBClient;
         try{
             client = await db.q('create-client', args);
         }
@@ -97,10 +106,12 @@ class ClientService{
         return this.getClient(client.id);
     }
 
-    async updateClient(client: Client): Promise<Client>{
-        let curClient;
+    async updateClient(client: Client): Promise<Client|undefined>{
+        let curClient: Client|undefined;
         try{
-            curClient = await db.q('get-client', [ client.id ]);
+            curClient = await this.getClient(<number>client.id);
+
+            if(!curClient) return;
         }
         catch(e){
             return Promise.reject('Failed to get client from database');
@@ -121,9 +132,11 @@ class ClientService{
             curClient.disabledComment
         ];
 
-        let updated;
+        let updated: IDBClient|undefined;
         try{
             updated = await db.q('update-client', args);
+
+            if(!updated) return;
         }
         catch(e){
             console.error(`Error updating client "${ client.name }"`);
@@ -144,10 +157,12 @@ class ClientService{
         return this.getClient(updated.id);
     }
 
-    async disableClient(id: number, comment: string): Promise<Client>{
-        let client;
+    async disableClient(id: number, comment: string): Promise<Client|undefined>{
+        let client: Client|undefined;
         try{
             client = await this.getClient(id);
+
+            if(!client) return;
         }
         catch(e){
             return Promise.reject(e);
@@ -160,9 +175,11 @@ class ClientService{
     }
 
     async enableClient(id: number){
-        let client;
+        let client: Client|undefined;
         try{
             client = await this.getClient(id);
+
+            if(!client) return;
         }
         catch(e){
             return Promise.reject(e);
