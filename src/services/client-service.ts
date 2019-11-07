@@ -1,10 +1,11 @@
 'use strict';
 
-import { db }        from '../db';
-import { Client }    from '../models';
-import { IType }     from '../interfaces';
-import { slugify }   from '../utilities';
-import { IDBClient } from '../db/interfaces';
+import { db }                       from '../db';
+import { IDBClient, IDBClientType } from '../db/interfaces';
+
+import { Client }  from '../models';
+import { IType }   from '../interfaces';
+import { slugify } from '../utilities';
 
 /*
     TODO
@@ -197,7 +198,7 @@ class ClientService{
         TYPE METHODS
         ============
     */
-    async getTypes(): Promise<IType[]>{
+    async getTypes(): Promise<IDBClientType[]>{
         try{
             const types = await db.q('get-types');
 
@@ -210,10 +211,10 @@ class ClientService{
 
     async getTypeIds(): Promise<number[]>{
         try{
-            const types = await this.getTypes();
+            const types: IDBClientType[] = await this.getTypes();
 
-            const validTypes: number[] = types.reduce((acc: number[], t: IType) => {
-                acc.push(t.id as number);
+            const validTypes: number[] = types.reduce((acc: number[], t: IDBClientType) => {
+                acc.push(<number>t.id);
 
                 return acc;
             }, []);
@@ -221,18 +222,24 @@ class ClientService{
             return validTypes;
         }
         catch(e){
-            return Promise.reject(e);
+            console.error('Error fetching client types:');
+            console.error(e.message);
+            
+            return [];
         }
     }
 
-    async getType(id: number): Promise<IType>{
+    async getType(id: number): Promise<IDBClientType|undefined>{
         try{
-            const type = await db.q('get-type', [ id ]);
+            const type: IDBClientType|undefined = await db.q('get-type', [ id ]);
 
-            return type || {id: null, name: ''};
+            return type;
         }
         catch(e){
-            return Promise.reject(`Failed to get type "${ id }" from database`);
+            console.error(`Failed to get type "${ id }" from database`);
+            console.error(e.message);
+
+            return;
         }
     }
 

@@ -1,4 +1,3 @@
-
 SELECT
 	  C.id
 	, C.name
@@ -11,18 +10,20 @@ SELECT
 FROM
 	account.client AS C
 	
-LEFT JOIN LATERAL(
+LEFT JOIN (
 	SELECT
-		  AT.name
-		, CT.client_id
+		  client_id
+		, type_id
 	FROM
-		account.client_type AS CT
-	
-	LEFT JOIN
-		account.type AS AT ON AT.id=CT.type_id
-	
-	WHERE
-		CT.client_id=C.id
-) AS T ON T.client_id=C.id
+		account.client_type
+) AS CT ON CT.client_id=C.id
+
+LEFT JOIN (
+	SELECT
+		  id
+		, name
+	FROM
+		account.type
+) AS T ON T.id=CT.client_id
 
 GROUP BY C.id;

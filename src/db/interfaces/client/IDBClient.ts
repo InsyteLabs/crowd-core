@@ -11,5 +11,5 @@ export interface IDBClient{
     is_disabled:      boolean;
     disabled_comment: string;
 
-    types: (string|number)[];
+    types: string[];
 }
