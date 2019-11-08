@@ -238,7 +238,7 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
 */
 router.get('/clients/:clientId/events/:eventId/questions', async (req, res, next) => {
     try{
-        const questions = await eventService.getEventQuestions(+req.params.eventId);
+        const questions = await eventService.getEventQuestions(res.locals.user.id, +req.params.eventId);
 
         return res.json(questions);
     }
@@ -249,7 +249,7 @@ router.get('/clients/:clientId/events/:eventId/questions', async (req, res, next
 
 router.post('/clients/:clientId/events/:eventId/questions', getClient, async (req, res, next) => {
     try{
-        const question = await eventService.createQuestion(req.body);
+        const question = await eventService.createQuestion(res.locals.user.id, req.body);
 
         res.json(question);
 
@@ -265,7 +265,7 @@ router.post('/clients/:clientId/events/:eventId/questions', getClient, async (re
 
 router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
     try{
-        const question = await eventService.updateQuestion(req.body);
+        const question = await eventService.updateQuestion(res.locals.user.id, req.body);
 
         res.json(question);
 
@@ -281,7 +281,7 @@ router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient
 
 router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
     try{
-        const deleted = await eventService.deleteQuestion(+req.params.questionId);
+        const deleted = await eventService.deleteQuestion(res.locals.user.id, +req.params.questionId);
 
         res.json({ deleted });
 
@@ -301,22 +301,9 @@ router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getCli
     CLIENT EVENT QUESTION VOTE METHODS
     ==================================
 */
-router.get('/clients/:clientId/events/:eventId/questions/:questionId/votes', async (req, res, next) => {
-    try{
-        const { eventId, questionId } = req.params;
-
-        const score = await eventService.getQuestionScore(+eventId, +questionId);
-
-        return res.json(score);
-    }
-    catch(e){
-        return http.serverError(res, e);
-    }
-});
-
 router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', getClient, async (req, res, next) => {
     try{
-        const question = await eventService.createQuestionVote(req.body);
+        const question = await eventService.createQuestionVote(res.locals.user.id, req.body);
         
         res.json(question);
 

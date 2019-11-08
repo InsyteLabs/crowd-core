@@ -50,7 +50,8 @@ export class Question{
                 upvotes:   q.upvotes,
                 downvotes: q.downvotes,
                 votes:     q.votes,
-                score:     q.score
+                score:     q.score,
+                userVote:  q.user_vote
             },
         });
     }

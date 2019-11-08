@@ -16,6 +16,7 @@ SELECT
 	, COUNT(CASE WHEN V.value=-1 THEN 1 ELSE NULL END)::integer           AS downvotes
 	, COUNT(CASE WHEN V.value IS NOT NULL THEN 1 ELSE NULL END):: integer AS votes
     , COALESCE(SUM(V.value), 0)::integer                                  AS score
+    , SUM(CASE WHEN V.user_id=$1 THEN V.value ELSE 0 END)::integer        AS user_vote
 
 FROM
     event.question AS Q
@@ -23,9 +24,8 @@ FROM
 LEFT JOIN account.user AS U on U.id = Q.user_id
 LEFT JOIN event.vote   AS V on V.question_id=Q.id
 
-WHERE
-    Q.event_id=$1
-	
+WHERE Q.event_id=$2
+
 GROUP BY
 	  Q.id
 	, U.id;
