@@ -7,7 +7,7 @@ import {
 import { db }             from '../db';
 import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
-import { IDBEvent } from '../db/interfaces';
+import { IDBEvent, IDBEventSettings } from '../db/interfaces';
 
 class EventService{
 
@@ -163,63 +163,53 @@ class EventService{
         SETTINGS METHODS
         ================
     */
-    async getEventSettings(eventId: number): Promise<EventSettings>{
+    async getEventSettings(eventId: number): Promise<EventSettings|undefined>{
         try{
-            const settings = await db.q('get-event-settings', [ eventId ]);
+            const settings: IDBEventSettings|undefined = await db.q('get-event-settings', [ eventId ]);
 
-            return EventSettings.from(settings || {});
+            return settings ? EventSettings.fromDb(settings) : undefined;
         }
         catch(e){
             console.error(`Failed to get settings for event of id ${ eventId }`);
-            console.error(e);
-
-            return EventSettings.from({});
+            console.error(e.message);
         }
     }
 
     async createEventSettings(s: EventSettings){
         try{
-            const args = [
+            const settings: IDBEventSettings|undefined = await db.q('create-event-settings', [
                 s.eventId,
                 s.isLocked,
                 s.requirePassword,
                 s.password,
                 s.requireLogin,
                 s.enableChat
-            ];
+            ]);
 
-            const settings = await db.q('create-event-settings', args);
-
-            return EventSettings.from(settings);
+            return settings ? EventSettings.fromDb(settings) : undefined;
         }
         catch(e){
             console.error(`Failed to create settings for event of ID ${ s.eventId }`);
-            console.error(e);
-
-            return EventSettings.from({});
+            console.error(e.message);
         }
     }
 
-    async updateEventSettings(s: EventSettings){
+    async updateEventSettings(s: EventSettings): Promise<EventSettings|undefined>{
         try{
-            const args = [
+            const settings: IDBEventSettings|undefined = await db.q('update-event-settings', [
                 s.eventId,
                 s.isLocked,
                 s.requirePassword,
                 s.password,
                 s.requireLogin,
                 s.enableChat
-            ];
-            
-            const settings = await db.q('update-event-settings', args);
+            ]);
 
-            return EventSettings.from(settings);
+            return settings ? EventSettings.fromDb(settings) : undefined;
         }
         catch(e){
             console.error(`Failed to update settings for event of ID ${ s.eventId }`);
-            console.error(e);
-
-            return EventSettings.from({});
+            console.error(e.message);
         }
     }
 
