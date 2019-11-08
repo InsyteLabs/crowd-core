@@ -8,6 +8,7 @@ import { db }             from '../db';
 import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
 import { IDBEvent, IDBEventSettings } from '../db/interfaces';
+import { IDBQuestion } from '../db/interfaces/event/IDBQuestion';
 
 class EventService{
 
@@ -221,127 +222,91 @@ class EventService{
     */
     async getQuestions(): Promise<Question[]>{
         try{
-            const questions = await db.query('get-questions');
+            const questions: IDBQuestion[] = await db.query('get-questions');
 
-            return questions.map((q: any) => Question.from(q));
+            return questions.map(q => Question.fromDb(q));
         }
         catch(e){
             console.error('Failed to get questions from database');
-            console.error(e);
+            console.error(e.message);
 
             return [];
         }
     }
 
-    async getQuestion(id: number): Promise<Question>{
+    async getQuestion(id: number): Promise<Question|undefined>{
         try{
-            const question = await db.q('get-question', [ id ]),
-                  stats    = await this.getQuestionScore(question.event_id, id);
+            const question: IDBQuestion|undefined = await db.q('get-question', [ id ]);
 
-            question.stats = stats;
-
-            return Question.from(question);
+            return question ? Question.fromDb(question) : undefined;
         }
         catch(e){
             console.error(`Failed to get question of ID ${ id } from database`);
-            console.error(e);
-
-            return new Question({});
+            console.error(e.message);
         }
     }
 
     async getEventQuestions(eventId: number): Promise<Question[]>{
         try{
-            const questions = await db.q('get-event-questions', [ eventId ]);
-
-            /*
-                This bad, need to refactor the question getting query to also get
-                the score
-            */
-            for(let i = 0, len = questions.length; i < len; i++){
-                const question = questions[i],
-                      stats    = await this.getQuestionScore(eventId, question.id);
-                
-                question.stats = stats;
-            }
-
-            return questions.map((q: any) => Question.from(q));
+            const questions: IDBQuestion[] = await db.q('get-event-questions', [ eventId ]);
+            
+            return questions.map(q => Question.fromDb(q));
         }
         catch(e){
             console.error(`Failed to load quations for event of ID ${ eventId }`);
-            console.error(e);
+            console.error(e.message);
 
             return [];
         }
     }
 
-    async deleteQuestion(id: number): Promise<Question>{
+    async deleteQuestion(id: number): Promise<Question|undefined>{
+        const existing: Question|undefined = await this.getQuestion(id);
+
+        if(!existing) return;
+
         try{
             const question = await db.q('delete-question', [ id ]);
 
-            return Question.from(question || {});
+            return existing;
         }
         catch(e){
             console.error(`Failed to delete question of ID ${ id }`);
-            console.error(e);
-
-            return Question.from({});
+            console.error(e.message);
         }
     }
 
-    async deleteEventQuestions(eventId: number): Promise<Question[]>{
+    async createQuestion(q: Question): Promise<Question|undefined>{
         try{
-            const questions = await db.q('delete-event-questions', [ eventId ]);
+            const question: IDBQuestion|undefined = await db.q('create-question', [
+                q.eventId,
+                q.userId,
+                q.text
+            ]);
 
-            return questions.map(Question.from);
-        }
-        catch(e){
-            console.error(`Failed to delete questions for event of ID ${ eventId }`);
-            console.error(e);
-
-            return [];
-        }
-    }
-
-    async createQuestion(q: Question): Promise<Question>{
-        const args = [
-            q.eventId,
-            q.userId,
-            q.text
-        ];
-
-        try{
-            const question = await db.q('create-question', args);
-
-            return this.getQuestion(question.id);
+            return question ? this.getQuestion(question.id) : undefined;
         }
         catch(e){
             console.error(`Failed to create question for event of ID ${ q.eventId }`);
-            console.error(e);
-
-            return new Question({});
+            console.error(e.message);
         }
     }
 
-    async updateQuestion(q: Question): Promise<Question>{
-        const args = [
-            q.id,
-            q.eventId,
-            q.userId,
-            q.text,
-            q.hidden
-        ];
-
+    async updateQuestion(q: Question): Promise<Question|undefined>{
         try{
-            const question = await db.q('update-question', args);
+            const question: IDBQuestion|undefined = await db.q('update-question', [
+                q.id,
+                q.eventId,
+                q.userId,
+                q.text,
+                q.hidden
+            ]);
 
-            return this.getQuestion(question.id);
+            return question ? this.getQuestion(question.id) : undefined;
         }
         catch(e){
             console.error(`Failed to update question for event of ID ${ q.eventId }`);
-            console.error(e);
-
-            return new Question({});
+            console.error(e.message);
         }
     }
 
@@ -365,7 +330,7 @@ class EventService{
         }
     }
 
-    async createQuestionVote(vote: Vote): Promise<Question>{
+    async createQuestionVote(vote: Vote): Promise<Question|undefined>{
         let existing
         try{
             existing = await this.getQuestionVoteByUser(vote.questionId, vote.userId);
