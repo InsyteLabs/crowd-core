@@ -7,8 +7,10 @@ import {
 import { db }             from '../db';
 import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
-import { IDBEvent, IDBEventSettings } from '../db/interfaces';
-import { IDBQuestion } from '../db/interfaces/event/IDBQuestion';
+
+import {
+    IDBEvent, IDBEventSettings, IDBQuestion, IDBQuestionVote
+} from '../db/interfaces';
 
 class EventService{
 
@@ -220,9 +222,9 @@ class EventService{
         QUESTION METHODS
         ================
     */
-    async getQuestions(): Promise<Question[]>{
+    async getQuestions(userId: number): Promise<Question[]>{
         try{
-            const questions: IDBQuestion[] = await db.query('get-questions');
+            const questions: IDBQuestion[] = await db.query('get-questions', [ userId ]);
 
             return questions.map(q => Question.fromDb(q));
         }
@@ -234,9 +236,9 @@ class EventService{
         }
     }
 
-    async getQuestion(id: number): Promise<Question|undefined>{
+    async getQuestion(userId: number, id: number): Promise<Question|undefined>{
         try{
-            const question: IDBQuestion|undefined = await db.q('get-question', [ id ]);
+            const question: IDBQuestion|undefined = await db.q('get-question', [ userId, id ]);
 
             return question ? Question.fromDb(question) : undefined;
         }
@@ -246,9 +248,9 @@ class EventService{
         }
     }
 
-    async getEventQuestions(eventId: number): Promise<Question[]>{
+    async getEventQuestions(userId: number, eventId: number): Promise<Question[]>{
         try{
-            const questions: IDBQuestion[] = await db.q('get-event-questions', [ eventId ]);
+            const questions: IDBQuestion[] = await db.q('get-event-questions', [ userId, eventId ]);
             
             return questions.map(q => Question.fromDb(q));
         }
@@ -260,8 +262,8 @@ class EventService{
         }
     }
 
-    async deleteQuestion(id: number): Promise<Question|undefined>{
-        const existing: Question|undefined = await this.getQuestion(id);
+    async deleteQuestion(userId: number, id: number): Promise<Question|undefined>{
+        const existing: Question|undefined = await this.getQuestion(userId, id);
 
         if(!existing) return;
 
@@ -276,7 +278,7 @@ class EventService{
         }
     }
 
-    async createQuestion(q: Question): Promise<Question|undefined>{
+    async createQuestion(userId: number, q: Question): Promise<Question|undefined>{
         try{
             const question: IDBQuestion|undefined = await db.q('create-question', [
                 q.eventId,
@@ -284,7 +286,7 @@ class EventService{
                 q.text
             ]);
 
-            return question ? this.getQuestion(question.id) : undefined;
+            return question ? this.getQuestion(userId, question.id) : undefined;
         }
         catch(e){
             console.error(`Failed to create question for event of ID ${ q.eventId }`);
@@ -292,7 +294,7 @@ class EventService{
         }
     }
 
-    async updateQuestion(q: Question): Promise<Question|undefined>{
+    async updateQuestion(userId: number, q: Question): Promise<Question|undefined>{
         try{
             const question: IDBQuestion|undefined = await db.q('update-question', [
                 q.id,
@@ -302,7 +304,7 @@ class EventService{
                 q.hidden
             ]);
 
-            return question ? this.getQuestion(question.id) : undefined;
+            return question ? this.getQuestion(userId, question.id) : undefined;
         }
         catch(e){
             console.error(`Failed to update question for event of ID ${ q.eventId }`);
@@ -316,79 +318,44 @@ class EventService{
         QUESTION VOTE METHODS
         =====================
     */
-    async getQuestionVoteByUser(questionId: number, userId: number): Promise<Vote>{
+    async getQuestionVoteByUser(questionId: number, userId: number): Promise<Vote|undefined>{
         try{
-            let vote = await db.q('get-question-vote-by-user', [ questionId, userId ]);
+            const vote: IDBQuestionVote|undefined = await db.q('get-question-vote-by-user', [ questionId, userId ]);
 
-            return Vote.from(vote || {});
+            return vote ? Vote.fromDb(vote) : undefined;
         }
         catch(e){
             console.error(`Error fetching vote of questionId ${ questionId } and userId ${ userId }`);
-            console.error(e);
-
-            return Vote.from({});
+            console.error(e.message);
         }
     }
 
-    async createQuestionVote(vote: Vote): Promise<Question|undefined>{
-        let existing
-        try{
-            existing = await this.getQuestionVoteByUser(vote.questionId, vote.userId);
-        }
-        catch(e){
-            console.error(`Error fetching existing vote of questionId ${ vote.questionId } and userId ${ vote.userId }`);
-            console.error(e);
-
-            return this.getQuestion(vote.questionId);
-        }
+    async createQuestionVote(userId: number, vote: Vote): Promise<Question|undefined>{
+        const existing: Vote|undefined = await this.getQuestionVoteByUser(vote.questionId, vote.userId);
 
         if(existing && existing.id){
-            try{
-                const deleted = await this.deleteVote(existing.id);
+            await this.deleteVote(existing.id);
 
-                // If vote was the same, do not write new vote (un-vote)
-                if(existing.value === vote.value){
-                    return this.getQuestion(vote.questionId);
-                }
-            }
-            catch(e){
-                throw e;
+            // If vote was the same, do not write new vote (un-vote)
+            if(existing.value === vote.value){
+                return this.getQuestion(userId, vote.questionId);
             }
         }
 
-        const args = [
-            vote.eventId,
-            vote.questionId,
-            vote.userId,
-            vote.value
-        ];
-
         try{
-            let vote = await db.q('create-question-vote', args);
-                vote = Vote.from(vote);
-            
-            return this.getQuestion(vote.questionId);
+            await db.q('create-question-vote', [
+                vote.eventId,
+                vote.questionId,
+                vote.userId,
+                vote.value
+            ]);
         }
         catch(e){
             console.error(`Error creating vote of questionId ${ vote.questionId } and userId ${ vote.userId }`);
-            console.error(e);
-
-            return this.getQuestion(vote.questionId);
+            console.error(e.message);
         }
-    }
 
-    async deleteQuestionVotes(questionId: number): Promise<boolean>{
-        try{
-            const deleted = await db.q('delete-question-votes', [ questionId ]);
-
-            return true;
-        }
-        catch(e){
-            console.error(`Failed to delete votes for question of ID ${ questionId }`);
-            console.error(e);
-
-            return false;
-        }
+        return this.getQuestion(userId, vote.questionId);
     }
 
     async deleteVote(voteId: number): Promise<boolean>{
@@ -399,26 +366,11 @@ class EventService{
         }
         catch(e){
             console.error(`Error deleting vote of ID ${ voteId }`);
-            console.error(e);
+            console.error(e.message);
 
             return false;
         }
     }
-
-    async getQuestionScore(eventId: number, questionId: number): Promise<IQuestionScore>{
-        try{
-            const score: IQuestionScore = await db.q('get-question-score', [ eventId, questionId ]);
-
-            return score;
-        }
-        catch(e){
-            console.error(`Failed to get score for questionId ${ questionId }`);
-            console.error(e);
-
-            return {}
-        }
-    }
-
 
     /*
         ==================

@@ -15,6 +15,7 @@ export interface IDBQuestion{
     user_username:     string;
     user_is_anonymous: string;
 
+    user_vote: number;
     upvotes:   number;
     downvotes: number;
     votes:     number;

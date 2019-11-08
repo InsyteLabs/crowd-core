@@ -1,5 +1,7 @@
 'use strict';
 
+import { IDBQuestionVote } from "../db/interfaces";
+
 export class Vote{
     id?:        number;
     eventId:    number;
@@ -15,7 +17,7 @@ export class Vote{
         this.value      = v.value;
     }
 
-    static from(v: any): Vote{
+    static fromDb(v: IDBQuestionVote): Vote{
         return new Vote({
             id:         v.id,
             eventId:    v.event_id,

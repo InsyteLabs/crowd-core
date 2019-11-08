@@ -1,1 +1,0 @@
-DELETE FROM event.vote WHERE question_id=$1;
