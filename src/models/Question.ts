@@ -47,11 +47,12 @@ export class Question{
             },
 
             stats: {
-                upvotes:   q.upvotes,
-                downvotes: q.downvotes,
-                votes:     q.votes,
-                score:     q.score,
-                userVote:  q.user_vote
+                upvotes:       q.upvotes,
+                downvotes:     q.downvotes,
+                votes:         q.votes,
+                score:         q.score,
+                userVote:      q.user_vote,
+                voteRequester: q.vote_requester
             },
         });
     }
