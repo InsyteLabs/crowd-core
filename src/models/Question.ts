@@ -1,6 +1,7 @@
 'use strict';
 
 import { IQuestionScore } from "../interfaces";
+import { IDBQuestion } from "../db/interfaces/event/IDBQuestion";
 
 export class Question{
     id?:      number;
@@ -18,7 +19,7 @@ export class Question{
         isAnonymous: boolean;
     }
 
-    constructor(q: any){
+    constructor(q: Question){
         this.id      = q.id;
         this.eventId = q.eventId;
         this.userId  = q.userId;
@@ -28,22 +29,29 @@ export class Question{
         this.stats   = q.stats;
     }
 
-    static from(q: any){
+    static fromDb(q: IDBQuestion): Question{
         return new Question({
             id:      q.id,
             eventId: q.event_id,
-            text:    q.text,
-            hidden:  q.hidden,
-            stats:   q.stats || {},
 
-            userId:  q.user_id,
+            text:   q.text,
+            hidden: q.hidden,
+
+            userId: q.user_id,
             user: {
                 id:            q.user_id,
                 firstName:     q.user_first_name,
                 lastName:      q.user_last_name,
                 username:      q.user_username,
                 isAnonymous: !!q.user_is_anonymous
-            }
+            },
+
+            stats: {
+                upvotes:   q.upvotes,
+                downvotes: q.downvotes,
+                votes:     q.votes,
+                score:     q.score
+            },
         });
     }
 }
