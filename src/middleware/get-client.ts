@@ -34,11 +34,9 @@ export async function getClient(req: Request, res: Response, next: NextFunction)
         }
     }
 
-    res.locals.client = client && client.id
-        ? client
-        : null;
+    res.locals.client = client ? client : null;
 
-    if(!res.locals.client) return http.notFound(res, 'Client account not found');
+    if(!client) return http.notFound(res, 'Client account not found');
 
     next();
 }
