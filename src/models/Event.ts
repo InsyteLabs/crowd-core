@@ -1,6 +1,7 @@
 'use strict';
 
 import { EventSettings } from "./EventSettings";
+import { IDBEvent } from "../db/interfaces";
 
 export class Event{
     id?:         number;
@@ -11,9 +12,10 @@ export class Event{
     startTime:   Date;
     endTime:     Date;
     active?:     boolean;
+    
     settings:    EventSettings;
 
-    constructor(event: any){
+    constructor(event: Event){
         this.id          = event.id;
         this.clientId    = event.clientId;
         this.title       = event.title;
@@ -25,17 +27,28 @@ export class Event{
         this.settings    = event.settings;
     }
 
-    static from(event: any): Event{
+    static fromDb(e: IDBEvent): Event{
         return new Event({
-            id:          event.id,
-            clientId:    event.client_id,
-            title:       event.title,
-            slug:        event.slug,
-            description: event.description,
-            startTime:   new Date(event.start_time),
-            endTime:     new Date(event.end_time),
-            active:      event.is_active,
-            settings:    event.settings
+            id:       e.id,
+            clientId: e.client_id,
+
+            title:       e.title,
+            slug:        e.slug,
+            description: e.description,
+            startTime:   new Date(e.start_time),
+            endTime:     new Date(e.end_time),
+            active:      e.is_active,
+
+            settings: {
+                id:      e.settings_id,
+                eventId: e.id,
+
+                isLocked:        e.is_locked,
+                requirePassword: e.require_password,
+                password:        e.password,
+                requireLogin:    e.require_login,
+                enableChat:      e.enable_chat
+            }
         });
     }
 }

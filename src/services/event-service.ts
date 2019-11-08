@@ -7,6 +7,7 @@ import {
 import { db }             from '../db';
 import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
+import { IDBEvent } from '../db/interfaces';
 
 class EventService{
 
@@ -17,13 +18,13 @@ class EventService{
     */
     async getEvents(): Promise<Event[]>{
         try{
-            const events: Event[] = await db.q('get-events');
+            const events: IDBEvent[] = await db.q('get-events');
 
-            return events.map(e => Event.from(e));
+            return events.map(e => Event.fromDb(e));
         }
         catch(e){
             console.error('Failed to get events from database');
-            console.error(e);
+            console.error(e.message);
 
             return [];
         }
@@ -31,151 +32,129 @@ class EventService{
 
     async getClientEvents(clientId: number): Promise<Event[]>{
         try{
-            const events = await db.q('get-client-events', [ clientId ]);
+            const events: IDBEvent[] = await db.q('get-client-events', [ clientId ]);
 
-            for(let i = 0, len = events.length; i < len; i++){
-                const event = events[i];
-
-                try{
-                    event.settings  = await this.getEventSettings(<number>event.id);
-                }
-                catch(e){
-                    console.error(`Failed to get questions for event of ID ${ event.id }`);
-                    console.error(e);
-                    
-                    event.questions = [];
-                }
-            }
-
-            return events.map((e: any) => Event.from(e));
+            return events.map(e => Event.fromDb(e));
         }
         catch(e){
             console.error(`Failed to get events for client of ID ${ clientId }`);
-            console.error(e);
+            console.error(e.message);
 
             return [];
         }
     }
 
-    async getClientEventBySlug(clientId: number, eventSlug: string): Promise<Event>{
+    async getClientEventBySlug(clientId: number, eventSlug: string): Promise<Event|undefined>{
         try{
-            const event     = await db.q('get-client-event-by-slug', [ clientId, eventSlug ]),
-                  settings  = await this.getEventSettings(<number>event.id);
+            const event: IDBEvent|undefined = await db.q('get-client-event-by-slug', [ clientId, eventSlug ]);
             
-            event.settings  = settings;
-
-            return Event.from(event);
+            return event ? Event.fromDb(event) : undefined;
         }
         catch(e){
             console.error(`Failed to get event of client ID ${ clientId } and slug ${ eventSlug }`);
-            console.error(e);
-
-            return Event.from({});
+            console.error(e.message);
         }
     }
 
-    async getEvent(id: number): Promise<Event>{
+    async getEvent(id: number): Promise<Event|undefined>{
         try{
-            const event:     Event         = await db.q('get-event', [ id ]),
-                  settings:  EventSettings = await this.getEventSettings(id);
+            const event: IDBEvent|undefined = await db.q('get-event', [ id ]);
 
-            event.settings  = settings;
-
-            return Event.from(event);
+            return event ? Event.fromDb(event) : undefined;
         }
         catch(e){
             console.error('Failed to get event from database');
-            console.error(e);
-
-            return new Event({});
+            console.error(e.message);
         }
     }
 
-    async createEvent(event: any): Promise<Event>{
-        const args = [
-            event.clientId,
-            event.title,
-            event.slug || slugify(event.title),
-            event.description,
-            event.startTime,
-            event.endTime
-        ];
-
+    async createEvent(event: any): Promise<Event|undefined>{
+        let newEvent: IDBEvent|undefined;
         try{
-            const newEvent = await db.q('create-event', args);
-
-            if(event.settings){
-                try{
-                    event.settings.eventId = newEvent.id;
-
-                    const settings = await this.createEventSettings(event.settings);
-
-                    newEvent.settings = settings;
-                }
-                catch(e){
-                    console.error(e);
-                }
-            }
-
-            return Event.from(newEvent);
+            newEvent = await db.q('create-event', [
+                event.clientId,
+                event.title,
+                event.slug || slugify(event.title),
+                event.description,
+                event.startTime,
+                event.endTime
+            ]);
         }
         catch(e){
             console.error(`Failed to create event "${ event.title }"`);
-            console.error(e);
-
-            return new Event({});
+            console.error(e.message);
         }
+
+        if(!newEvent) return;
+
+        if(event.settings){
+            try{
+                event.settings.eventId = newEvent.id;
+
+                await this.createEventSettings(event.settings);
+            }
+            catch(e){
+                console.error(`Error creating settings for new event "${ event.title }"`);
+                console.error(e.message);
+            }
+        }
+
+        return this.getEvent(newEvent.id);
     }
 
-    async updateEvent(event: any): Promise<Event>{
-        const args = [
-            event.id,
-            event.clientId,
-            event.title,
-            event.slug || slugify(event.title),
-            event.description,
-            event.startTime,
-            event.endTime
-        ];
-
+    async updateEvent(event: any): Promise<Event|undefined>{
+        let updatedEvent: IDBEvent|undefined;
         try{
-            const updatedEvent = await db.q('update-event', args);
-
-            if(event.settings){
-                try{
-                    event.settings.eventId = event.id;
-
-                    const settings = await this.updateEventSettings(event.settings);
-
-                    updatedEvent.settings = settings;
-                }
-                catch(e){
-                    console.error(e);
-                }
-            }
-
-            return Event.from(updatedEvent);
+            updatedEvent = await db.q('update-event', [
+                event.id,
+                event.clientId,
+                event.title,
+                event.slug || slugify(event.title),
+                event.description,
+                event.startTime,
+                event.endTime
+            ]);
         }
         catch(e){
             console.error(`Failed to update event "${ event.title }"`);
-            console.error(e);
-
-            return new Event({});
+            console.error(e.message);
         }
+
+        if(!updatedEvent) return;
+
+        if(event.settings){
+            try{
+                event.settings.eventId = event.id;
+
+                await this.updateEventSettings(event.settings);
+            }
+            catch(e){
+                console.error(`Error updating settings for event of Id "${ event.id }"`);
+                console.error(e.message);
+            }
+        }
+
+        return this.getEvent(event.id);
     }
 
-    async deleteEvent(id: number): Promise<Event>{
-        try{
-            const event = await db.q('delete-event', [ id ]);
+    async deleteEvent(id: number): Promise<Event|undefined>{
+        const existingEvent: Event|undefined = await this.getEvent(id);
 
-            return Event.from(event);
+        if(!existingEvent){
+            console.error('Not deleting event that could not be found');
+            return;
+        }
+
+        try{
+            await db.q('delete-event', [ id ]);
         }
         catch(e){
-            console.error(`Failed to delete event of ID ${ id }`);
-            console.error(e);
-
-            return new Event({});
+            console.error(`Error deleting event of Id "${ id }"`);
+            console.error(e.message);
+            return;
         }
+
+        return existingEvent;
     }
 
 
