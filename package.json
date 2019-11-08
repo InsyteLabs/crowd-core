@@ -4,14 +4,12 @@
   "description": "Voting application for conferences and organizations",
   "main": "dist/index.js",
   "scripts": {
-    "start":     "tsc-watch --onSuccess 'npm run start-dev'",
+    "start": "tsc-watch --onSuccess 'npm run start-dev'",
     "start-dev": "cp -r `find src/db/queries/ -type d` dist/db/queries && nodemon dist/index.js",
-
-    "build":    "npm run tsc && npm run copy-sql",
+    "build": "npm run tsc && npm run copy-sql",
     "copy-sql": "cp -r `find src/db/queries/ -type d` dist/db/queries",
-    
     "test": "jest",
-    "tsc":  "tsc",
+    "tsc": "tsc",
     "seed": "node dist/db-seeder.js"
   },
   "repository": {
