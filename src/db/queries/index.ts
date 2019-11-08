@@ -160,11 +160,6 @@ export const queries: IQueryDescriptor[] = [
         firstRow: true
     },
     {
-        name:     'remove-user-role',
-        path:     './account/role/remove-user-role.sql',
-        firstRow: true
-    },
-    {
         name: 'drop-user-roles',
         path: './account/role/drop-all-user-roles.sql'
     },

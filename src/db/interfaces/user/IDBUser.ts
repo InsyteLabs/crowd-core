@@ -14,5 +14,5 @@ export interface IDBUser{
     is_disabled:      boolean;
     disabled_comment: string;
 
-    roles: (string|number)[];
+    roles: string[];
 }

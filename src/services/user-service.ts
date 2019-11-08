@@ -6,6 +6,7 @@ import uuid        from 'uuid/v4';
 import { db }    from '../db';
 import { User }  from '../models';
 import { IRole } from '../interfaces';
+import { IDBUser, IDBRole, IDBUserRole } from '../db/interfaces';
 
 class UserService{
 
@@ -19,17 +20,9 @@ class UserService{
     */
     async getUsers(): Promise<User[]>{
         try{
-            const users = await db.q('get-users');
+            const users: IDBUser[] = await db.q('get-users');
 
-            for(let i = 0, len = users.length; i < len; i++){
-                const user = users[i];
-
-                const roles: IRole[] = await this.getUserRoles(user.id);
-
-                user.roles = roles.map(r => r.name);
-            }
-    
-            return users.map((u: any) => User.from(u));
+            return users.map(u => User.fromDb(u));
         }
         catch(e){
             console.error('Failed to get users from database');
@@ -41,17 +34,9 @@ class UserService{
 
     async getUsersByClient(clientId: number): Promise<User[]>{
         try{
-            const users = await db.q('get-users-by-client', [ clientId ]);
+            const users: IDBUser[] = await db.q('get-users-by-client', [ clientId ]);
 
-            for(let i = 0, len = users.length; i < len; i++){
-                const user = users[i];
-
-                const roles: IRole[] = await this.getUserRoles(user.id);
-
-                user.roles = roles.map(r => r.name);
-            }
-
-            return users.map((u: any) => User.from(u));
+            return users.map(u => User.fromDb(u));
         }
         catch(e){
             console.error(`Failed to get users of clientId ${ clientId }`);
@@ -61,108 +46,149 @@ class UserService{
         }
     }
 
-    async getUser(id: number): Promise<User>{
+    async getUser(id: number): Promise<User|undefined>{
         try{
-            const user  = await db.query('get-user', [ id ]),
-                  roles = await this.getUserRoles(id);
+            const user  = await db.query('get-user', [ id ]);
 
-            if(user){
-                user.roles = roles.map(r => r.name);
-            }
-    
-            return User.from(user || {});
+            return user ? User.fromDb(user) : undefined;
         }
         catch(e){
             console.error(`Failed to get user of ID "${ id }"`);
             console.error(e);
-
-            return new User({});
         }
     }
 
-    async getUserByUsername(username: string): Promise<User>{
+    async getUserByUsername(username: string): Promise<User|undefined>{
         try{
-            const user = await db.q('get-user-by-username', [ username ]);
+            const user: IDBUser = await db.q('get-user-by-username', [ username ]);
 
-            if(user){
-                const roles = await this.getUserRoles(user.id);
-
-                user.roles = roles.map(r => r.name);
-                
-                return User.from(user);
-            }
-            else{
-                return User.from({});
-            }
+            return user ? User.fromDb(user) : undefined;
         }
         catch(e){
             console.error(`Failed to get user of username ${ username }`);
             console.error(e);
-
-            return User.from({});
         }
     }
 
-    async createUser(newUser: User): Promise<User>{
+    async createUser(newUser: User): Promise<User|undefined>{
         let hash;
         try{
             hash = await this._hashPassword(newUser.password);
         }
         catch(e){
             console.error(`Error hashing password for new user "${ newUser.username || newUser.email }"`);
-            console.error(e);
+            console.error(e.message);
 
-            throw e
+            return;
         }
 
-        const args = [
-            newUser.clientId || null,
-            newUser.firstName,
-            newUser.lastName,
-            newUser.email,
-            newUser.username,
-            hash
-        ];
-
-        let user;
+        let user: IDBUser;
         try{
-            user = await db.query('create-user', args);
+            user = await db.query('create-user', [
+                newUser.clientId || null,
+                newUser.firstName,
+                newUser.lastName,
+                newUser.email,
+                newUser.username,
+                hash
+            ]);
+
+            if(!user) return;
         }
         catch(e){
             console.error(`Error saving new user "${ newUser.username || newUser.email }"`);
             console.error(e);
 
-            throw e
+            return;
         }
 
         if(newUser.roles && newUser.roles.length){
-            try{
-                const roles = await this.updateUserRoles(user.id, <number[]>newUser.roles);
-            }
-            catch(e){
-                console.error(`Error setting roles for new user "${ newUser.username || newUser.email }"`);
-                console.error(e);
+            await this.setUserRoles(user.id, newUser.roles);
+        }
 
-                throw e;
+        return this.getUser(user.id);
+    }
+
+    async createAnonymousUser(clientId: number): Promise<User|undefined>{
+        try{
+            const user: IDBUser|undefined = await db.q('create-anonymous-user', [ clientId, uuid() ]);
+
+            return user ? this.getUser(user.id) : undefined;
+        }
+        catch(e){
+            console.error('Error creating anonymous user');
+            console.error(e.message);
+        }
+    }
+
+    async updateUser(user: User): Promise<User|undefined>{
+        const curUser: User|undefined = await this.getUser(<number>user.id);
+
+        if(!curUser) return;
+
+        for(let prop in user){
+            if(user[prop] !== undefined){
+                curUser[prop] = user[prop];
             }
         }
 
-        user = await this.getUser(user.id);
+        let updated;
+        try{
+            updated = await db.q('update-user', [
+                curUser.id,
+                curUser.firstName,
+                curUser.lastName,
+                curUser.email,
+                curUser.username,
+                curUser.isDisabled,
+                curUser.disabledComment
+            ]);
+        }
+        catch(e){
+            console.error(`Error updating user "${ user.username || user.email }"`);
+            console.error(e.message);
 
-        return user;
+            return;
+        }
+
+        if(user.roles && user.roles.length){
+            await this.setUserRoles(<number>user.id, user.roles);
+        }
+
+        return this.getUser(updated.id);
+    }
+    
+    async deleteUser(id: number): Promise<User|undefined>{
+        const curUser: User|undefined = await this.getUser(id);
+
+        if(!curUser) return;
+
+        try{
+            await db.q('delete-user', [ id ]);
+            
+            return curUser;
+        }
+        catch(e){
+            console.error(`Error deleting user of Id ${ id }`);
+            console.error(e.message);
+
+            return;
+        }
     }
 
-    async createAnonymousUser(clientId: number): Promise<User>{
+    async setUserPassword(userId: number, password: string): Promise<User|undefined>{
+        const hash = await this._hashPassword(password);
+
         try{
-            const user = await db.q('create-anonymous-user', [ clientId, uuid() ]);
+            const user: IDBUser = await db.q('update-user-password', [ userId, hash ]);
 
             return this.getUser(user.id);
         }
         catch(e){
-            console.error('Error creating anonymous user');
+            console.error(`Failed to update password for user of ID ${ userId }`);
             console.error(e);
 
-            throw e;
+            return;
         }
     }
 
@@ -179,291 +205,123 @@ class UserService{
         return this._checkPassword(password, user.password);
     }
 
-    async updateUser(user: User): Promise<User>{
-
-        let curUser;
-        try{
-            curUser = await this.getUser(user.id as number);
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
-
-        for(let prop in user){
-            if(user[prop] !== undefined){
-                curUser[prop] = user[prop];
-            }
-        }
-
-        const args = [
-            curUser.id,
-            curUser.firstName,
-            curUser.lastName,
-            curUser.email,
-            curUser.username,
-            curUser.isDisabled,
-            curUser.disabledComment
-        ];
-
-        let updated;
-        try{
-            updated = await db.q('update-user', args);
-        }
-        catch(e){
-            console.error('Error updating user')
-            console.error(e);
-
-            return Promise.reject('Failed to update user');
-        }
-
-        if(user.roles && user.roles.length){
-            try{
-                const roles = await this.updateUserRoles(updated.id, <number[]>user.roles);
-            }
-            catch(e){
-                return Promise.reject(e);
-            }
-        }
-
-        return this.getUser(updated.id);
-    }
-
-    async setUserPassword(userId: number, password: string): Promise<User>{
-        const hash = await this._hashPassword(password);
-
-        try{
-            const user = await db.q('update-user-password', [ userId, hash ]);
-
-            return User.from(user);
-        }
-        catch(e){
-            console.error(`Failed to update password for user of ID ${ userId }`);
-            console.error(e);
-
-            return new User({});
-        }
-    }
-
-    async disableUser(id: number, comment: string): Promise<User>{
-        let user;
-        try{
-            user = await this.getUser(id);
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
-
-        user.isDisabled      = true;
-        user.disabledComment = comment;
-
-        return this.updateUser(user);
-    }
-
-    async enableUser(id: number): Promise<User>{
-        let user;
-        try{
-            user = await this.getUser(id);
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
-
-        user.isDisabled      = false;
-        user.disabledComment = null;
-
-        return this.updateUser(user);
-    }
-
-    async deleteUser(id: number): Promise<User>{
-        let user;
-        try{
-            user = await db.q('delete-user', [ id ]);
-
-            user.roles = [];
-
-            return User.from(user);
-        }
-        catch(e){
-            console.error(`Error deleting user of Id ${ id }`);
-            console.error(e);
-
-            return User.from({});
-        }
-    }
-
 
     /*
         ============
         ROLE METHODS
         ============
     */
-    async getRoles(): Promise<IRole[]>{
+    async getRoles(): Promise<IDBRole[]>{
         try{
-            return await db.q('get-roles');
+            const roles: IDBRole[] = await db.q('get-roles');
+
+            return roles;
         }
         catch(e){
             console.error('Failed to get roles from database');
             console.error(e);
 
-            return Promise.resolve([]);
+            return [];
         }
     }
 
-    async getRoleIds(): Promise<number[]>{
+    async getRole(id: number): Promise<IDBRole|undefined>{
         try{
-            const roles = await this.getRoles();
+            const role: IDBRole = await db.q('get-role', [ id ]);
 
-            const validRoleIds: number[] = roles.reduce((acc: number[], r: IRole) => {
-                acc.push(r.id as number);
-    
-                return acc;
-            }, []);
-
-            return validRoleIds;
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
-    }
-
-    async getRole(id: number): Promise<IRole>{
-        try{
-            return await db.q('get-role', [ id ]);
+            return role ? role : undefined;
         }
         catch(e){
             console.error(`Failed to get role "${ id }" from database`);
-            console.error(e);
-
-            return Promise.resolve({id: null, name: ''});
+            console.error(e.message);
         }
     }
 
-    async createRole(role: IRole): Promise<IRole>{
+    async createRole(newRole: IRole): Promise<IDBRole|undefined>{
         try{
-            return await db.q('create-role', [ role.name ]);
+            const role: IDBRole = await db.q('create-role', [ newRole.name ]);
+
+            return role ? role : undefined;
         }
         catch(e){
-            console.error(`Failed to create role "${ role.name }"`);
-            console.error(e);
-
-            return Promise.reject({id: null, name: ''});
+            console.error(`Failed to create role "${ newRole.name }"`);
+            console.error(e.message);
         }
     }
 
-    async updateRole(role: IRole): Promise<IRole>{
-        let curRole;
+    async updateRole(role: IRole): Promise<IDBRole|undefined>{
+        const curRole: IDBRole|undefined = await this.getRole(<number>role.id);
+
+        if(!curRole) return;
+
+        curRole.name = role.name;
+
         try{
-            curRole = await this.getRole(role.id as number);
+
+            const updatedRole: IDBRole = await db.q('update-role', [ curRole.id, curRole.name ]);
+
+            return updatedRole ? updatedRole : undefined;
         }
         catch(e){
-            return Promise.reject(e);
+            console.error(`Error updating role of Id "${ role.id }"`);
+            console.error(e.message);
         }
-
-        for(let prop in role){
-            if(role[prop] !== undefined){
-                curRole[prop] = role[prop];
-            }
-        }
-        return db.q('update-role', [ curRole.id, curRole.name ]);
+        
     }
 
-    async getUserRoles(userId: number): Promise<IRole[]>{
+    async getUserRoles(userId: number): Promise<string[]>{
 
         try{
-            const roles = await db.query('get-user-roles', [ userId ]);
+            const userRoles: { roles: string[] } = await db.query('get-user-roles', [ userId ]);
 
-            return roles;
+            return userRoles.roles;
         }
         catch(e){
             console.error(`Failed to get roles for userID "${ userId }"`);
-            console.error(e);
+            console.error(e.message);
 
             return [];
         }
     }
 
-    async updateUserRoles(userId: number, roles: number[]){
-        let validRoles: number[];
-        try{
-            validRoles = await this.getRoleIds();
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
+    async setUserRoles(userId: number, roles: string[]): Promise<string[]>{
+        if(!roles.length) return [];
 
-        // Filter out roles that are not valid
-        roles = roles.filter(r => validRoles.includes(r));
+        const validRoles: IDBRole[] = await this.getRoles();
 
-        // Drop all roles for the user
-        try{
-            await this.dropUserRoles(userId);
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
+        const rolesToSet: IDBRole[] = validRoles.filter(r => roles.includes(r.name));
 
-        // Set the provided roles
-        try{
-            const rolesAdded = await this.addUserRoles(userId, roles);
-
-            return rolesAdded;
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
+        await this.dropUserRoles(userId);
+        await this.addUserRoles(userId, rolesToSet.map(r => r.id));
+        
+        return this.getUserRoles(userId);
     }
 
-    async addUserRoles(userId: number, roles: number[]){
+    async addUserRoles(userId: number, roles: number[]): Promise<string[]>{
         try{
-            const insertedRoles = [];
             for(let i = 0, len = roles.length; i < len; i++){
-                const inserted = await db.q('add-user-role', [ roles[i], userId ]);
-
-                inserted && insertedRoles.push(inserted.role_id);
+                const inserted: IDBUserRole = await db.q('add-user-role', [ roles[i], userId ]);
             }
 
-            return insertedRoles;
+            return this.getUserRoles(userId);
         }
         catch(e){
             console.error('Error adding user roles to database');
-            console.error(e);
+            console.error(e.message);
 
             return [];
         }
     }
 
-    async removeUserRoles(userId: number, roles: number[]){
+    async dropUserRoles(userId: number): Promise<string[]>{
         try{
-            const deletedRoles = [];
-            for(let i = 0, len = roles.length; i < len; i++){
-                const deleted = await db.q('remove-user-role', [ roles[i], userId ]);
+            const droppedRoles: IDBUserRole[] = await db.q('drop-user-roles', [ userId ]);
 
-                deleted && deletedRoles.push(deleted.role_id);
-            }
-
-            return deletedRoles.filter(r => r);
-        }
-        catch(e){
-            console.error('Error deleting user roles from database');
-            console.error(e);
-
-            return [];
-        }
-    }
-
-    async dropUserRoles(userId: number){
-        try{
-            const droppedRoles = await db.q('drop-user-roles', [ userId ]);
-
-            return droppedRoles.reduce((acc: number[], r: any) => {
-                acc.push(r.role_id);
-
-                return acc;
-            }, []);
+            return this.getUserRoles(userId);
         }
         catch(e){
             console.error(`Failed to drop roles for userID "${ userId }"`);
-            console.error(e);
+            console.error(e.message);
 
             return [];
         }

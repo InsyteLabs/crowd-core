@@ -26,4 +26,6 @@ LEFT JOIN LATERAL (
 		UR.user_id=U.id
 ) AS R ON R.user_id=U.id
 
+WHERE U.id=$1
+
 GROUP BY U.id;

@@ -35,9 +35,9 @@ export async function getCurrentUser(req: Request, res: Response, next: NextFunc
     }
 
     try{
-        const user: User = await userService.getUser(validToken.data.id);
+        const user: User|undefined = await userService.getUser(validToken.data.id);
 
-        if(!(user && user.id)){
+        if(!user){
             return http.unauthorized(res, 'Token valid, user not found. Maybe the user was deleted?');
         }
 

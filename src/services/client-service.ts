@@ -230,23 +230,8 @@ class ClientService{
 
         if(!typesToSet.length) return this.getClientTypes(clientId);
 
-        try{
-            await this.dropClientTypes(clientId);
-        }
-        catch(e){
-            console.error(`Error dropping types for client of Id "${ clientId }"`);
-            console.error(e.message);
-
-            return this.getClientTypes(clientId);
-        }
-
-        try{
-            await this.addClientTypes(clientId, typesToSet.map(t => <number>t.id));
-        }
-        catch(e){
-            console.error(`Error setting new types for client of Id "${ clientId }"`);
-            console.error(e.message);
-        }
+        await this.dropClientTypes(clientId);
+        await this.addClientTypes(clientId, typesToSet.map(t => <number>t.id));
         
         return this.getClientTypes(clientId);
     }

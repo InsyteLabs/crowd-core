@@ -1,9 +1,11 @@
 
 SELECT
-    USER_ROLE.role_id AS id,
-    ROLE_TYPE.name
+    COALESCE(json_agg(R.name) FILTER (WHERE R.name IS NOT NULL), '[]'::json) AS roles
+
 FROM
-    account.user_role AS USER_ROLE
+    account.user_role AS UR
+
 LEFT JOIN
-    account.role AS ROLE_TYPE ON ROLE_TYPE.id = USER_ROLE.role_id
-WHERE user_id=$1
+    account.role AS R ON R.id = UR.role_id
+
+WHERE user_id=$1;

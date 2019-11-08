@@ -98,28 +98,6 @@ router.delete('/users/:id', async (req, res, next) => {
     }
 });
 
-router.get('/users/:id/disable', async (req, res, next) => {
-    try{
-        const user = await userService.disableUser(+req.params.id, 'Disabled via API');
-
-        return res.json(user);
-    }
-    catch(e){
-        return http.serverError(res, e);
-    }
-});
-
-router.get('/users/:id/enable', async (req, res, next) => {
-    try{
-        const user = await userService.enableUser(+req.params.id);
-
-        return res.json(user);
-    }
-    catch(e){
-        return http.serverError(res, e);
-    }
-});
-
 router.get('/roles', async (req, res, next) => {
     try{
         const roles = await userService.getRoles();

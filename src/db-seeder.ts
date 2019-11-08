@@ -52,7 +52,7 @@ import { Client, User }               from './models';
                 email:     'bryce@brycejech.com',
                 username:  'PyGuy',
                 password:  'myFakePa$$wor^d',
-                roles:     [1]
+                roles:     ['admin']
             },
             {
                 clientId:  null,
@@ -61,7 +61,7 @@ import { Client, User }               from './models';
                 email:     'laryn_burns@yahoo.com',
                 username:  'Laryolyn',
                 password:  'aSuperF4k$pass',
-                roles:     [2, 3]
+                roles:     ['sub-admin', 'moderator']
             },
             {
                 clientId:  null,
@@ -70,7 +70,7 @@ import { Client, User }               from './models';
                 email:     'traceyjech@gmail.com',
                 username:  'Gammy',
                 password:  'theM0$stSecur%epass4Eva',
-                roles:     [2, 3]
+                roles:     ['sub-admin', 'moderator']
             }
         ];
 
