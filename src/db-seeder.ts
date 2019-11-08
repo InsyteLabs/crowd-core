@@ -143,7 +143,7 @@ import { Client, User }               from './models';
                 name:    'InsyteLabs',
                 slug:    'insyte-labs',
                 ownerId: owner.id as number,
-                types:   [4]
+                types:   ['elite']
             }
         ];
 
