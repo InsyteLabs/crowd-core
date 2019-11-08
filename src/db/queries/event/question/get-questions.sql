@@ -17,6 +17,7 @@ SELECT
 	, COUNT(CASE WHEN V.value IS NOT NULL THEN 1 ELSE NULL END):: integer AS votes
     , COALESCE(SUM(V.value), 0)::integer                                  AS score
     , SUM(CASE WHEN V.user_id=$1 THEN V.value ELSE 0 END)::integer        AS user_vote
+	, $1                                                                  AS vote_requester
 
 FROM
     event.question AS Q
