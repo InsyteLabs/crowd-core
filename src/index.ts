@@ -7,6 +7,7 @@ import Express          from 'express';
 import bodyParser       from 'body-parser';
 import { router }       from './routes';
 import { SocketServer } from './web-sockets';
+import conf             from './conf';
 
 const app:          Express.Express = Express(),
       server:       http.Server     = http.createServer(app),
@@ -42,6 +43,6 @@ app.get('/', (req, res, next) => {
 
 app.use(router);
 
-server.listen(8080, () => {
-    console.log('Server listening on 8080');
+server.listen(conf.PORT, () => {
+    console.log(`Express server listening on ${ conf.PORT }`);
 });
