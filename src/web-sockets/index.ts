@@ -16,9 +16,9 @@ export class SocketServer{
 
         this._server.on('connection', (ws: WS, req: Request): void => {
             // Socket clients must provide a client slug for channel notifications
-            if(!req.url.includes('/client/')) return ws.close();
+            if(!req.url.includes('/websocket/')) return ws.close();
 
-            const slug: string = req.url.replace('/client/', '');
+            const slug: string = req.url.replace('/websocket/', '');
     
             if(this._clients.hasOwnProperty(slug) && Array.isArray(this._clients[slug])){
                 this._clients[slug].push(ws);
