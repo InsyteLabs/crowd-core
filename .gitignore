@@ -1,7 +1,13 @@
 
+# Application config
 src/conf
-!.gitkeep
 database.json
-dist/**
+process.config.js
+
+# Build/log folders
+dist
+log
+
+!.gitkeep
 
 node_modules
