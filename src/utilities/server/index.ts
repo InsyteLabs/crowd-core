@@ -6,7 +6,7 @@ import { SocketServer } from '../../web-sockets';
 
 export async function currentStats(httpServer: http.Server, socketServer: SocketServer){
     const cpuUsage = await getCPUUsage(),
-          cpuFree  = await getFreeCPU();
+          cpuFree  = 100 - cpuUsage;
 
     const totalConnections  = await getAPIConnections(httpServer),
           socketConnections = socketServer.getClientCount(),
@@ -19,9 +19,9 @@ export async function currentStats(httpServer: http.Server, socketServer: Socket
             free:  cpuFree
         },
         memory: {
-            total: os.totalmem(),
-            free:  os.freemem(),
-            usage: parseInt((os.freememPercentage() * 100).toFixed(2))
+            totalMB: parseFloat(os.totalmem().toFixed(2)),
+            freeMB:  parseFloat(os.freemem().toFixed(2)),
+            usage:   parseFloat((os.freememPercentage() * 100).toFixed(2))
         },
         sys: {
             platform: os.platform(),
