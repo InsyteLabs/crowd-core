@@ -53,6 +53,10 @@ export class SocketServer{
 
         clients.forEach(c => c.send(msg));
     }
+
+    getClientCount(): number{
+        return this._server.clients.size;
+    }
     
 
     /*

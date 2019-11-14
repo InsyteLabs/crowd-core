@@ -2,12 +2,13 @@
 
 require('source-map-support').install();
 
-import * as http        from 'http';
-import Express          from 'express';
-import bodyParser       from 'body-parser';
-import { router }       from './routes';
-import { SocketServer } from './web-sockets';
-import conf             from './conf';
+import * as http                 from 'http';
+import Express                   from 'express';
+import bodyParser                from 'body-parser';
+import { router }                from './routes';
+import { SocketServer }          from './web-sockets';
+import conf                      from './conf';
+import { server as serverUtils } from './utilities';
 
 const app:          Express.Express = Express(),
       server:       http.Server     = http.createServer(app),
@@ -39,6 +40,12 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res, next) => {
     return res.send({ message: 'OK' });
+});
+
+app.get('/healthcheck', async (req, res, next) => {
+    const stats = await serverUtils.currentStats(server, socketServer);
+
+    res.json(stats);
 });
 
 app.use(router);
