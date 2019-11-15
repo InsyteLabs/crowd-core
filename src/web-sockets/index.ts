@@ -29,6 +29,10 @@ export class SocketServer{
 
             ws.send('{"type": "connection-accepted"}');
 
+            ws.on('message', (msg) => {
+                console.log(`WS MESSAGE: ${ msg }`);
+            });
+
             console.log(`UPGRADE ${ req.url }`);
 
             /*
