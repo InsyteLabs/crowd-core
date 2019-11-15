@@ -29,6 +29,8 @@ export class SocketServer{
 
             ws.send('{"type": "connection-accepted"}');
 
+            console.log(`UPGRADE ${ req.url }`);
+
             /*
                 =========
                 HEARTBEAT
