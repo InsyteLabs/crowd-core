@@ -2,7 +2,7 @@
 
 import { Router }         from 'express';
 import * as jwt           from 'jsonwebtoken';
-import conf               from '../conf';
+import conf               from '../../conf';
 import { getClient }      from '../middleware';
 import { userService }    from '../services';
 import { SocketServer }   from '../web-sockets';

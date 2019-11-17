@@ -1,6 +1,6 @@
 
 # Application config
-src/conf
+conf
 database.json
 process.config.js
 
