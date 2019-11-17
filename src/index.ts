@@ -7,7 +7,7 @@ import Express                   from 'express';
 import bodyParser                from 'body-parser';
 import { router }                from './routes';
 import { SocketServer }          from './web-sockets';
-import conf                      from './conf';
+import conf                      from '../conf';
 import { server as serverUtils } from './utilities';
 
 const app:          Express.Express = Express(),

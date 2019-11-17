@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as jwt                            from 'jsonwebtoken';
 import { userService }                     from '../services';
 import { User }                            from '../models';
-import conf                                from '../conf';
+import conf                                from '../../conf';
 import { http }                            from '../utilities';
 
 export async function getCurrentUser(req: Request, res: Response, next: NextFunction){
