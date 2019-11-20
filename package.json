@@ -8,7 +8,7 @@
     "start-dev": "cp -r `find src/db/queries/ -type d` dist/db/queries && nodemon dist/index.js",
     "build": "npm run tsc && npm run copy-sql",
     "copy-sql": "cp -r `find src/db/queries/ -type d` dist/db/queries",
-    "watch": "tsc-watch",
+    "watch": "tsc-watch --onSuccess 'npm run copy-sql'",
     "test": "jest",
     "tsc": "tsc",
     "seed": "node dist/db-seeder.js"
