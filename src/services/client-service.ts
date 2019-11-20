@@ -9,13 +9,6 @@ import { Client }  from '../models';
 import { IType }   from '../interfaces';
 import { slugify } from '../utilities';
 
-/*
-    TODO
-    ----
-
-    Join client types in the client queries as JSON to avoid excessive lookups
-*/
-
 class ClientService{
 
     /*
