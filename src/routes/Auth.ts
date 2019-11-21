@@ -23,16 +23,17 @@ router.post('/authenticate', async (req, res, next) => {
               valid = await userService.checkUserPassword(username, password);
 
         if(!valid){
-            return http.unauthorized(res, 'Incorrect username/password');
+            http.unauthorized(res, 'Incorrect username/password');
         }
-
-        const token = await jwt.sign({
-            issuer: 'CROWDCORE_API',
-            exp: Math.floor(Date.now() / 1000) + (SECONDS_IN_DAY),
-            data: user
-        }, conf.SECRET);
-        
-        res.json({ token });
+        else{
+            const token = await jwt.sign({
+                issuer: 'CROWDCORE_API',
+                exp: Math.floor(Date.now() / 1000) + (SECONDS_IN_DAY),
+                data: user
+            }, conf.SECRET);
+            
+            res.json({ token });
+        }
 
         await logService.createAuthLog({
             clientId: user ? user.clientId : null,
@@ -80,17 +81,17 @@ router.post('/authenticate/anonymous', async (req, res, next) => {
             }, conf.SECRET);
     
             res.json({ token });
+
+            await logService.createAuthLog({
+                clientId: user ? user.clientId : null,
+                userId:   user ? user.id       : null,
+                ip:       req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+                success:  true
+            });
         }
         else{
             http.notFound(res, 'user-not-found');
         }
-
-        await logService.createAuthLog({
-            clientId: user ? user.clientId : null,
-            userId:   user ? user.id       : null,
-            ip:       req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-            success:  true
-        });
     }
     catch(e){
         return http.serverError(res, e);
