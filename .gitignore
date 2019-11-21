@@ -6,7 +6,7 @@ process.config.js
 
 # Build/log folders
 dist
-log
+/log
 
 !.gitkeep
 
