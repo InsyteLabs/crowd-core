@@ -1,13 +1,13 @@
 'use strict';
 
-import { Router }         from 'express';
-import * as jwt           from 'jsonwebtoken';
-import conf               from '../conf';
-import { getClient }      from '../middleware';
-import { userService }    from '../services';
-import { SocketServer }   from '../web-sockets';
-import { http }           from '../utilities';
-import { SECONDS_IN_DAY } from '../constants';
+import { Router }                  from 'express';
+import * as jwt                    from 'jsonwebtoken';
+import conf                        from '../conf';
+import { getClient }               from '../middleware';
+import { userService, logService } from '../services';
+import { SocketServer }            from '../web-sockets';
+import { http }                    from '../utilities';
+import { SECONDS_IN_DAY }          from '../constants';
 
 const router = Router();
 
@@ -32,7 +32,14 @@ router.post('/authenticate', async (req, res, next) => {
             data: user
         }, conf.SECRET);
         
-        return res.json({ token });
+        res.json({ token });
+
+        await logService.createAuthLog({
+            clientId: user ? user.clientId : null,
+            userId:   user ? user.id       : null,
+            ip:       req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+            success:  valid
+        });
     }
     catch(e){
         return http.serverError(res, e);
@@ -72,10 +79,18 @@ router.post('/authenticate/anonymous', async (req, res, next) => {
                 data: user
             }, conf.SECRET);
     
-            return res.json({ token });
+            res.json({ token });
         }
-        
-        return http.notFound(res, 'user-not-found');
+        else{
+            http.notFound(res, 'user-not-found');
+        }
+
+        await logService.createAuthLog({
+            clientId: user ? user.clientId : null,
+            userId:   user ? user.id       : null,
+            ip:       req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+            success:  true
+        });
     }
     catch(e){
         return http.serverError(res, e);

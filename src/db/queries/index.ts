@@ -314,6 +314,26 @@ export const queries: IQueryDescriptor[] = [
         name:     'delete-event-message',
         path:     './event/chat/delete-event-message.sql',
         firstRow: true
+    },
+
+
+    /*
+        ================
+        AUTH LOG QUERIES
+        ================
+    */
+    {
+        name: 'get-auth-log',
+        path: './log/auth/get-auth-log.sql'
+    },
+    {
+        name: 'get-client-auth-log',
+        path: './log/auth/get-client-auth-log.sql'
+    },
+    {
+        name:     'create-auth-log',
+        path:     './log/auth/create-auth-log.sql',
+        firstRow: true
     }
 ].map((q: any) => {
     try{
