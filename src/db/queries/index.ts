@@ -331,8 +331,17 @@ export const queries: IQueryDescriptor[] = [
         path: './log/auth/get-client-auth-log.sql'
     },
     {
+        name: 'get-user-auth-log',
+        path: './log/auth/get-user-auth-log.sql'
+    },
+    {
         name:     'create-auth-log',
         path:     './log/auth/create-auth-log.sql',
+        firstRow: true
+    },
+    {
+        name:     'get-auth-log-by-id',
+        path:     './log/auth/get-auth-log-by-id.sql',
         firstRow: true
     }
 ].map((q: any) => {
