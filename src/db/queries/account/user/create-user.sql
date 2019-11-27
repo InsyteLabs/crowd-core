@@ -6,7 +6,8 @@ INSERT INTO account.user
     last_name,
     email,
     username,
-    password
+    password,
+    is_anonymous
 )
 
 VALUES
@@ -16,7 +17,8 @@ VALUES
     $3,
     $4,
     $5,
-    $6
+    $6,
+    False
 )
 
 RETURNING 
