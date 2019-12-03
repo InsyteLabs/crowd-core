@@ -343,7 +343,29 @@ export const queries: IQueryDescriptor[] = [
         name:     'get-auth-log-by-id',
         path:     './log/auth/get-auth-log-by-id.sql',
         firstRow: true
+    },
+
+
+    /*
+        ==================
+        EVENT VIEW QUERIES
+        ==================
+    */
+    {
+        name: 'get-event-views',
+        path: './log/event-view/get-event-views.sql'
+    },
+    {
+        name:     'get-event-view',
+        path:     './log/event-view/get-event-view.sql',
+        firstRow: true
+    },
+    {
+        name:     'create-event-view',
+        path:     './log/event-view/create-event-view.sql',
+        firstRow: true
     }
+
 ].map((q: any) => {
     try{
         q.sql = fs.readFileSync(path.resolve(__dirname, q.path), 'utf8');

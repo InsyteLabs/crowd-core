@@ -1,21 +1,25 @@
 INSERT INTO log.event_view (
-	  client_id
+	  code
+	, client_id
 	, user_id
 	, event_id
-	, user_event
 	, time
 )
 VALUES
 (
-	$1, $2, $3, $2 || '_' || $3, NOW()
+	  $1
+	, $2
+	, $3
+	, $4
+	, NOW() AT time zone 'utc'
 )
 
-ON CONFLICT (user_event) DO UPDATE SET time=NOW()
+ON CONFLICT (code) DO UPDATE SET time=NOW() AT time zone 'utc'
 
 RETURNING
 	  id
 	, client_id
 	, user_id
 	, event_id
-	, user_event
+	, code
 	, time;

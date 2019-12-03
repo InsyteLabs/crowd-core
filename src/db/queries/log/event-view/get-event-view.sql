@@ -26,6 +26,4 @@ INNER JOIN account.client AS C ON C.id=EV.client_id
 INNER JOIN account.user   AS U ON U.id=EV.user_id
 INNER JOIN event.event    AS E ON E.id=EV.event_id
 
-WHERE EV.event_id=$1
-
-ORDER BY EV.time DESC;
+WHERE EV.id=$1;
