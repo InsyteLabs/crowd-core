@@ -52,6 +52,7 @@ import { Client, User }               from './models';
                 email:     'bryce@brycejech.com',
                 username:  'PyGuy',
                 password:  'myFakePa$$wor^d',
+                lastLogin: null,
                 roles:     ['admin']
             },
             {
@@ -61,6 +62,7 @@ import { Client, User }               from './models';
                 email:     'laryn_burns@yahoo.com',
                 username:  'Laryolyn',
                 password:  'aSuperF4k$pass',
+                lastLogin: null,
                 roles:     ['sub-admin', 'moderator']
             },
             {
@@ -70,6 +72,7 @@ import { Client, User }               from './models';
                 email:     'traceyjech@gmail.com',
                 username:  'Gammy',
                 password:  'theM0$stSecur%epass4Eva',
+                lastLogin: null,
                 roles:     ['sub-admin', 'moderator']
             }
         ];
