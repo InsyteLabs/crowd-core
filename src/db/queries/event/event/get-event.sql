@@ -20,13 +20,19 @@ SELECT
 	, S.password
 	, S.require_login
 	, S.enable_chat
+	, COALESCE(COUNT(V), 0)::int AS views
     
 FROM
     event.event AS E
 	
-LEFT JOIN setting.event AS S on S.event_id=E.id
+LEFT JOIN setting.event  AS S ON S.event_id=E.id
+LEFT JOIN log.event_view AS V ON V.event_id=E.id
 
 WHERE E.id=$1
+
+GROUP BY
+	  E.id
+	, S.id
 
 ORDER BY
 	is_active    DESC,

@@ -12,6 +12,7 @@ export class Event{
     startTime:   Date;
     endTime:     Date;
     active?:     boolean;
+    views:       number;
     
     settings:    EventSettings;
 
@@ -24,6 +25,7 @@ export class Event{
         this.startTime   = new Date(event.startTime);
         this.endTime     = new Date(event.endTime);
         this.active      = event.active;
+        this.views       = event.views || 0;
         this.settings    = event.settings;
     }
 
@@ -38,6 +40,7 @@ export class Event{
             startTime:   new Date(e.start_time),
             endTime:     new Date(e.end_time),
             active:      e.is_active,
+            views:       e.views,
 
             settings: {
                 id:      e.settings_id,
