@@ -12,6 +12,7 @@ export class User{
     email:            string;
     username:         string;
     password:         string;
+    lastLogin:        Date|null;
     isAnonymous?:     boolean;
     isDisabled?:      boolean;
     disabledComment?: string|null;
@@ -19,16 +20,17 @@ export class User{
     roles:            string[];
 
     constructor(user: any){
-        this.id              = user.id
-        this.clientId        = user.clientId
-        this.firstName       = user.firstName
-        this.lastName        = user.lastName
-        this.email           = user.email
-        this.username        = user.username
-        this.password        = user.password
+        this.id              = user.id;
+        this.clientId        = user.clientId;
+        this.firstName       = user.firstName;
+        this.lastName        = user.lastName;
+        this.email           = user.email;
+        this.username        = user.username;
+        this.password        = user.password;
+        this.lastLogin       = user.lastLogin;
         this.isAnonymous     = user.isAnonymous;
-        this.isDisabled      = user.isDisabled
-        this.disabledComment = user.disabledComment
+        this.isDisabled      = user.isDisabled;
+        this.disabledComment = user.disabledComment;
 
         this.roles           = user.roles || [];
     }
@@ -42,6 +44,7 @@ export class User{
             email:            u.email,
             username:         u.username,
             password:         u.password,
+            lastLogin:        u.last_login ? new Date(u.last_login) : null,
             isAnonymous:      u.is_anonymous,
             isDisabled:       u.is_disabled,
             disabled_comment: u.disabled_comment,
