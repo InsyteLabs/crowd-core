@@ -9,6 +9,7 @@ export interface IDBUser{
     email:      string;
     username:   string;
     password:   string;
+    last_login: Date|string;
 
     is_anonymous:     boolean;
     is_disabled:      boolean;
