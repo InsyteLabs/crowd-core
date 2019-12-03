@@ -39,4 +39,12 @@ router.get('/log/auth/user/:userId', async (req: Request, res: Response, next: N
     }
 });
 
+router.get('/log/event-view/:eventId', async (req: Request, res: Response, next: NextFunction) => {
+    const eventId: number = +req.params.eventId || 0;
+
+    const views = await logService.getEventViews(eventId);
+
+    res.json(views);
+});
+
 export default router;
