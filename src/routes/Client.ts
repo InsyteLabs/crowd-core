@@ -1,10 +1,17 @@
 'use strict';
 
-import { Router }                                   from 'express';
-import { getCurrentUser, getClient }                from '../middleware';
-import { http }                                     from '../utilities';
-import { SocketServer }                             from '../web-sockets';
-import { clientService, eventService, userService } from '../services';
+import { Router }                    from 'express';
+import { getCurrentUser, getClient } from '../middleware';
+import { http }                      from '../utilities';
+import { SocketServer }              from '../web-sockets';
+import { Event }                     from '../models';
+
+import {
+    clientService,
+    eventService,
+    userService,
+    logService
+} from '../services';
 
 const router = Router();
 
@@ -170,12 +177,22 @@ router.get('/clients/:id/events', async (req, res, next) => {
     }
 });
 
-router.get('/clients/:id/events/:slug', async (req, res, next) => {
-    const { id, slug } = req.params;
+router.get('/clients/:clientId/events/:slug', getClient, async (req, res, next) => {
+    const { clientId, slug } = req.params;
     try{
-        const event = await eventService.getClientEventBySlug(+id, slug);
+        const event: Event|undefined = await eventService.getClientEventBySlug(+clientId, slug);
 
-        return res.json(event);
+        if(event){
+            res.json(event);
+
+            // Log that a user viewed the event
+            const clientId: number = res.locals.client.id,
+                  userId:   number = res.locals.user.id,
+                  eventId:  number = (<number>(<Event>(event)).id);
+
+            return logService.createEventView(clientId, userId, eventId);
+        }
+        return http.notFound(res);
     }
     catch(e){
         return http.serverError(res, e);
@@ -200,14 +217,18 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
 
 router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
     try{
-        const event = await eventService.updateEvent(req.body);
+        const event: Event|undefined = await eventService.updateEvent(req.body);
 
-        res.json(event);
+        if(event){
+            res.json(event);
 
-        const clientSlug:   string       = res.locals.client.slug,
-              socketServer: SocketServer = res.locals.socketServer;
+            const clientSlug:   string       = res.locals.client.slug,
+                  socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'event-updated', event);
+            return socketServer.messageClients(clientSlug, 'event-updated', event);
+        }
+
+        http.notFound(res);
     }
     catch(e){
         return http.serverError(res, e);
