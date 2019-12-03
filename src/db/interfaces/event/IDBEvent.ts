@@ -10,6 +10,7 @@ export interface IDBEvent{
     start_time:  string;
     end_time:    string;
     is_active:   boolean;
+    views:       number;
 
     // Settings
     settings_id:      number;
