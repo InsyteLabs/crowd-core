@@ -13,7 +13,8 @@ VALUES
 ON CONFLICT (user_event) DO UPDATE SET time=NOW()
 
 RETURNING
-	  client_id
+	  id
+	, client_id
 	, user_id
 	, event_id
 	, user_event
