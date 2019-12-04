@@ -5,6 +5,7 @@ import { getCurrentUser, getClient } from '../middleware';
 import { http }                      from '../utilities';
 import { SocketServer }              from '../web-sockets';
 import { Event }                     from '../models';
+import { MessageType }               from '../constants';
 
 import {
     clientService,
@@ -121,7 +122,7 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'user-created', user);
+        socketServer.messageClients(clientSlug, MessageType.USER_CREATED, user);
     }
     catch(e){
         return http.serverError(res, e);
@@ -137,7 +138,7 @@ router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next)
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'user-updated', user);
+        socketServer.messageClients(clientSlug, MessageType.USER_UPDATED, user);
     }
     catch(e){
         return http.serverError(res, e);
@@ -153,7 +154,7 @@ router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, ne
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'user-deleted', user);
+        socketServer.messageClients(clientSlug, MessageType.USER_DELETED, user);
     }
     catch(e){
         return http.serverError(res, e);
@@ -208,7 +209,7 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'event-created', event);
+        socketServer.messageClients(clientSlug, MessageType.EVENT_CREATED, event);
     }
     catch(e){
         return http.serverError(res, e);
@@ -225,7 +226,7 @@ router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, nex
             const clientSlug:   string       = res.locals.client.slug,
                   socketServer: SocketServer = res.locals.socketServer;
 
-            return socketServer.messageClients(clientSlug, 'event-updated', event);
+            return socketServer.messageClients(clientSlug, MessageType.EVENT_UPDATED, event);
         }
 
         http.notFound(res);
@@ -244,7 +245,7 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'event-deleted', event);
+        socketServer.messageClients(clientSlug, MessageType.EVENT_DELETED, event);
     }
     catch(e){
         return http.serverError(res, e);
@@ -277,7 +278,7 @@ router.post('/clients/:clientId/events/:eventId/questions', getClient, async (re
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'question-created', question);
+        socketServer.messageClients(clientSlug, MessageType.QUESTION_CREATED, question);
     }
     catch(e){
         return http.serverError(res, e);
@@ -293,7 +294,7 @@ router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'question-updated', question);
+        socketServer.messageClients(clientSlug, MessageType.QUESTION_UPDATED, question);
     }
     catch(e){
         return http.serverError(res, e);
@@ -309,7 +310,7 @@ router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getCli
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'question-deleted', deleted);
+        socketServer.messageClients(clientSlug, MessageType.QUESTION_DELETED, deleted);
     }
     catch(e){
         return http.serverError(res, e);
@@ -331,7 +332,7 @@ router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', ge
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'question-updated', question);
+        socketServer.messageClients(clientSlug, MessageType.QUESTION_UPDATED, question);
     }
     catch(e){
         return http.serverError(res, e);
@@ -364,7 +365,7 @@ router.post('/clients/:clientId/events/:eventId/chat', getClient, async (req, re
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'message-created', newMessage);
+        socketServer.messageClients(clientSlug, MessageType.MESSAGE_CREATED, newMessage);
     }
     catch(e){
         return http.serverError(res, e);
@@ -380,7 +381,7 @@ router.put('/clients/:clientId/events/:eventId/chat/:messageId', getClient, asyn
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'message-updated', updatedMessage);
+        socketServer.messageClients(clientSlug, MessageType.MESSAGE_UPDATED, updatedMessage);
     }
     catch(e){
         return http.serverError(res, e);
@@ -396,7 +397,7 @@ router.delete('/clients/:clientId/events/:eventId/chat/:messageId', getClient, a
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'message-deleted', deletedMessage);
+        socketServer.messageClients(clientSlug, MessageType.MESSAGE_DELETED, deletedMessage);
     }
     catch(e){
         return http.serverError(res, e);

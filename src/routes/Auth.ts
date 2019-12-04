@@ -7,7 +7,7 @@ import { getClient }               from '../middleware';
 import { userService, logService } from '../services';
 import { SocketServer }            from '../web-sockets';
 import { http }                    from '../utilities';
-import { SECONDS_IN_DAY }          from '../constants';
+import { SECONDS_IN_DAY, MessageType }          from '../constants';
 
 const router = Router();
 
@@ -56,7 +56,7 @@ router.post('/clients/:clientSlug/users/anonymous', getClient, async (req, res, 
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, 'user-created', user);
+        socketServer.messageClients(clientSlug, MessageType.USER_CREATED, user);
     }
     catch(e){
         return http.serverError(res, e);
