@@ -161,6 +161,17 @@ router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, ne
     }
 });
 
+router.get('/roles', async (req, res, next) => {
+    try{
+        const roles = await userService.getRoles();
+
+        return res.json(roles);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
 
 /*
     =============
@@ -258,6 +269,23 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
     CLIENT EVENT QUESTION ROUTES
     ============================
 */
+router.get('/events/:id/questions', async (req, res, next) => {
+    /*
+        TODO
+        ----
+
+        Make this route match the existing URL scheme
+    */
+    try{
+        const questions = await eventService.getEventQuestions(res.locals.user.id, +req.params.id);
+
+        return res.json(questions);
+    }
+    catch(e){
+        return http.serverError(res, e);
+    }
+});
+
 router.get('/clients/:clientId/events/:eventId/questions', async (req, res, next) => {
     try{
         const questions = await eventService.getEventQuestions(res.locals.user.id, +req.params.eventId);
