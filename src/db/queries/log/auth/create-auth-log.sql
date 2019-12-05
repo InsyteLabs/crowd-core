@@ -13,6 +13,7 @@ VALUES
     , $2
     , $3
     , $4
+    , CURRENT_TIMESTAMP
 )
 
 RETURNING

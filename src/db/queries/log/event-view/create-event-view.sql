@@ -11,10 +11,10 @@ VALUES
 	, $2
 	, $3
 	, $4
-	, NOW() AT time zone 'utc'
+	, CURRENT_TIMESTAMP
 )
 
-ON CONFLICT (code) DO UPDATE SET time=NOW() AT time zone 'utc'
+ON CONFLICT (code) DO UPDATE SET time=CURRENT_TIMESTAMP
 
 RETURNING
 	  id
