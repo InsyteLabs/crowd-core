@@ -5,6 +5,7 @@ INSERT INTO log.auth
     , user_id
     , ip
     , success
+    , time
 )
 
 VALUES
