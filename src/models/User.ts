@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBUser } from "../db/interfaces";
+import { IDBUser } from '../db/interfaces';
 
 export class User{
     [key: string]: any;
@@ -19,7 +19,7 @@ export class User{
 
     roles:            string[];
 
-    constructor(user: any){
+    constructor(user: User){
         this.id              = user.id;
         this.clientId        = user.clientId;
         this.firstName       = user.firstName;
@@ -32,10 +32,11 @@ export class User{
         this.isDisabled      = user.isDisabled;
         this.disabledComment = user.disabledComment;
 
-        this.roles           = user.roles || [];
+        this.roles = user.roles || [];
     }
 
     static fromDb(u: IDBUser): User{
+        !u.is_anonymous && console.log(u);
         return new User({
             id:               u.id,
             clientId:         u.client_id,
@@ -47,7 +48,7 @@ export class User{
             lastLogin:        u.last_login ? new Date(u.last_login) : null,
             isAnonymous:      u.is_anonymous,
             isDisabled:       u.is_disabled,
-            disabled_comment: u.disabled_comment,
+            disabledComment:  u.disabled_comment,
 
             roles: u.roles || []
         })
