@@ -36,7 +36,6 @@ export class User{
     }
 
     static fromDb(u: IDBUser): User{
-        !u.is_anonymous && console.log(u);
         return new User({
             id:               u.id,
             clientId:         u.client_id,
