@@ -56,7 +56,7 @@ class ClientService{
             client = await db.q('create-client', [
                 newClient.name,
                 newClient.slug || slugify(newClient.name),
-                newClient.ownerId,
+                newClient.owner.id,
                 newClient.type.id
             ]);
         }
@@ -77,7 +77,7 @@ class ClientService{
 
         client.name            !== undefined && (curClient.name            =   client.name);
         client.slug            !== undefined && (curClient.slug            =   client.slug);
-        client.ownerId         !== undefined && (curClient.ownerId         =   client.ownerId);
+        client.owner.id        !== undefined && (curClient.owner.id        =   client.owner.id);
         client.type.id         !== undefined && (curClient.type.id         =   client.type.id);
         client.isDisabled      !== undefined && (curClient.isDisabled      = !!client.isDisabled);
         client.disabledComment !== undefined && (curClient.disabledComment =   client.disabledComment);
@@ -88,7 +88,7 @@ class ClientService{
                 curClient.id,
                 curClient.name,
                 curClient.slug,
-                curClient.ownerId,
+                curClient.owner.id,
                 curClient.type.id,
                 curClient.isDisabled,
                 curClient.disabledComment

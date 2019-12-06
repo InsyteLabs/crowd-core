@@ -145,7 +145,16 @@ import { Client, User }               from './models';
             {
                 name:    'InsyteLabs',
                 slug:    'insyte-labs',
-                ownerId: owner.id as number,
+                owner:    {
+                    id: <number>owner.id,
+                    firstName: owner.firstName,
+                    lastName: owner.lastName,
+                    email: owner.email,
+                    username: owner.username,
+                    isAnonymous: !!owner.isAnonymous,
+                    isDisabled: !!owner.isDisabled,
+                    disabledComment: owner.disabledComment || ''
+                },
                 type: {
                     id: 2,
                     name: 'Standard',
