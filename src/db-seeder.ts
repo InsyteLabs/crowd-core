@@ -96,16 +96,16 @@ import { Client, User }               from './models';
         CREATE TYPES
         ============
     */
-    const types = await clientService.getTypes();
+    const types = await clientService.getClientTypes();
 
     if(!types.length){
         console.log('DB has no account types, creating...');
 
         const typesToCreate = [
-            { name: 'demo'  },
-            { name: 'free'  },
-            { name: 'pro'   },
-            { name: 'elite' }
+            { id: 0, name: 'Demo',     maxEvents: 1,   maxEventViewers: 10   },
+            { id: 0, name: 'Standard', maxEvents: 10,  maxEventViewers: 100  },
+            { id: 0, name: 'Pro',      maxEvents: 25,  maxEventViewers: 250  },
+            { id: 0, name: 'Elite',    maxEvents: 100, maxEventViewers: 1000 }
         ];
 
         for(let i = 0, len = typesToCreate.length; i < len; i++){
@@ -113,7 +113,7 @@ import { Client, User }               from './models';
 
             console.log(`Creating type "${ type.name }"`);
             
-            await clientService.createType(type);
+            await clientService.createClientType(type);
         }
 
         console.log('Done creating types');
@@ -146,7 +146,12 @@ import { Client, User }               from './models';
                 name:    'InsyteLabs',
                 slug:    'insyte-labs',
                 ownerId: owner.id as number,
-                types:   ['elite']
+                type: {
+                    id: 2,
+                    name: 'Standard',
+                    maxEvents: 10,
+                    maxEventViewers: 100
+                }
             }
         ];
 

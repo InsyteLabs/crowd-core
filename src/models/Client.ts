@@ -1,26 +1,27 @@
 'use strict';
 
-import { IDBClient } from "../db/interfaces";
+import { IDBClient }  from '../db/interfaces';
+import { ClientType } from './ClientType';
 
 export class Client {
-    [key: string]:    any;
-
     id?:              number;
     name:             string;
     slug?:            string;
     ownerId:          number;
-    types:            string[];
     isDisabled?:      boolean;
     disabledComment?: string|null;
+
+    type: ClientType;
 
     constructor(c: Client){
         this.id              = c.id;
         this.name            = c.name;
         this.slug            = c.slug;
         this.ownerId         = c.ownerId;
-        this.types           = c.types || [];
+        this.type            = c.type;
         this.isDisabled      = c.isDisabled;
         this.disabledComment = c.disabledComment;
+
     }
 
     static fromDb(c: IDBClient): Client{
@@ -31,8 +32,13 @@ export class Client {
             ownerId:         c.owner_id,
             isDisabled:      c.is_disabled,
             disabledComment: c.disabled_comment,
-
-            types: c.types || []
+            
+            type: {
+                id:              c.type_id,
+                name:            c.type_name,
+                maxEvents:       c.max_events,
+                maxEventViewers: c.max_event_viewers
+            }
         });
     }
 }

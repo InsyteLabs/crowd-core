@@ -1,8 +1,6 @@
 'use strict';
 
 export interface IDBClient{
-    [key: string]: any;
-    
     id:       number;
     owner_id: number;
     name:     string;
@@ -11,5 +9,8 @@ export interface IDBClient{
     is_disabled:      boolean;
     disabled_comment: string;
 
-    types: string[];
+    type_id:           number;
+    type_name:         string;
+    max_events:        number;
+    max_event_viewers: number;
 }

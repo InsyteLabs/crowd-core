@@ -2,6 +2,7 @@
 
 export * from './User';
 export * from './Client';
+export * from './ClientType';
 export * from './Event';
 export * from './EventSettings';
 export * from './Question';
