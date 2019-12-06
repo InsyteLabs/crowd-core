@@ -1,13 +1,9 @@
 'use strict';
 
-import { db } from '../db';
-import {
-    IDBClient, IDBClientType, IDBType
-} from '../db/interfaces';
-
-import { Client }  from '../models';
-import { IType }   from '../interfaces';
-import { slugify } from '../utilities';
+import { db }                       from '../db';
+import { IDBClient, IDBClientType } from '../db/interfaces';
+import { Client, ClientType }       from '../models';
+import { slugify }                  from '../utilities';
 
 class ClientService{
 
@@ -60,7 +56,8 @@ class ClientService{
             client = await db.q('create-client', [
                 newClient.name,
                 newClient.slug || slugify(newClient.name),
-                newClient.ownerId
+                newClient.ownerId,
+                newClient.type.id
             ]);
         }
         catch(e){
@@ -68,10 +65,6 @@ class ClientService{
             console.error(e.message);
 
             return;
-        }
-
-        if(newClient.types && newClient.types.length){
-            await this.setClientTypes(client.id, newClient.types);
         }
 
         return this.getClient(client.id);
@@ -82,11 +75,12 @@ class ClientService{
         
         if(!curClient) return;
 
-        for(let prop in client){
-            if(client[prop] !== undefined){
-                curClient[prop] = client[prop];
-            }
-        }
+        client.name            !== undefined && (curClient.name            =   client.name);
+        client.slug            !== undefined && (curClient.slug            =   client.slug);
+        client.ownerId         !== undefined && (curClient.ownerId         =   client.ownerId);
+        client.type.id         !== undefined && (curClient.type.id         =   client.type.id);
+        client.isDisabled      !== undefined && (curClient.isDisabled      = !!client.isDisabled);
+        client.disabledComment !== undefined && (curClient.disabledComment =   client.disabledComment);
 
         let updated: IDBClient|undefined;
         try{
@@ -95,6 +89,7 @@ class ClientService{
                 curClient.name,
                 curClient.slug,
                 curClient.ownerId,
+                curClient.type.id,
                 curClient.isDisabled,
                 curClient.disabledComment
             ]);
@@ -108,24 +103,20 @@ class ClientService{
             return;
         }
 
-        if(client.types && client.types.length){
-            await this.setClientTypes(<number>curClient.id, client.types);
-        }
-
         return this.getClient(updated.id);
     }
 
 
     /*
-        ============
-        TYPE METHODS
-        ============
+        ===================
+        CLIENT TYPE METHODS
+        ===================
     */
-    async getTypes(): Promise<IDBType[]>{
+    async getClientTypes(): Promise<ClientType[]>{
         try{
-            const types = await db.q('get-types');
+            const types: IDBClientType[] = await db.q('get-client-types');
 
-            return types;
+            return types && types.length ? types.map(t => ClientType.fromDb(t)) : [];
         }
         catch(e){
             console.error('Failed to get types from database');
@@ -135,53 +126,27 @@ class ClientService{
         }
     }
 
-    async getClientTypes(clientId: number): Promise<string[]>{
+    async getClientType(id: number): Promise<ClientType|undefined>{
         try{
-            const clientTypes: { types: string[] } = await db.q('get-client-types', [ clientId ]);
+            const type: IDBClientType|undefined = await db.q('get-client-type', [ id ]);
 
-            return clientTypes.types;
-        }
-        catch(e){
-            console.error(`Error fetching types for client of Id "${ clientId }"`);
-            console.error(e.message);
-
-            return [];
-        }
-    }
-
-    async getTypeIds(): Promise<number[]>{
-        try{
-            const types: IDBType[] = await this.getTypes();
-
-            return types.map(t => <number>t.id);
-        }
-        catch(e){
-            console.error('Error fetching client types:');
-            console.error(e.message);
-            
-            return [];
-        }
-    }
-
-    async getType(id: number): Promise<IDBType|undefined>{
-        try{
-            const type: IDBType|undefined = await db.q('get-type', [ id ]);
-
-            return type;
+            return type ? ClientType.fromDb(type) : undefined;
         }
         catch(e){
             console.error(`Failed to get type "${ id }" from database`);
             console.error(e.message);
-
-            return;
         }
     }
 
-    async createType(newType: IType): Promise<IDBType|undefined>{
+    async createClientType(newType: ClientType): Promise<ClientType|undefined>{
         try{
-            const type = await db.q('create-type', [ newType.name ]);
+            const type: IDBClientType = await db.q('create-client-type', [
+                newType.name,
+                newType.maxEvents,
+                newType.maxEventViewers
+            ]);
 
-            return type;
+            return type ? ClientType.fromDb(type) : undefined;
         }
         catch(e){
             console.error(`Failed to create type "${ newType.name }"`);
@@ -189,76 +154,27 @@ class ClientService{
         }
     }
     
-    async updateType(type: IDBType): Promise<IDBType|undefined>{
-        let curType: IDBType|undefined;
+    async updateClientType(type: ClientType): Promise<ClientType|undefined>{
+        let curType: ClientType|undefined;
         try{
-            curType = await this.getType(type.id as number);
+            curType = await this.getClientType(type.id);
 
             if(!curType) return;
 
-            return await db.q('update-type', [ curType.id, type.name ]);
+            const updatedType: IDBClientType = await db.q('update-client-type', [
+                curType.id,
+                type.name,
+                type.maxEvents,
+                type.maxEventViewers
+            ]);
 
+            return this.getClientType(updatedType.id);
         }
         catch(e){
             console.error(`Error updating type of Id "${ type.id }"`);
             console.error(e.message);
 
             return;
-        }
-    }
-
-    async setClientTypes(clientId: number, types: string[]): Promise<string[]>{
-        let validTypes: IDBType[];
-        try{
-            validTypes = await this.getTypes();
-        }
-        catch(e){
-            console.error(`Error fetching valid types`);
-            console.error(e.message);
-
-            return [];
-        }
-
-        const typesToSet = validTypes.filter(t => types.includes(t.name));
-
-        if(!typesToSet.length) return this.getClientTypes(clientId);
-
-        await this.dropClientTypes(clientId);
-        await this.addClientTypes(clientId, typesToSet.map(t => <number>t.id));
-        
-        return this.getClientTypes(clientId);
-    }
-
-    async addClientTypes(clientId: number, types: number[]): Promise<number[]>{
-        try{
-            const insertedTypes = [];
-            for(let i = 0, len = types.length; i < len; i++){
-                const inserted = await db.q('add-client-type', [ types[i], clientId ]);
-
-                inserted && insertedTypes.push(inserted.type_id);
-            }
-
-            return insertedTypes;
-        }
-        catch(e){
-            console.error('Error adding client types to database');
-            console.error(e);
-
-            return [];
-        }
-    }
-
-    async dropClientTypes(clientId: number): Promise<number[]>{
-        try{
-            const droppedTypes: IDBClientType[] = await db.q('drop-client-types', [ clientId ]);
-
-            return droppedTypes.map(t => t.type_id);
-        }
-        catch(e){
-            console.error(`Failed to drop types for clientId: "${ clientId }"`);
-            console.error(e);
-
-            return []
         }
     }
 }

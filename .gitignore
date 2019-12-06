@@ -3,6 +3,7 @@
 conf
 database.json
 process.config.js
+env.sh
 
 # Build/log folders
 dist

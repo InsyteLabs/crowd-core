@@ -6,15 +6,16 @@ SELECT
 	, C.owner_id
 	, C.is_disabled
 	, C.disabled_comment
-	, COALESCE(json_agg(T.name) FILTER (WHERE T.name IS NOT NULL), '[]'::json) AS types
+
+	, C.type_id
+	, CT.name AS type_name
+	, CT.max_events
+	, CT.max_event_viewers
 	
 FROM
 	account.client AS C
 	
-LEFT JOIN account.client_type AS CT ON CT.client_id=C.id
-LEFT JOIN account.type        AS T  ON T.id=CT.type_id
+LEFT JOIN account.client_type AS CT ON CT.id=C.type_id
 
 WHERE
-	C.slug=$1
-
-GROUP BY C.id;
+	C.slug=$1;
