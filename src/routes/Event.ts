@@ -6,7 +6,7 @@ import { eventService, logService } from '../services';
 import { Event }                    from '../models';
 import { getClient }                from '../middleware';
 import { http }                     from '../utilities';
-import { SocketServer }             from '../web-sockets';
+import { SocketServer }             from '../socket-server';
 import { MessageType }              from '../constants';
 
 const router = Router();

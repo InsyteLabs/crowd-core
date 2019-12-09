@@ -1,13 +1,13 @@
 'use strict';
 
-import { Router }                  from 'express';
-import * as jwt                    from 'jsonwebtoken';
-import conf                        from '../conf';
-import { getClient }               from '../middleware';
-import { userService, logService } from '../services';
-import { SocketServer }            from '../web-sockets';
-import { http }                    from '../utilities';
-import { SECONDS_IN_DAY, MessageType }          from '../constants';
+import { Router }                      from 'express';
+import * as jwt                        from 'jsonwebtoken';
+import conf                            from '../conf';
+import { getClient }                   from '../middleware';
+import { userService, logService }     from '../services';
+import { SocketServer }                from '../socket-server';
+import { http }                        from '../utilities';
+import { SECONDS_IN_DAY, MessageType } from '../constants';
 
 const router = Router();
 
