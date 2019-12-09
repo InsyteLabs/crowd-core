@@ -14,6 +14,11 @@ import { getCurrentUser } from '../middleware';
 
 export const router = Router();
 
+router.use(logRouter);
+router.use(authRouter);
+
+router.use(getCurrentUser);
+
 // Log the request method, url, and identified user to the console
 router.use((req, res, next) => {
     const fullUrl: string = req.protocol + '://' + req.get('host') + req.originalUrl;
@@ -24,11 +29,6 @@ router.use((req, res, next) => {
 
     next();
 });
-
-router.use(logRouter);
-router.use(authRouter);
-
-router.use(getCurrentUser);
 
 // Routers that require auth
 router.use(clientRouter);

@@ -65,7 +65,7 @@ export class SocketServer{
 
         if(!(channel && clientId)) return ws.terminate();
 
-        ws.send(`{"type": "connection-accepted", "clientId": "${ clientId }", "channel": ${ channel }}`);
+        ws.send(`{"type": "connection-accepted", "clientId": "${ clientId.replace('"', '\\"') }", "channel": "${ channel.replace('"', '\\"') }" }`);
 
         (<any>ws).id      = clientId;
         (<any>ws).channel = channel;
@@ -89,7 +89,7 @@ export class SocketServer{
             =============
         */
         ws.on('message', (msg) => {
-            ws.send(`{ "received": "${ msg }" }`);
+
         });
         ws.on('error', () => {
             socketChannel.removeClient(clientId);
