@@ -1,8 +1,9 @@
 'use strict';
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { http } from '../utilities';
+
 import { logService } from '../services';
+import { http }       from '../utilities';
 
 const router = Router();
 
