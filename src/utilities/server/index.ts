@@ -2,7 +2,7 @@
 
 import http             from 'http';
 import os               from 'os-utils';
-import { SocketServer } from '../../web-sockets';
+import { SocketServer } from '../../socket-server';
 
 export async function currentStats(httpServer: http.Server, socketServer: SocketServer){
     const cpuUsage = await getCPUUsage(),

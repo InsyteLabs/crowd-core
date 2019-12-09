@@ -6,7 +6,7 @@ import * as http                 from 'http';
 import Express                   from 'express';
 import bodyParser                from 'body-parser';
 import { router }                from './routes';
-import { SocketServer }          from './web-sockets';
+import { SocketServer }          from './socket-server';
 import conf                      from './conf';
 import { server as serverUtils } from './utilities';
 

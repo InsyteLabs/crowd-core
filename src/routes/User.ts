@@ -5,7 +5,7 @@ import { Router } from 'express';
 import { getClient }    from '../middleware';
 import { userService }  from '../services';
 import { http }         from '../utilities';
-import { SocketServer } from '../web-sockets';
+import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
 
 const router = Router();
