@@ -32,7 +32,9 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.USER_CREATED, user);
+        // socketServer.messageClients(clientSlug, MessageType.USER_CREATED, user);
+
+        socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_CREATED, user);
     }
     catch(e){
         return http.serverError(res, e);
@@ -48,7 +50,9 @@ router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next)
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.USER_UPDATED, user);
+        // socketServer.messageClients(clientSlug, MessageType.USER_UPDATED, user);
+
+        socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_UPDATED, user);
     }
     catch(e){
         return http.serverError(res, e);
@@ -64,7 +68,9 @@ router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, ne
         const clientSlug:   string       = res.locals.client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.USER_DELETED, user);
+        // socketServer.messageClients(clientSlug, MessageType.USER_DELETED, user);
+
+        socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_DELETED, user);
     }
     catch(e){
         return http.serverError(res, e);
