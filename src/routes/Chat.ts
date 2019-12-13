@@ -28,9 +28,10 @@ router.post('/clients/:clientId/events/:eventId/chat', getClient, async (req, re
         res.json(newMessage);
 
         const clientSlug:   string       = res.locals.client.slug,
+              channel:      string       = `client::${ clientSlug };events::${ newMessage.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.MESSAGE_CREATED, newMessage);
+        socketServer.messageClients(channel, MessageType.MESSAGE_CREATED, newMessage);
     }
     catch(e){
         return http.serverError(res, e);
@@ -44,9 +45,10 @@ router.put('/clients/:clientId/events/:eventId/chat/:messageId', getClient, asyn
         res.json(updatedMessage);
 
         const clientSlug:   string       = res.locals.client.slug,
+              channel:      string       = `client::${ clientSlug };events::${ updatedMessage.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.MESSAGE_UPDATED, updatedMessage);
+        socketServer.messageClients(channel, MessageType.MESSAGE_UPDATED, updatedMessage);
     }
     catch(e){
         return http.serverError(res, e);
@@ -60,9 +62,10 @@ router.delete('/clients/:clientId/events/:eventId/chat/:messageId', getClient, a
         res.json(deletedMessage);
 
         const clientSlug:   string       = res.locals.client.slug,
+              channel:      string       = `client::${ clientSlug };events::${ deletedMessage.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.MESSAGE_DELETED, deletedMessage);
+        socketServer.messageClients(channel, MessageType.MESSAGE_DELETED, deletedMessage);
     }
     catch(e){
         return http.serverError(res, e);

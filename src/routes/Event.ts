@@ -48,12 +48,17 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
     try{
         const event = await eventService.createEvent(req.body);
 
+        if(!event){
+            return http.serverError(res, new Error('Error creating event'));
+        }
+
         res.json(event);
 
         const clientSlug:   string       = res.locals.client.slug,
+              channel:      string       = `client::${ clientSlug };events`,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.EVENT_CREATED, event);
+        socketServer.messageClients(channel, MessageType.EVENT_CREATED, event);
     }
     catch(e){
         return http.serverError(res, e);
@@ -68,9 +73,16 @@ router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, nex
             res.json(event);
 
             const clientSlug:   string       = res.locals.client.slug,
+                  channel:      string       = `client::${ clientSlug };events::${ event.id }`,
                   socketServer: SocketServer = res.locals.socketServer;
 
-            return socketServer.messageClients(clientSlug, MessageType.EVENT_UPDATED, event);
+            socketServer.messageClients(channel, MessageType.EVENT_UPDATED, event);
+
+            const channel2: string = `client::${ clientSlug };events`;
+
+            socketServer.messageClients(channel2, MessageType.EVENT_UPDATED, event);
+
+            return;
         }
 
         http.notFound(res);
@@ -84,12 +96,17 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
     try{
         const event = await eventService.deleteEvent(+req.params.eventId);
 
+        if(!event){
+            return http.serverError(res, new Error('Error deleting event'));
+        }
+
         res.json(event);
 
         const clientSlug:   string       = res.locals.client.slug,
+              channel:      string       = `client::${ clientSlug };events`,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.EVENT_DELETED, event);
+        socketServer.messageClients(channel, MessageType.EVENT_DELETED, event);
     }
     catch(e){
         return http.serverError(res, e);

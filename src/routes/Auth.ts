@@ -54,9 +54,10 @@ router.post('/clients/:clientSlug/users/anonymous', getClient, async (req, res, 
         res.json(user);
 
         const clientSlug:   string       = res.locals.client.slug,
+              channel:      string       = `client::${ clientSlug };users`,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(clientSlug, MessageType.USER_CREATED, user);
+        socketServer.messageClients(channel, MessageType.USER_CREATED, user);
     }
     catch(e){
         return http.serverError(res, e);
