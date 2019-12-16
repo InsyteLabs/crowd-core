@@ -10,14 +10,14 @@ import eventRouter    from './Event';
 import questionRouter from './Question';
 import chatRouter     from './Chat';
 
-import { getCurrentUser } from '../middleware';
+import { getCurrentUser, getClient } from '../middleware';
 
 export const router = Router();
 
 router.use(logRouter);
 router.use(authRouter);
 
-router.use(getCurrentUser);
+router.use(getCurrentUser, getClient);
 
 // Log the request method, url, and identified user to the console
 router.use((req, res, next) => {

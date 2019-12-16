@@ -3,17 +3,17 @@
 import { Router } from 'express';
 
 import { eventService, logService } from '../services';
-import { Event }                    from '../models';
-import { getClient }                from '../middleware';
+import { Client, Event, User }      from '../models';
 import { http }                     from '../utilities';
 import { SocketServer }             from '../socket-server';
 import { MessageType }              from '../constants';
 
 const router = Router();
 
-router.get('/clients/:id/events', async (req, res, next) => {
+router.get('/events', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
-        const events = await eventService.getClientEvents(+req.params.id);
+        const events = await eventService.getClientEvents(<number>client.id);
 
         return res.json(events);
     }
@@ -22,18 +22,21 @@ router.get('/clients/:id/events', async (req, res, next) => {
     }
 });
 
-router.get('/clients/:clientId/events/:slug', getClient, async (req, res, next) => {
-    const { clientId, slug } = req.params;
-    try{
-        const event: Event|undefined = await eventService.getClientEventBySlug(+clientId, slug);
+router.get('/events/:slug', async (req, res, next) => {
+    const client: Client = res.locals.client,
+          user:   User   = res.locals.user;
 
-        if(event){
+    const { slug } = req.params;
+    try{
+        const event: Event|undefined = await eventService.getClientEventBySlug(<number>client.id, slug);
+
+        if(event && event.id){
             res.json(event);
 
             // Log that a user viewed the event
-            const clientId: number = res.locals.client.id,
-                  userId:   number = res.locals.user.id,
-                  eventId:  number = (<number>(<Event>(event)).id);
+            const clientId: number = <number>client.id,
+                  userId:   number = <number>user.id,
+                  eventId:  number = event.id;
 
             return logService.createEventView(clientId, userId, eventId);
         }
@@ -44,7 +47,8 @@ router.get('/clients/:clientId/events/:slug', getClient, async (req, res, next) 
     }
 });
 
-router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
+router.post('/events', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const event = await eventService.createEvent(req.body);
 
@@ -54,7 +58,7 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
 
         res.json(event);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events`,
               socketServer: SocketServer = res.locals.socketServer;
 
@@ -65,14 +69,15 @@ router.post('/clients/:clientId/events', getClient, async (req, res, next) => {
     }
 });
 
-router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
+router.put('/events/:eventId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const event: Event|undefined = await eventService.updateEvent(req.body);
 
         if(event){
             res.json(event);
 
-            const clientSlug:   string       = res.locals.client.slug,
+            const clientSlug:   string       = <string>client.slug,
                   channel:      string       = `client::${ clientSlug };events::${ event.id }`,
                   socketServer: SocketServer = res.locals.socketServer;
 
@@ -92,7 +97,8 @@ router.put('/clients/:clientId/events/:eventId', getClient, async (req, res, nex
     }
 });
 
-router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, next) => {
+router.delete('/events/:eventId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const event = await eventService.deleteEvent(+req.params.eventId);
 
@@ -102,7 +108,7 @@ router.delete('/clients/:clientId/events/:eventId', getClient, async (req, res, 
 
         res.json(event);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events`,
               socketServer: SocketServer = res.locals.socketServer;
 

@@ -3,7 +3,7 @@
 import { Router } from 'express';
 
 import { eventService } from '../services';
-import { getClient }    from '../middleware';
+import { Client }       from '../models';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
@@ -27,7 +27,7 @@ router.get('/events/:id/questions', async (req, res, next) => {
     }
 });
 
-router.get('/clients/:clientId/events/:eventId/questions', async (req, res, next) => {
+router.get('/events/:eventId/questions', async (req, res, next) => {
     try{
         const questions = await eventService.getEventQuestions(res.locals.user.id, +req.params.eventId);
 
@@ -38,7 +38,8 @@ router.get('/clients/:clientId/events/:eventId/questions', async (req, res, next
     }
 });
 
-router.post('/clients/:clientId/events/:eventId/questions', getClient, async (req, res, next) => {
+router.post('/events/:eventId/questions', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const question = await eventService.createQuestion(res.locals.user.id, req.body);
 
@@ -48,7 +49,7 @@ router.post('/clients/:clientId/events/:eventId/questions', getClient, async (re
 
         res.json(question);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events::${ question.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
@@ -59,7 +60,8 @@ router.post('/clients/:clientId/events/:eventId/questions', getClient, async (re
     }
 });
 
-router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
+router.put('/events/:eventId/questions/:questionId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const question = await eventService.updateQuestion(res.locals.user.id, req.body);
 
@@ -69,7 +71,7 @@ router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient
 
         res.json(question);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events::${ question.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
@@ -80,7 +82,8 @@ router.put('/clients/:clientId/events/:eventId/questions/:questionId', getClient
     }
 });
 
-router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getClient, async (req, res, next) => {
+router.delete('/clients/:clientId/events/:eventId/questions/:questionId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const deleted = await eventService.deleteQuestion(res.locals.user.id, +req.params.questionId);
 
@@ -90,7 +93,7 @@ router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getCli
 
         res.json({ deleted });
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events::${ deleted.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
@@ -101,7 +104,8 @@ router.delete('/clients/:clientId/events/:eventId/questions/:questionId', getCli
     }
 });
 
-router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', getClient, async (req, res, next) => {
+router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const question = await eventService.createQuestionVote(res.locals.user.id, req.body);
 
@@ -111,7 +115,7 @@ router.post('/clients/:clientId/events/:eventId/questions/:questionId/votes', ge
         
         res.json(question);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events::${ question.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 

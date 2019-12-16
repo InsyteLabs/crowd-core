@@ -3,14 +3,14 @@
 import { Router } from 'express';
 
 import { eventService } from '../services';
-import { getClient }    from '../middleware';
+import { Client }       from '../models';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
 
 const router = Router();
 
-router.get('/clients/:clientId/events/:eventId/chat', getClient, async (req, res, next) => {
+router.get('/events/:eventId/chat', async (req, res, next) => {
     try{
         const messages = await eventService.getEventMessages(+req.params.eventId);
 
@@ -21,13 +21,14 @@ router.get('/clients/:clientId/events/:eventId/chat', getClient, async (req, res
     }
 });
 
-router.post('/clients/:clientId/events/:eventId/chat', getClient, async (req, res, next) => {
+router.post('/events/:eventId/chat', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const newMessage = await eventService.createEventMessage(req.body);
 
         res.json(newMessage);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events::${ newMessage.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
@@ -38,13 +39,14 @@ router.post('/clients/:clientId/events/:eventId/chat', getClient, async (req, re
     }
 });
 
-router.put('/clients/:clientId/events/:eventId/chat/:messageId', getClient, async (req, res, next) => {
+router.put('/events/:eventId/chat/:messageId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const updatedMessage = await eventService.updateEventMessage(req.body);
 
         res.json(updatedMessage);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events::${ updatedMessage.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 
@@ -55,13 +57,14 @@ router.put('/clients/:clientId/events/:eventId/chat/:messageId', getClient, asyn
     }
 });
 
-router.delete('/clients/:clientId/events/:eventId/chat/:messageId', getClient, async (req, res, next) => {
+router.delete('/events/:eventId/chat/:messageId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const deletedMessage = await eventService.deleteEventMessage(+req.params.messageId);
 
         res.json(deletedMessage);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events::${ deletedMessage.eventId }`,
               socketServer: SocketServer = res.locals.socketServer;
 

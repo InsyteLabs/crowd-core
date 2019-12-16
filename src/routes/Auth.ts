@@ -1,13 +1,13 @@
 'use strict';
 
-import { Router }                      from 'express';
-import * as jwt                        from 'jsonwebtoken';
-import conf                            from '../conf';
-import { getClient }                   from '../middleware';
-import { userService, logService }     from '../services';
-import { SocketServer }                from '../socket-server';
-import { http }                        from '../utilities';
-import { SECONDS_IN_DAY, MessageType } from '../constants';
+import { Router }                                 from 'express';
+import * as jwt                                   from 'jsonwebtoken';
+import conf                                       from '../conf';
+import { userService, logService, clientService } from '../services';
+import { Client }                                 from '../models';
+import { SocketServer }                           from '../socket-server';
+import { http }                                   from '../utilities';
+import { SECONDS_IN_DAY, MessageType }            from '../constants';
 
 const router = Router();
 
@@ -47,9 +47,16 @@ router.post('/authenticate', async (req, res, next) => {
     }
 });
 
-router.post('/clients/:clientSlug/users/anonymous', getClient, async (req, res, next) => {
+router.post('/clients/:clientSlug/users/anonymous', async (req, res, next) => {
+
+    let client: Client|undefined = await clientService.getClientBySlug(req.params.clientSlug);
+
+    if(!(client && client.id)){
+        return http.notFound(res);
+    }
+
     try{
-        const user = await userService.createAnonymousUser(res.locals.client.id);
+        const user = await userService.createAnonymousUser(client.id);
 
         res.json(user);
 

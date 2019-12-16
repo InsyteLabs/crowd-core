@@ -2,19 +2,18 @@
 
 import { Router } from 'express';
 
-import { getClient }    from '../middleware';
 import { userService }  from '../services';
+import { Client }       from '../models';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
 
 const router = Router();
 
-router.get('/clients/:id/users', async (req, res, next) => {
-    const { id } = req.params;
-
+router.get('/users', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
-        const users = await userService.getUsersByClient(+id);
+        const users = await userService.getUsersByClient(<number>client.id);
 
         return res.json(users);
     }
@@ -23,16 +22,15 @@ router.get('/clients/:id/users', async (req, res, next) => {
     }
 });
 
-router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
+router.post('/users', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const user = await userService.createUser(req.body);
 
         res.json(user);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               socketServer: SocketServer = res.locals.socketServer;
-
-        // socketServer.messageClients(clientSlug, MessageType.USER_CREATED, user);
 
         socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_CREATED, user);
     }
@@ -41,16 +39,15 @@ router.post('/clients/:clientId/users', getClient, async (req, res, next) => {
     }
 });
 
-router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
+router.put('/users/:userId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const user = await userService.updateUser(req.body);
 
         res.json(user);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               socketServer: SocketServer = res.locals.socketServer;
-
-        // socketServer.messageClients(clientSlug, MessageType.USER_UPDATED, user);
 
         socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_UPDATED, user);
     }
@@ -59,16 +56,15 @@ router.put('/clients/:clientId/users/:userId', getClient, async (req, res, next)
     }
 });
 
-router.delete('/clients/:clientId/users/:userId', getClient, async (req, res, next) => {
+router.delete('/clients/:clientId/users/:userId', async (req, res, next) => {
+    const client: Client = res.locals.client;
     try{
         const user = await userService.deleteUser(+req.params.userId);
 
         res.json(user);
 
-        const clientSlug:   string       = res.locals.client.slug,
+        const clientSlug:   string       = <string>client.slug,
               socketServer: SocketServer = res.locals.socketServer;
-
-        // socketServer.messageClients(clientSlug, MessageType.USER_DELETED, user);
 
         socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_DELETED, user);
     }
