@@ -6,6 +6,7 @@ import { Client, User }                          from '../models';
 import { http }                            from '../utilities';
 
 export async function getClient(req: Request, res: Response, next: NextFunction){
+    if(req.method === 'OPTIONS') return next();
 
     const user: User|null = res.locals.user;
 
