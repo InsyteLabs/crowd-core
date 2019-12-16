@@ -1,5 +1,7 @@
 'use strict';
 
+import { IDBMessage } from "../db/interfaces";
+
 export class Message{
     id?:     number;
     eventId: number;
@@ -15,22 +17,23 @@ export class Message{
         isAnonymous: boolean;
     }
 
-    constructor(message: any){
+    constructor(message: Message){
         this.id      = message.id;
         this.eventId = message.eventId;
         this.text    = message.text;
         this.hidden  = message.hidden;
         this.userId  = message.userId;
-        this.user    = message.user || {}
+        this.user    = message.user;
     }
 
-    static from(m: any): Message{
+    static from(m: IDBMessage): Message{
         return new Message({
             id:      m.id,
             eventId: m.event_id,
-            userId:  m.user_id,
             text:    m.text,
             hidden:  m.hidden,
+
+            userId: m.user_id,
             user: {
                 id: m.user_id,
     

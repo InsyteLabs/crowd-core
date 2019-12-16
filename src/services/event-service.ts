@@ -9,7 +9,7 @@ import { slugify }        from '../utilities';
 import { IQuestionScore } from '../interfaces';
 
 import {
-    IDBEvent, IDBEventSettings, IDBQuestion, IDBQuestionVote
+    IDBEvent, IDBEventSettings, IDBQuestion, IDBQuestionVote, IDBMessage
 } from '../db/interfaces';
 
 class EventService{
@@ -379,7 +379,7 @@ class EventService{
     */
     async getEventMessages(eventId: number): Promise<Message[]>{
         try{
-            let messages = await db.q('get-event-messages', [ eventId ]);
+            let messages: IDBMessage[] = await db.q('get-event-messages', [ eventId ]);
 
             return messages.map((m: any) => Message.from(m));
         }
@@ -391,21 +391,19 @@ class EventService{
         }
     }
 
-    async getEventMessage(id: number): Promise<Message>{
+    async getEventMessage(id: number): Promise<Message|undefined>{
         try{
-            const message = await db.q('get-message', [ id ]);
+            const message: IDBMessage|undefined = await db.q('get-message', [ id ]);
 
-            return Message.from(message);
+            return message ? Message.from(message) : message;
         }
         catch(e){
             console.error(`Failed to get message of ID ${ id }`);
             console.error(e);
-
-            return Message.from({});
         }
     }
 
-    async createEventMessage(m: Message): Promise<Message>{
+    async createEventMessage(m: Message): Promise<Message|undefined>{
         const args = [
             m.eventId,
             m.userId,
@@ -413,19 +411,17 @@ class EventService{
         ];
 
         try{
-            const message = await db.q('create-event-message', args);
+            const message: IDBMessage|undefined = await db.q('create-event-message', args);
 
-            return this.getEventMessage(message.id);
+            return message ? this.getEventMessage(message.id) : undefined;
         }
         catch(e){
             console.error(`Failed to create message for event of ID ${ m.id }`);
             console.error(e);
-
-            return new Message({});
         }
     }
 
-    async updateEventMessage(m: Message): Promise<Message>{
+    async updateEventMessage(m: Message): Promise<Message|undefined>{
         const args = [
             m.id,
             m.text,
@@ -433,19 +429,17 @@ class EventService{
         ];
 
         try{
-            const message = await db.q('update-event-message', args);
+            const message: IDBMessage|undefined = await db.q('update-event-message', args);
 
-            return this.getEventMessage(message.id);
+            return message ? this.getEventMessage(message.id) : undefined;
         }
         catch(e){
             console.error(`Failed to update message of ID ${ m.id }`);
             console.error(e);
-
-            return new Message({});
         }
     }
 
-    async deleteEventMessage(id: number): Promise<Message>{
+    async deleteEventMessage(id: number): Promise<Message|undefined>{
         try{
             const messageOriginal = await this.getEventMessage(id);
 
@@ -456,8 +450,6 @@ class EventService{
         catch(e){
             console.error(`Failed to delete message of ID ${ id }`);
             console.error(e);
-
-            return Message.from({});
         }
     }
 }
