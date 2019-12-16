@@ -7,7 +7,7 @@ export class Message{
     hidden:  boolean;
     
     userId?: number;
-    user: {
+    user?: {
         id:          number;
         firstName:   string;
         lastName:    string;

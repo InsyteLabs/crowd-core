@@ -3,7 +3,7 @@
 import { Router } from 'express';
 
 import { eventService } from '../services';
-import { Client }       from '../models';
+import { Client, Message, User }       from '../models';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
@@ -22,9 +22,29 @@ router.get('/events/:eventId/chat', async (req, res, next) => {
 });
 
 router.post('/events/:eventId/chat', async (req, res, next) => {
-    const client: Client = res.locals.client;
+    const client: Client = res.locals.client,
+          user:   User   = res.locals.user;
+
     try{
-        const newMessage = await eventService.createEventMessage(req.body);
+        /*
+            TODO
+            ----
+            - Check that user has permissions to create message
+            - Check that event is active
+            - Sanitize inputs
+        */
+        const message: Message = {
+            eventId: +req.params.eventId,
+            userId:   user.id,
+            text:     req.body.text,
+            hidden:   false
+        }
+
+        const newMessage: Message|undefined = await eventService.createEventMessage(message);
+
+        if(!newMessage){
+            return http.serverError(res, new Error('Error creating chat message'));
+        }
 
         res.json(newMessage);
 
@@ -40,9 +60,30 @@ router.post('/events/:eventId/chat', async (req, res, next) => {
 });
 
 router.put('/events/:eventId/chat/:messageId', async (req, res, next) => {
-    const client: Client = res.locals.client;
+    const client: Client = res.locals.client,
+          user:   User   = res.locals.user;
     try{
-        const updatedMessage = await eventService.updateEventMessage(req.body);
+        /*
+            TODO
+            ----
+            - Check that user has permissions to update message
+            - User should be owner of message
+            - Check that event is active
+            - Sanitize inputs
+        */
+        const message: Message = {
+            id:      +req.params.messageId,
+            eventId: +req.params.eventId,
+            userId:   user.id,
+            text:     req.body.text,
+            hidden: !!req.body.hidden
+        }
+
+        const updatedMessage: Message|undefined = await eventService.updateEventMessage(message);
+
+        if(!updatedMessage){
+            return http.serverError(res, new Error('Error updating chat message'));
+        }
 
         res.json(updatedMessage);
 
@@ -60,7 +101,18 @@ router.put('/events/:eventId/chat/:messageId', async (req, res, next) => {
 router.delete('/events/:eventId/chat/:messageId', async (req, res, next) => {
     const client: Client = res.locals.client;
     try{
+        /*
+            TODO
+            ----
+            - Check that user has permissions to delete message
+            - User should be owner of message or moderator
+            - Check that event is active
+        */
         const deletedMessage = await eventService.deleteEventMessage(+req.params.messageId);
+
+        if(!(deletedMessage && deletedMessage.id)){
+            return http.notFound(res);
+        }
 
         res.json(deletedMessage);
 
