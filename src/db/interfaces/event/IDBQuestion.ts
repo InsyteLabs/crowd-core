@@ -21,4 +21,11 @@ export interface IDBQuestion{
     downvotes:      number;
     votes:          number;
     score:          number;
+
+    moderator_response:     string;
+    moderator_id:           number;
+    moderator_first_name:   string;
+    moderator_last_name:    string;
+    moderator_username:     string;
+    moderator_is_anonymous: boolean;
 }

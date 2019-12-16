@@ -19,15 +19,24 @@ SELECT
     , SUM(CASE WHEN V.user_id=$1 THEN V.value ELSE 0 END)::integer        AS user_vote
 	, $1                                                                  AS vote_requester
 
+	, Q.moderator_response
+	, M.id                  AS moderator_id
+	, M.first_name          AS moderator_first_name
+	, M.last_name           AS moderator_last_name
+	, M.username            AS moderator_username
+	, M.is_anonymous        AS moderator_is_anonymous
+
 FROM
     event.question AS Q
 
-LEFT JOIN account.user AS U on U.id = Q.user_id
-LEFT JOIN event.vote   AS V on V.question_id=Q.id
+LEFT JOIN account.user AS U ON U.id=Q.user_id
+LEFT JOIN account.user AS M ON M.id=Q.moderator_id
+LEFT JOIN event.vote   AS V ON V.question_id=Q.id
 
 WHERE
     Q.id=$2
 	
 GROUP BY
 	  Q.id
-	, U.id;
+	, U.id
+	, M.id;
