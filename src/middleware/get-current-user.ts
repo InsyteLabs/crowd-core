@@ -1,28 +1,23 @@
 'use strict';
 
 import { Request, Response, NextFunction } from 'express';
-import * as jwt                            from 'jsonwebtoken';
-import { userService }                     from '../services';
+import { userService, tokenService }       from '../services';
 import { User }                            from '../models';
-import conf                                from '../conf';
+import { IWebToken }                       from '../interfaces';
 import { http }                            from '../utilities';
 
 export async function getCurrentUser(req: Request, res: Response, next: NextFunction){
     if(req.method === 'OPTIONS') return next();
 
-    res.locals.user = null;
-
-    const authHeader: string = req.headers['authorization'] || '';
-
-    if(!(authHeader && authHeader.startsWith('Bearer '))){
-        return http.unauthorized(res);
-    }
-
-    const token = authHeader.replace(/^Bearer\s/, '');
-
-    let validToken: any;
+    let userToken: IWebToken;
     try{
-        validToken = await jwt.verify(token, conf.SECRET);
+        userToken = await tokenService.validateFromAuthHeader(
+            req.headers['authorization'] || ''
+        );
+
+        if(!(userToken.data && userToken.data.id)){
+            return http.unauthorized(res);
+        }
     }
     catch(e){
         console.error(`Invalid token received: ${ e.message }`);
@@ -30,12 +25,8 @@ export async function getCurrentUser(req: Request, res: Response, next: NextFunc
         return http.unauthorized(res);
     }
 
-    if(!(validToken && validToken.data && validToken.data.id)){
-        return http.unauthorized(res);
-    }
-
     try{
-        const user: User|undefined = await userService.getUser(validToken.data.id);
+        const user: User|undefined = await userService.getUser(userToken.data.id);
 
         if(!user){
             return http.unauthorized(res, 'Token valid, user not found. Maybe the user was deleted?');
@@ -48,8 +39,10 @@ export async function getCurrentUser(req: Request, res: Response, next: NextFunc
         res.locals.user = user;
     }
     catch(e){
+        res.locals.user = null;
+
         return http.serverError(res, e);
     }
-    
+
     next();
 }
