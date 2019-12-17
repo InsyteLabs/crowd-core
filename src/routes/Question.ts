@@ -2,11 +2,12 @@
 
 import { Router } from 'express';
 
-import { eventService }           from '../services';
-import { Client, User, Question } from '../models';
-import { http }                   from '../utilities';
-import { SocketServer }           from '../socket-server';
-import { MessageType }            from '../constants';
+import { eventService } from '../services';
+import { http }         from '../utilities';
+import { SocketServer } from '../socket-server';
+import { MessageType }  from '../constants';
+
+import { Client, User, Question }                 from '../models';
 import { IQuestionPost, IQuestionPut, IVotePost } from '../interfaces';
 
 const router = Router();

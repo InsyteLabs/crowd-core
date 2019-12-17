@@ -7,3 +7,4 @@ export * from './ISocketClientsMap';
 export * from './IWebToken';
 
 export * from './question';
+export * from './message';

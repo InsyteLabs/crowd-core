@@ -3,10 +3,12 @@
 import { Router } from 'express';
 
 import { eventService } from '../services';
-import { Client, Message, User }       from '../models';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
+
+import { Client, Message, User }     from '../models';
+import { IMessagePost, IMessagePut } from '../interfaces';
 
 const router = Router();
 
@@ -33,11 +35,10 @@ router.post('/events/:eventId/chat', async (req, res, next) => {
             - Check that event is active
             - Sanitize inputs
         */
-        const message: Message = {
+        const message: IMessagePost = {
             eventId: +req.params.eventId,
-            userId:   user.id,
-            text:     req.body.text,
-            hidden:   false
+            userId:   <number>user.id,
+            text:     req.body.text
         }
 
         const newMessage: Message|undefined = await eventService.createEventMessage(message);
@@ -71,10 +72,8 @@ router.put('/events/:eventId/chat/:messageId', async (req, res, next) => {
             - Check that event is active
             - Sanitize inputs
         */
-        const message: Message = {
+        const message: IMessagePut = {
             id:      +req.params.messageId,
-            eventId: +req.params.eventId,
-            userId:   user.id,
             text:     req.body.text,
             hidden: !!req.body.hidden
         }

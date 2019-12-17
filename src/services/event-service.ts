@@ -11,6 +11,7 @@ import { IQuestionScore, IQuestionPost, IQuestionPut, IVotePost } from '../inter
 import {
     IDBEvent, IDBEventSettings, IDBQuestion, IDBQuestionVote, IDBMessage
 } from '../db/interfaces';
+import { IMessagePost, IMessagePut } from '../interfaces/message';
 
 class EventService{
 
@@ -403,7 +404,7 @@ class EventService{
         }
     }
 
-    async createEventMessage(m: Message): Promise<Message|undefined>{
+    async createEventMessage(m: IMessagePost): Promise<Message|undefined>{
         const args = [
             m.eventId,
             m.userId,
@@ -416,12 +417,12 @@ class EventService{
             return message ? this.getEventMessage(message.id) : undefined;
         }
         catch(e){
-            console.error(`Failed to create message for event of ID ${ m.id }`);
+            console.error(`Failed to create message for event of ID ${ m.eventId }`);
             console.error(e);
         }
     }
 
-    async updateEventMessage(m: Message): Promise<Message|undefined>{
+    async updateEventMessage(m: IMessagePut): Promise<Message|undefined>{
         const args = [
             m.id,
             m.text,
