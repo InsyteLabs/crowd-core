@@ -5,7 +5,7 @@ import uuid        from 'uuid/v4';
 
 import { db }    from '../db';
 import { User }  from '../models';
-import { IRole } from '../interfaces';
+import { IRole, IUserPost } from '../interfaces';
 import { IDBUser, IDBRole, IDBUserRole } from '../db/interfaces';
 
 class UserService{
@@ -70,7 +70,7 @@ class UserService{
         }
     }
 
-    async createUser(newUser: User): Promise<User|undefined>{
+    async createUser(newUser: IUserPost): Promise<User|undefined>{
         let hash;
         try{
             hash = await this._hashPassword(newUser.password);

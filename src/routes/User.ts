@@ -3,10 +3,11 @@
 import { Router } from 'express';
 
 import { userService }  from '../services';
-import { Client }       from '../models';
+import { Client, User } from '../models';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
+import { IUserPost }    from '../interfaces';
 
 const router = Router();
 
@@ -23,16 +24,34 @@ router.get('/users', async (req, res, next) => {
 });
 
 router.post('/users', async (req, res, next) => {
-    const client: Client = res.locals.client;
-    try{
-        const user = await userService.createUser(req.body);
+    const client: Client = res.locals.client,
+          user:   User   = res.locals.user;
 
-        res.json(user);
+    try{
+        /*
+            TODO
+            ----
+            - Check that user has permissions to create user
+            - Sanitize inputs
+        */
+        const userToCreate: IUserPost = {
+            clientId:  <number>client.id,
+            firstName: req.body.firstName,
+            lastName:  req.body.lastName,
+            email:     req.body.email,
+            username:  req.body.username,
+            password:  req.body.password,
+            roles:     req.body.roles
+        }
+
+        const newUser = await userService.createUser(userToCreate);
+
+        res.json(newUser);
 
         const clientSlug:   string       = <string>client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_CREATED, user);
+        socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_CREATED, newUser);
     }
     catch(e){
         return http.serverError(res, e);
