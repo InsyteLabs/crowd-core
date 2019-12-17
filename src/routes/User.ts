@@ -95,13 +95,14 @@ router.put('/users/:userId', async (req, res, next) => {
     }
 });
 
-router.delete('/clients/:clientId/users/:userId', async (req, res, next) => {
+router.delete('/users/:userId', async (req, res, next) => {
     const client: Client = res.locals.client;
     try{
         /*
             TODO
             ----
-            Check that user being deleted belongs to current client
+            - Check that user being deleted belongs to current client
+            - Check that user has permission to delete users
         */
         const user = await userService.deleteUser(+req.params.userId);
 
