@@ -1,17 +1,20 @@
 'use strict';
 
+
+import { db }      from '../db';
+import { slugify } from '../utilities';
+
 import {
     Event, EventSettings, Question, Message, Vote
 } from '../models';
 
-import { db }             from '../db';
-import { slugify }        from '../utilities';
-import { IQuestionScore, IQuestionPost, IQuestionPut, IVotePost } from '../interfaces';
+import {
+    IQuestionPost, IQuestionPut, IVotePost, IMessagePost, IMessagePut
+} from '../interfaces';
 
 import {
     IDBEvent, IDBEventSettings, IDBQuestion, IDBQuestionVote, IDBMessage
 } from '../db/interfaces';
-import { IMessagePost, IMessagePut } from '../interfaces/message';
 
 class EventService{
 
