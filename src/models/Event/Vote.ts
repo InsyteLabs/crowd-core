@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBQuestionVote } from "../db/interfaces";
+import { IDBQuestionVote } from '../../db/interfaces';
 
 export class Vote{
     id?:        number;

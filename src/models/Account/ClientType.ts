@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBClientType } from "../db/interfaces";
+import { IDBClientType } from '../../db/interfaces';
 
 export class ClientType{
     id:              number;

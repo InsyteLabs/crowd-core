@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBEventSettings } from "../db/interfaces";
+import { IDBEventSettings } from '../../db/interfaces';
 
 export class EventSettings{
     id?:             number;

@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBAuthLog } from "../db/interfaces";
+import { IDBAuthLog } from "../../db/interfaces";
 
 export class AuthLog{
     id?: number;

@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBUser } from '../db/interfaces';
+import { IDBUser } from '../../db/interfaces';
 
 export class User{
     id?:              number;

@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBClient }  from '../db/interfaces';
+import { IDBClient }  from '../../db/interfaces';
 import { ClientType } from './ClientType';
 
 export class Client {

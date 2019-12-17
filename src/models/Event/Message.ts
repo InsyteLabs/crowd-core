@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBMessage } from "../db/interfaces";
+import { IDBMessage } from '../../db/interfaces';
 
 export class Message{
     id?:     number;
