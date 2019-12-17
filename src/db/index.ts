@@ -4,7 +4,7 @@ import conf from '../conf';
 
 import { Pool }             from 'pg';
 import { queries }          from './queries';
-import { IQueryDescriptor } from '../interfaces';
+import { IQueryDescriptor } from './interfaces';
 
 
 class Database{

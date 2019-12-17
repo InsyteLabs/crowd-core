@@ -1,6 +1,6 @@
 'use strict';
 
-import { User } from '../models';
+import { User } from '../../models';
 
 export interface IWebToken{
     issuer: string;
