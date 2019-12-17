@@ -6,7 +6,7 @@ import {
 
 import { db }             from '../db';
 import { slugify }        from '../utilities';
-import { IQuestionScore } from '../interfaces';
+import { IQuestionScore, IQuestionPost, IQuestionPut, IVotePost } from '../interfaces';
 
 import {
     IDBEvent, IDBEventSettings, IDBQuestion, IDBQuestionVote, IDBMessage
@@ -278,7 +278,7 @@ class EventService{
         }
     }
 
-    async createQuestion(userId: number, q: Question): Promise<Question|undefined>{
+    async createQuestion(q: IQuestionPost): Promise<Question|undefined>{
         try{
             const question: IDBQuestion|undefined = await db.q('create-question', [
                 q.eventId,
@@ -286,7 +286,7 @@ class EventService{
                 q.text
             ]);
 
-            return question ? this.getQuestion(userId, question.id) : undefined;
+            return question ? this.getQuestion(question.user_id, question.id) : undefined;
         }
         catch(e){
             console.error(`Failed to create question for event of ID ${ q.eventId }`);
@@ -294,7 +294,7 @@ class EventService{
         }
     }
 
-    async updateQuestion(userId: number, q: Question): Promise<Question|undefined>{
+    async updateQuestion(q: IQuestionPut): Promise<Question|undefined>{
         try{
             const question: IDBQuestion|undefined = await db.q('update-question', [
                 q.id,
@@ -304,7 +304,7 @@ class EventService{
                 q.hidden
             ]);
 
-            return question ? this.getQuestion(userId, question.id) : undefined;
+            return question ? this.getQuestion(question.user_id, question.id) : undefined;
         }
         catch(e){
             console.error(`Failed to update question for event of ID ${ q.eventId }`);
@@ -330,7 +330,7 @@ class EventService{
         }
     }
 
-    async createQuestionVote(userId: number, vote: Vote): Promise<Question|undefined>{
+    async createQuestionVote(vote: IVotePost): Promise<Question|undefined>{
         const existing: Vote|undefined = await this.getQuestionVoteByUser(vote.questionId, vote.userId);
 
         if(existing && existing.id){
@@ -338,7 +338,7 @@ class EventService{
 
             // If vote was the same, do not write new vote (un-vote)
             if(existing.value === vote.value){
-                return this.getQuestion(userId, vote.questionId);
+                return this.getQuestion(vote.userId, vote.questionId);
             }
         }
 
@@ -355,12 +355,12 @@ class EventService{
             console.error(e.message);
         }
 
-        return this.getQuestion(userId, vote.questionId);
+        return this.getQuestion(vote.userId, vote.questionId);
     }
 
     async deleteVote(voteId: number): Promise<boolean>{
         try{
-            const deleted = await db.q('delete-vote', [ voteId ]);
+            await db.q('delete-vote', [ voteId ]);
 
             return true;
         }

@@ -1,7 +1,7 @@
 'use strict';
 
-import { IQuestionScore } from "../interfaces";
-import { IDBQuestion } from "../db/interfaces/event/IDBQuestion";
+import { IQuestionScore } from '../interfaces';
+import { IDBQuestion }    from '../db/interfaces/event/IDBQuestion';
 
 export class Question{
     id?:      number;

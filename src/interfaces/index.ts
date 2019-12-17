@@ -5,3 +5,5 @@ export * from './IRole';
 export * from './IQuestionScore';
 export * from './ISocketClientsMap';
 export * from './IWebToken';
+
+export * from './question';
