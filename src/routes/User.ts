@@ -2,12 +2,12 @@
 
 import { Router } from 'express';
 
-import { userService }  from '../services';
-import { Client, User } from '../models';
-import { http }         from '../utilities';
-import { SocketServer } from '../socket-server';
-import { MessageType }  from '../constants';
-import { IUserPost, IUserPut }    from '../interfaces';
+import { userService }         from '../services';
+import { Client, User }        from '../models';
+import { http }                from '../utilities';
+import { SocketServer }        from '../socket-server';
+import { MessageType }         from '../constants';
+import { IUserPost, IUserPut } from '../interfaces';
 
 const router = Router();
 
@@ -108,7 +108,7 @@ router.delete('/clients/:clientId/users/:userId', async (req, res, next) => {
         if(!user){
             return http.notFound(res);
         }
-        
+
         res.json(user);
 
         const clientSlug:   string       = <string>client.slug,

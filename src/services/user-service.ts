@@ -3,9 +3,9 @@
 import * as bcrypt from 'bcrypt';
 import uuid        from 'uuid/v4';
 
-import { db }    from '../db';
-import { User }  from '../models';
-import { IRole, IUserPost, IUserPut } from '../interfaces';
+import { db }                            from '../db';
+import { User }                          from '../models';
+import { IRole, IUserPost, IUserPut }    from '../interfaces';
 import { IDBUser, IDBRole, IDBUserRole } from '../db/interfaces';
 
 class UserService{
