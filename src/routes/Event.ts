@@ -7,6 +7,7 @@ import { Client, Event, User }      from '../models';
 import { http }                     from '../utilities';
 import { SocketServer }             from '../socket-server';
 import { MessageType }              from '../constants';
+import { IEventPost, IEventPut }               from '../interfaces';
 
 const router = Router();
 
@@ -48,21 +49,44 @@ router.get('/events/:slug', async (req, res, next) => {
 });
 
 router.post('/events', async (req, res, next) => {
-    const client: Client = res.locals.client;
-    try{
-        const event = await eventService.createEvent(req.body);
+    const client: Client = res.locals.client,
+          user:   User   = res.locals.user;
 
-        if(!event){
+    if(!req.body.settings){
+        return http.clientError(res, 'Must provide settings object');
+    }
+
+    try{
+        const event: IEventPost = {
+            clientId:    <number>client.id,
+            title:       req.body.title,
+            slug:        req.body.slug || '',
+            description: req.body.description || '',
+            startTime:   req.body.startTime || null,
+            endTime:     req.body.endTime   || null,
+
+            settings: {
+                isLocked:        !!req.body.settings.isLocked,
+                requirePassword: !!req.body.settings.requirePassword,
+                password:          req.body.settings.password || null,
+                requireLogin:    !!req.body.settings.requireLogin,
+                enableChat:      !!req.body.settings.enableChat
+            }
+        }
+
+        const newEvent = await eventService.createEvent(event);
+
+        if(!newEvent){
             return http.serverError(res, new Error('Error creating event'));
         }
 
-        res.json(event);
+        res.json(newEvent);
 
         const clientSlug:   string       = <string>client.slug,
               channel:      string       = `client::${ clientSlug };events`,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(channel, MessageType.EVENT_CREATED, event);
+        socketServer.messageClients(channel, MessageType.EVENT_CREATED, newEvent);
     }
     catch(e){
         return http.serverError(res, e);
@@ -72,20 +96,39 @@ router.post('/events', async (req, res, next) => {
 router.put('/events/:eventId', async (req, res, next) => {
     const client: Client = res.locals.client;
     try{
-        const event: Event|undefined = await eventService.updateEvent(req.body);
+        const event: IEventPut = {
+            id:          +req.params.eventId,
+            clientId:     <number>client.id,
+            title:        req.body.title,
+            slug:         req.body.slug || '',
+            description:  req.body.description || '',
+            startTime:    req.body.startTime || null,
+            endTime:      req.body.endTime   || null,
 
-        if(event){
-            res.json(event);
+            settings: {
+                eventId:          +req.params.eventId,
+                isLocked:        !!req.body.settings.isLocked,
+                requirePassword: !!req.body.settings.requirePassword,
+                password:          req.body.settings.password || null,
+                requireLogin:    !!req.body.settings.requireLogin,
+                enableChat:      !!req.body.settings.enableChat
+            }
+        }
+
+        const updatedEvent: Event|undefined = await eventService.updateEvent(event);
+
+        if(updatedEvent){
+            res.json(updatedEvent);
 
             const clientSlug:   string       = <string>client.slug,
-                  channel:      string       = `client::${ clientSlug };events::${ event.id }`,
+                  channel:      string       = `client::${ clientSlug };events::${ updatedEvent.id }`,
                   socketServer: SocketServer = res.locals.socketServer;
 
-            socketServer.messageClients(channel, MessageType.EVENT_UPDATED, event);
+            socketServer.messageClients(channel, MessageType.EVENT_UPDATED, updatedEvent);
 
             const channel2: string = `client::${ clientSlug };events`;
 
-            socketServer.messageClients(channel2, MessageType.EVENT_UPDATED, event);
+            socketServer.messageClients(channel2, MessageType.EVENT_UPDATED, updatedEvent);
 
             return;
         }
@@ -103,7 +146,7 @@ router.delete('/events/:eventId', async (req, res, next) => {
         const event = await eventService.deleteEvent(+req.params.eventId);
 
         if(!event){
-            return http.serverError(res, new Error('Error deleting event'));
+            return http.notFound(res);
         }
 
         res.json(event);

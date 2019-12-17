@@ -9,7 +9,7 @@ import {
 } from '../models';
 
 import {
-    IQuestionPost, IQuestionPut, IVotePost, IMessagePost, IMessagePut
+    IQuestionPost, IQuestionPut, IVotePost, IMessagePost, IMessagePut, IEventPost, IEventSettingPost, IEventPut, IEventSettingPut
 } from '../interfaces';
 
 import {
@@ -75,7 +75,7 @@ class EventService{
         }
     }
 
-    async createEvent(event: any): Promise<Event|undefined>{
+    async createEvent(event: IEventPost): Promise<Event|undefined>{
         let newEvent: IDBEvent|undefined;
         try{
             newEvent = await db.q('create-event', [
@@ -109,7 +109,7 @@ class EventService{
         return this.getEvent(newEvent.id);
     }
 
-    async updateEvent(event: any): Promise<Event|undefined>{
+    async updateEvent(event: IEventPut): Promise<Event|undefined>{
         let updatedEvent: IDBEvent|undefined;
         try{
             updatedEvent = await db.q('update-event', [
@@ -182,7 +182,7 @@ class EventService{
         }
     }
 
-    async createEventSettings(s: EventSettings){
+    async createEventSettings(s: IEventSettingPost){
         try{
             const settings: IDBEventSettings|undefined = await db.q('create-event-settings', [
                 s.eventId,
@@ -201,7 +201,7 @@ class EventService{
         }
     }
 
-    async updateEventSettings(s: EventSettings): Promise<EventSettings|undefined>{
+    async updateEventSettings(s: IEventSettingPut): Promise<EventSettings|undefined>{
         try{
             const settings: IDBEventSettings|undefined = await db.q('update-event-settings', [
                 s.eventId,

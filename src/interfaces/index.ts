@@ -8,3 +8,4 @@ export * from './IWebToken';
 
 export * from './question';
 export * from './message';
+export * from './event';
