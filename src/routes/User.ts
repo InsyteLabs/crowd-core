@@ -63,6 +63,13 @@ router.put('/users/:userId', async (req, res, next) => {
           user:   User   = res.locals.user;
 
     try{
+        /*
+            TODO
+            ----
+            - Check that user has permissions to update user
+            - Check that user being updated belongs to current client
+            - Sanitize inputs
+        */
         const userUpdate: IUserPut = {
             id:               +req.params.id,
             firstName:         req.body.firstName,
@@ -91,8 +98,17 @@ router.put('/users/:userId', async (req, res, next) => {
 router.delete('/clients/:clientId/users/:userId', async (req, res, next) => {
     const client: Client = res.locals.client;
     try{
+        /*
+            TODO
+            ----
+            Check that user being deleted belongs to current client
+        */
         const user = await userService.deleteUser(+req.params.userId);
 
+        if(!user){
+            return http.notFound(res);
+        }
+        
         res.json(user);
 
         const clientSlug:   string       = <string>client.slug,
