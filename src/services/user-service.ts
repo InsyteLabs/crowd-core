@@ -5,7 +5,7 @@ import uuid        from 'uuid/v4';
 
 import { db }    from '../db';
 import { User }  from '../models';
-import { IRole, IUserPost } from '../interfaces';
+import { IRole, IUserPost, IUserPut } from '../interfaces';
 import { IDBUser, IDBRole, IDBUserRole } from '../db/interfaces';
 
 class UserService{
@@ -121,16 +121,17 @@ class UserService{
         }
     }
 
-    async updateUser(user: User): Promise<User|undefined>{
+    async updateUser(user: IUserPut): Promise<User|undefined>{
         const curUser: User|undefined = await this.getUser(<number>user.id);
 
         if(!curUser) return;
 
-        for(let prop in user){
-            if(user[prop] !== undefined){
-                curUser[prop] = user[prop];
-            }
-        }
+        user.firstName       !== undefined && (curUser.firstName       =   user.firstName);
+        user.lastName        !== undefined && (curUser.lastName        =   user.lastName);
+        user.email           !== undefined && (curUser.email           =   user.email);
+        user.username        !== undefined && (curUser.username        =   user.username);
+        user.isDisabled      !== undefined && (curUser.isDisabled      = !!user.isDisabled);
+        user.disabledComment !== undefined && (curUser.disabledComment =   user.disabledComment);
 
         let updated;
         try{

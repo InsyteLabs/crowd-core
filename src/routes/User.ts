@@ -7,7 +7,7 @@ import { Client, User } from '../models';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
-import { IUserPost }    from '../interfaces';
+import { IUserPost, IUserPut }    from '../interfaces';
 
 const router = Router();
 
@@ -59,16 +59,29 @@ router.post('/users', async (req, res, next) => {
 });
 
 router.put('/users/:userId', async (req, res, next) => {
-    const client: Client = res.locals.client;
-    try{
-        const user = await userService.updateUser(req.body);
+    const client: Client = res.locals.client,
+          user:   User   = res.locals.user;
 
-        res.json(user);
+    try{
+        const userUpdate: IUserPut = {
+            id:               +req.params.id,
+            firstName:         req.body.firstName,
+            lastName:          req.body.lastName,
+            email:             req.body.email,
+            username:          req.body.username,
+            isDisabled:      !!req.body.isDisabled,
+            disabledComment:   req.body.disabledComment,
+            roles:             req.body.roles
+        }
+
+        const updatedUser = await userService.updateUser(userUpdate);
+
+        res.json(updatedUser);
 
         const clientSlug:   string       = <string>client.slug,
               socketServer: SocketServer = res.locals.socketServer;
 
-        socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_UPDATED, user);
+        socketServer.messageClients(`client::${ clientSlug };users`, MessageType.USER_UPDATED, updatedUser);
     }
     catch(e){
         return http.serverError(res, e);

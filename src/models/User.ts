@@ -3,8 +3,6 @@
 import { IDBUser } from '../db/interfaces';
 
 export class User{
-    [key: string]: any;
-
     id?:              number;
     clientId?:        number|null;
     firstName:        string;

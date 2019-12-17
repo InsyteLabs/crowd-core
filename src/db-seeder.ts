@@ -1,7 +1,8 @@
 'use strict';
 
 import { clientService, userService } from './services';
-import { Client, User }               from './models';
+import { Client }                     from './models';
+import { IUserPost }                  from './interfaces';
 
 (async () => {
     /*
@@ -44,7 +45,7 @@ import { Client, User }               from './models';
     if(!users.length){
         console.log('DB has no users, creating...');
 
-        const usersToCreate: User[] = [
+        const usersToCreate: IUserPost[] = [
             {
                 clientId:  null,
                 firstName: 'Bryce',
@@ -52,7 +53,6 @@ import { Client, User }               from './models';
                 email:     'bryce@brycejech.com',
                 username:  'PyGuy',
                 password:  'myFakePa$$wor^d',
-                lastLogin: null,
                 roles:     ['admin']
             },
             {
@@ -62,7 +62,6 @@ import { Client, User }               from './models';
                 email:     'laryn_burns@yahoo.com',
                 username:  'Laryolyn',
                 password:  'aSuperF4k$pass',
-                lastLogin: null,
                 roles:     ['sub-admin', 'moderator']
             },
             {
@@ -72,7 +71,6 @@ import { Client, User }               from './models';
                 email:     'traceyjech@gmail.com',
                 username:  'Gammy',
                 password:  'theM0$stSecur%epass4Eva',
-                lastLogin: null,
                 roles:     ['sub-admin', 'moderator']
             }
         ];
