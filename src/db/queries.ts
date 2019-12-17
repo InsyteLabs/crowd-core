@@ -3,7 +3,9 @@
 import * as fs   from 'fs';
 import * as path from 'path';
 
-import { IQueryDescriptor } from '../interfaces';
+import { IQueryDescriptor } from './interfaces';
+
+const QUERY_DIRECTORY = path.resolve(__dirname, '..', '..', 'queries');
 
 export const queries: IQueryDescriptor[] = [
     /*
@@ -13,26 +15,26 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-clients',
-        path: './account/client/get-clients.sql'
+        path: 'account/client/get-clients.sql'
     },
     {
         name:     'get-client',
-        path:     './account/client/get-client.sql',
+        path:     'account/client/get-client.sql',
         firstRow: true
     },
     {
         name:     'get-client-by-slug',
-        path:     './account/client/get-client-by-slug.sql',
+        path:     'account/client/get-client-by-slug.sql',
         firstRow: true
     },
     {
         name:     'create-client',
-        path:     './account/client/create-client.sql',
+        path:     'account/client/create-client.sql',
         firstRow: true
     },
     {
         name:     'update-client',
-        path:     './account/client/update-client.sql',
+        path:     'account/client/update-client.sql',
         firstRow: true
     },
 
@@ -44,21 +46,21 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name:     'get-client-types',
-        path:     './account/client/get-client-types.sql'
+        path:     'account/client/get-client-types.sql'
     },
     {
         name:     'get-client-type',
-        path:     './account/client/get-client-type.sql',
+        path:     'account/client/get-client-type.sql',
         firstRow: true
     },
     {
         name:     'create-client-type',
-        path:     './account/client/create-client-type.sql',
+        path:     'account/client/create-client-type.sql',
         firstRow: true
     },
     {
         name:     'update-client-type',
-        path:     './account/client/update-client-type.sql',
+        path:     'account/client/update-client-type.sql',
         firstRow: true
     },
 
@@ -69,45 +71,45 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-users',
-        path: './account/user/get-users.sql'
+        path: 'account/user/get-users.sql'
     },
     {
         name: 'get-users-by-client',
-        path: './account/user/get-users-by-client.sql'
+        path: 'account/user/get-users-by-client.sql'
     },
     {
         name:     'get-user',
-        path:     './account/user/get-user.sql',
+        path:     'account/user/get-user.sql',
         firstRow: true
     },
     {
         name:     'get-user-by-username',
-        path:     './account/user/get-user-by-username.sql',
+        path:     'account/user/get-user-by-username.sql',
         firstRow: true
     },
     {
         name:    'create-user',
-        path:    './account/user/create-user.sql',
+        path:    'account/user/create-user.sql',
         firstRow: true
     },
     {
         name:     'create-anonymous-user',
-        path:     './account/user/create-anonymous-user.sql',
+        path:     'account/user/create-anonymous-user.sql',
         firstRow: true
     },
     {
         name:     'update-user',
-        path:     './account/user/update-user.sql',
+        path:     'account/user/update-user.sql',
         firstRow: true
     },
     {
         name:     'update-user-password',
-        path:     './account/user/update-password.sql',
+        path:     'account/user/update-password.sql',
         firstRow: true
     },
     {
         name:     'delete-user',
-        path:     './account/user/delete-user.sql',
+        path:     'account/user/delete-user.sql',
         firstRow: true
     },
 
@@ -119,35 +121,35 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-roles',
-        path: './account/role/get-roles.sql'
+        path: 'account/role/get-roles.sql'
     },
     {
         name:     'get-role',
-        path:     './account/role/get-role.sql',
+        path:     'account/role/get-role.sql',
         firstRow: true
     },
     {
         name:     'create-role',
-        path:     './account/role/create-role.sql',
+        path:     'account/role/create-role.sql',
         firstRow: true
     },
     {
         name:     'update-role',
-        path:     './account/role/update-role.sql',
+        path:     'account/role/update-role.sql',
         firstRow: true
     },
     {
         name:     'get-user-roles',
-        path:     './account/role/get-user-roles.sql'
+        path:     'account/role/get-user-roles.sql'
     },
     {
         name:     'add-user-role',
-        path:     './account/role/add-user-role.sql',
+        path:     'account/role/add-user-role.sql',
         firstRow: true
     },
     {
         name: 'drop-user-roles',
-        path: './account/role/drop-all-user-roles.sql'
+        path: 'account/role/drop-all-user-roles.sql'
     },
 
 
@@ -158,55 +160,55 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-events',
-        path: './event/event/get-events.sql'
+        path: 'event/event/get-events.sql'
     },
     {
         name: 'get-client-events',
-        path: './event/event/get-client-events.sql'
+        path: 'event/event/get-client-events.sql'
     },
     {
         name:     'get-client-event-by-slug',
-        path:     './event/event/get-client-event-by-slug.sql',
+        path:     'event/event/get-client-event-by-slug.sql',
         firstRow: true
     },
     {
         name:     'get-event',
-        path:     './event/event/get-event.sql',
+        path:     'event/event/get-event.sql',
         firstRow: true
     },
     {
         name:     'create-event',
-        path:     './event/event/create-event.sql',
+        path:     'event/event/create-event.sql',
         firstRow: true
     },
     {
         name:     'update-event',
-        path:     './event/event/update-event.sql',
+        path:     'event/event/update-event.sql',
         firstRow: true
     },
     {
         name:     'delete-event',
-        path:     './event/event/delete-event.sql',
+        path:     'event/event/delete-event.sql',
         firstRow: true
     },
     {
         name:     'get-event-settings',
-        path:     './setting/event/get-event-settings.sql',
+        path:     'setting/event/get-event-settings.sql',
         firstRow: true
     },
     {
         name:     'create-event-settings',
-        path:     './setting/event/create-event-settings.sql',
+        path:     'setting/event/create-event-settings.sql',
         firstRow: true
     },
     {
         name:     'update-event-settings',
-        path:     './setting/event/update-event-settings.sql',
+        path:     'setting/event/update-event-settings.sql',
         firstRow: true
     },
     {
         name:     'delete-event-settings',
-        path:     './setting/event/delete-event-settings.sql',
+        path:     'setting/event/delete-event-settings.sql',
         firstRow: true
     },
 
@@ -218,34 +220,34 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-questions',
-        path: './event/question/get-questions.sql'
+        path: 'event/question/get-questions.sql'
     },
     {
         name:     'get-question',
-        path:     './event/question/get-question.sql',
+        path:     'event/question/get-question.sql',
         firstRow: true
     },
     {
         name: 'get-event-questions',
-        path: './event/question/get-event-questions.sql'
+        path: 'event/question/get-event-questions.sql'
     },
     {
         name:     'create-question',
-        path:     './event/question/create-question.sql',
+        path:     'event/question/create-question.sql',
         firstRow: true
     },
     {
         name:     'update-question',
-        path:     './event/question/update-question.sql',
+        path:     'event/question/update-question.sql',
         firstRow: true
     },
     {
         name: 'delete-event-questions',
-        path: './event/question/delete-event-questions.sql'
+        path: 'event/question/delete-event-questions.sql'
     },
     {
         name:     'delete-question',
-        path:     './event/question/delete-question.sql',
+        path:     'event/question/delete-question.sql',
         firstRow: true
     },
 
@@ -257,17 +259,17 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name:     'get-question-vote-by-user',
-        path:     './event/vote/get-question-vote-by-user.sql',
+        path:     'event/vote/get-question-vote-by-user.sql',
         firstRow: true
     },
     {
         name:     'create-question-vote',
-        path:     './event/vote/create-question-vote.sql',
+        path:     'event/vote/create-question-vote.sql',
         firstRow: true
     },
     {
         name:     'delete-vote',
-        path:     './event/vote/delete-vote.sql',
+        path:     'event/vote/delete-vote.sql',
         firstRow: true
     },
 
@@ -279,26 +281,26 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-event-messages',
-        path: './event/chat/get-event-messages.sql'
+        path: 'event/chat/get-event-messages.sql'
     },
     {
         name:     'get-message',
-        path:     './event/chat/get-message.sql',
+        path:     'event/chat/get-message.sql',
         firstRow: true
     },
     {
         name:    'create-event-message',
-        path:    './event/chat/create-event-message.sql',
+        path:    'event/chat/create-event-message.sql',
         firstRow: true
     },
     {
         name:     'update-event-message',
-        path:     './event/chat/update-event-message.sql',
+        path:     'event/chat/update-event-message.sql',
         firstRow: true
     },
     {
         name:     'delete-event-message',
-        path:     './event/chat/delete-event-message.sql',
+        path:     'event/chat/delete-event-message.sql',
         firstRow: true
     },
 
@@ -310,24 +312,24 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-auth-log',
-        path: './log/auth/get-auth-log.sql'
+        path: 'log/auth/get-auth-log.sql'
     },
     {
         name: 'get-client-auth-log',
-        path: './log/auth/get-client-auth-log.sql'
+        path: 'log/auth/get-client-auth-log.sql'
     },
     {
         name: 'get-user-auth-log',
-        path: './log/auth/get-user-auth-log.sql'
+        path: 'log/auth/get-user-auth-log.sql'
     },
     {
         name:     'create-auth-log',
-        path:     './log/auth/create-auth-log.sql',
+        path:     'log/auth/create-auth-log.sql',
         firstRow: true
     },
     {
         name:     'get-auth-log-by-id',
-        path:     './log/auth/get-auth-log-by-id.sql',
+        path:     'log/auth/get-auth-log-by-id.sql',
         firstRow: true
     },
 
@@ -339,22 +341,22 @@ export const queries: IQueryDescriptor[] = [
     */
     {
         name: 'get-event-views',
-        path: './log/event-view/get-event-views.sql'
+        path: 'log/event-view/get-event-views.sql'
     },
     {
         name:     'get-event-view',
-        path:     './log/event-view/get-event-view.sql',
+        path:     'log/event-view/get-event-view.sql',
         firstRow: true
     },
     {
         name:     'create-event-view',
-        path:     './log/event-view/create-event-view.sql',
+        path:     'log/event-view/create-event-view.sql',
         firstRow: true
     }
 
 ].map((q: any) => {
     try{
-        q.sql = fs.readFileSync(path.resolve(__dirname, q.path), 'utf8');
+        q.sql = fs.readFileSync(path.resolve(QUERY_DIRECTORY, q.path), 'utf8');
     }
     catch(e){
         console.error(`Error loading query file "${ q.name }"`);
