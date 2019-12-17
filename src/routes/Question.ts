@@ -38,7 +38,7 @@ router.post('/events/:eventId/questions', async (req, res, next) => {
         */
         const question: IQuestionPost = {
             eventId: +req.params.eventId,
-            text:     req.body,
+            text:     req.body.text,
             userId:   <number>user.id
         }
 
@@ -76,7 +76,7 @@ router.put('/events/:eventId/questions/:questionId', async (req, res, next) => {
             - Sanitize inputs
         */
         const question: IQuestionPut = {
-            id:      +req.body.id,
+            id:      +req.params.questionId,
             eventId: +req.params.eventId,
             userId:   <number>user.id,
             text:     req.body.text,
