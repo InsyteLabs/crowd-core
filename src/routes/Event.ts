@@ -2,12 +2,13 @@
 
 import { Router } from 'express';
 
+import { getEvent }                 from '../middleware';
 import { eventService, logService } from '../services';
 import { Client, Event, User }      from '../models';
 import { http }                     from '../utilities';
 import { SocketServer }             from '../socket-server';
 import { MessageType }              from '../constants';
-import { IEventPost, IEventPut }               from '../interfaces';
+import { IEventPost, IEventPut }    from '../interfaces';
 
 const router = Router();
 
@@ -23,13 +24,13 @@ router.get('/events', async (req, res, next) => {
     }
 });
 
-router.get('/events/:slug', async (req, res, next) => {
+router.get('/events/:eventSlug', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;
 
-    const { slug } = req.params;
+    const { eventSlug } = req.params;
     try{
-        const event: Event|undefined = await eventService.getClientEventBySlug(<number>client.id, slug);
+        const event: Event|undefined = await eventService.getClientEventBySlug(<number>client.id, eventSlug);
 
         if(event && event.id){
             res.json(event);
@@ -93,7 +94,7 @@ router.post('/events', async (req, res, next) => {
     }
 });
 
-router.put('/events/:eventId', async (req, res, next) => {
+router.put('/events/:eventId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client;
     try{
         const event: IEventPut = {
@@ -140,7 +141,7 @@ router.put('/events/:eventId', async (req, res, next) => {
     }
 });
 
-router.delete('/events/:eventId', async (req, res, next) => {
+router.delete('/events/:eventId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client;
     try{
         const event = await eventService.deleteEvent(+req.params.eventId);

@@ -24,7 +24,9 @@ router.use((req, res, next) => {
     const fullUrl: string = req.protocol + '://' + req.get('host') + req.originalUrl;
 
     if(req.method.toLowerCase() !== 'options'){
-        console.log(`${ req.method.toUpperCase() } ${ fullUrl }: ${ res.locals.user ? res.locals.user.username : 'UNKNOWN' }`);
+        console.log(`${ req.method.toUpperCase() } ${ fullUrl }`);
+        console.log(`Requested by: ${ res.locals.user.username }`);
+        console.log(`Client - ID: ${ res.locals.client.id }; Slug: ${ res.locals.client.slug }\n`);
     }
 
     next();

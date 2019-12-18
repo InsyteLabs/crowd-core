@@ -2,6 +2,7 @@
 
 import { Router } from 'express';
 
+import { getEvent }     from '../middleware';
 import { eventService } from '../services';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
@@ -12,7 +13,7 @@ import { IQuestionPost, IQuestionPut, IVotePost } from '../interfaces';
 
 const router = Router();
 
-router.get('/events/:eventId/questions', async (req, res, next) => {
+router.get('/events/:eventId/questions', getEvent, async (req, res, next) => {
     const user: User = res.locals.user;
     try{
         const questions: Question[] = await eventService.getEventQuestions(<number>user.id, +req.params.eventId);
@@ -24,7 +25,7 @@ router.get('/events/:eventId/questions', async (req, res, next) => {
     }
 });
 
-router.post('/events/:eventId/questions', async (req, res, next) => {
+router.post('/events/:eventId/questions', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;
 
@@ -61,7 +62,7 @@ router.post('/events/:eventId/questions', async (req, res, next) => {
     }
 });
 
-router.put('/events/:eventId/questions/:questionId', async (req, res, next) => {
+router.put('/events/:eventId/questions/:questionId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;
 
@@ -102,7 +103,7 @@ router.put('/events/:eventId/questions/:questionId', async (req, res, next) => {
     }
 });
 
-router.delete('/events/:eventId/questions/:questionId', async (req, res, next) => {
+router.delete('/events/:eventId/questions/:questionId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;
 
@@ -133,7 +134,7 @@ router.delete('/events/:eventId/questions/:questionId', async (req, res, next) =
     }
 });
 
-router.post('/events/:eventId/questions/:questionId/votes', async (req, res, next) => {
+router.post('/events/:eventId/questions/:questionId/votes', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;
 

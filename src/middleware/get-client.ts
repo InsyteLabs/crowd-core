@@ -2,7 +2,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { clientService }                   from '../services';
-import { Client, User }                          from '../models';
+import { Client, User }                    from '../models';
 import { http }                            from '../utilities';
 
 export async function getClient(req: Request, res: Response, next: NextFunction){

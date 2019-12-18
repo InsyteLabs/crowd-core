@@ -2,6 +2,7 @@
 
 import { Router } from 'express';
 
+import { getEvent }     from '../middleware';
 import { eventService } from '../services';
 import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
@@ -12,7 +13,7 @@ import { IMessagePost, IMessagePut } from '../interfaces';
 
 const router = Router();
 
-router.get('/events/:eventId/chat', async (req, res, next) => {
+router.get('/events/:eventId/chat', getEvent, async (req, res, next) => {
     try{
         const messages = await eventService.getEventMessages(+req.params.eventId);
 
@@ -23,7 +24,7 @@ router.get('/events/:eventId/chat', async (req, res, next) => {
     }
 });
 
-router.post('/events/:eventId/chat', async (req, res, next) => {
+router.post('/events/:eventId/chat', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;
 
@@ -60,7 +61,7 @@ router.post('/events/:eventId/chat', async (req, res, next) => {
     }
 });
 
-router.put('/events/:eventId/chat/:messageId', async (req, res, next) => {
+router.put('/events/:eventId/chat/:messageId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;
     try{
@@ -97,7 +98,7 @@ router.put('/events/:eventId/chat/:messageId', async (req, res, next) => {
     }
 });
 
-router.delete('/events/:eventId/chat/:messageId', async (req, res, next) => {
+router.delete('/events/:eventId/chat/:messageId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client;
     try{
         /*
