@@ -26,27 +26,20 @@ router.get('/events', async (req, res, next) => {
 
 router.get('/events/:eventSlug', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
-          user:   User   = res.locals.user;
+          user:   User   = res.locals.user,
+          event:  Event  = res.locals.event;
 
-    const { eventSlug } = req.params;
-    try{
-        const event: Event|undefined = await eventService.getClientEventBySlug(<number>client.id, eventSlug);
+    if(event && event.id){
+        res.json(event);
 
-        if(event && event.id){
-            res.json(event);
+        // Log that a user viewed the event
+        const clientId: number = <number>client.id,
+              userId:   number = <number>user.id,
+              eventId:  number = event.id;
 
-            // Log that a user viewed the event
-            const clientId: number = <number>client.id,
-                  userId:   number = <number>user.id,
-                  eventId:  number = event.id;
-
-            return logService.createEventView(clientId, userId, eventId);
-        }
-        return http.notFound(res);
+        return logService.createEventView(clientId, userId, eventId);
     }
-    catch(e){
-        return http.serverError(res, e);
-    }
+    return http.notFound(res);
 });
 
 router.post('/events', async (req, res, next) => {
@@ -61,10 +54,10 @@ router.post('/events', async (req, res, next) => {
         const event: IEventPost = {
             clientId:    <number>client.id,
             title:       req.body.title,
-            slug:        req.body.slug || '',
+            slug:        req.body.slug        || '',
             description: req.body.description || '',
-            startTime:   req.body.startTime || null,
-            endTime:     req.body.endTime   || null,
+            startTime:   req.body.startTime   || null,
+            endTime:     req.body.endTime     || null,
 
             settings: {
                 isLocked:        !!req.body.settings.isLocked,
@@ -95,16 +88,22 @@ router.post('/events', async (req, res, next) => {
 });
 
 router.put('/events/:eventId', getEvent, async (req, res, next) => {
-    const client: Client = res.locals.client;
+    const client: Client = res.locals.client,
+          event:  Event  = res.locals.event;
+    
+    if(event.clientId !== client.id){
+        return http.forbidden(res);
+    }
+
     try{
-        const event: IEventPut = {
+        const eventUpdate: IEventPut = {
             id:          +req.params.eventId,
             clientId:     <number>client.id,
             title:        req.body.title,
-            slug:         req.body.slug || '',
+            slug:         req.body.slug        || '',
             description:  req.body.description || '',
-            startTime:    req.body.startTime || null,
-            endTime:      req.body.endTime   || null,
+            startTime:    req.body.startTime   || null,
+            endTime:      req.body.endTime     || null,
 
             settings: {
                 eventId:          +req.params.eventId,
@@ -116,7 +115,7 @@ router.put('/events/:eventId', getEvent, async (req, res, next) => {
             }
         }
 
-        const updatedEvent: Event|undefined = await eventService.updateEvent(event);
+        const updatedEvent: Event|undefined = await eventService.updateEvent(eventUpdate);
 
         if(updatedEvent){
             res.json(updatedEvent);
@@ -142,25 +141,22 @@ router.put('/events/:eventId', getEvent, async (req, res, next) => {
 });
 
 router.delete('/events/:eventId', getEvent, async (req, res, next) => {
-    const client: Client = res.locals.client;
-    try{
-        const event = await eventService.deleteEvent(+req.params.eventId);
+    const client: Client = res.locals.client,
+          event:  Event  = res.locals.event;
 
-        if(!event){
-            return http.notFound(res);
-        }
-
-        res.json(event);
-
-        const clientSlug:   string       = <string>client.slug,
-              channel:      string       = `client::${ clientSlug };events`,
-              socketServer: SocketServer = res.locals.socketServer;
-
-        socketServer.messageClients(channel, MessageType.EVENT_DELETED, event);
+    if(!event){
+        return http.notFound(res);
     }
-    catch(e){
-        return http.serverError(res, e);
-    }
+
+    const deletedEvent = await eventService.deleteEvent(+req.params.eventId);
+
+    res.json(deletedEvent);
+
+    const clientSlug:   string       = <string>client.slug,
+          channel:      string       = `client::${ clientSlug };events`,
+          socketServer: SocketServer = res.locals.socketServer;
+
+    socketServer.messageClients(channel, MessageType.EVENT_DELETED, event);
 });
 
 export default router;

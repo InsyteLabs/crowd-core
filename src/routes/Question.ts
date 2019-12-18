@@ -8,7 +8,7 @@ import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
 
-import { Client, User, Question }                 from '../models';
+import { Client, User, Question, Event }          from '../models';
 import { IQuestionPost, IQuestionPut, IVotePost } from '../interfaces';
 
 const router = Router();
@@ -27,14 +27,17 @@ router.get('/events/:eventId/questions', getEvent, async (req, res, next) => {
 
 router.post('/events/:eventId/questions', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
-          user:   User   = res.locals.user;
+          user:   User   = res.locals.user,
+          event:  Event  = res.locals.event;
+
+    if(!event.active)           return http.clientError(res, 'Event inactive');
+    if(event.settings.isLocked) return http.clientError(res, 'Event locked');
 
     try{
         /*
             TODO
             ----
             - Check that user has permissions to create question
-            - Check that event is active
             - Sanitize inputs
         */
         const question: IQuestionPost = {
@@ -64,7 +67,11 @@ router.post('/events/:eventId/questions', getEvent, async (req, res, next) => {
 
 router.put('/events/:eventId/questions/:questionId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
-          user:   User   = res.locals.user;
+          user:   User   = res.locals.user,
+          event:  Event  = res.locals.event;
+
+    if(!event.active)           return http.clientError(res, 'Event inactive');
+    if(event.settings.isLocked) return http.clientError(res, 'Event locked');
 
     try{
         /*
@@ -73,7 +80,6 @@ router.put('/events/:eventId/questions/:questionId', getEvent, async (req, res, 
             - Check that user has permissions to update question
                 - User must own question
                 - Mods can respond/make updates in other route
-            - Check that event is active
             - Sanitize inputs
         */
         const question: IQuestionPut = {
@@ -105,7 +111,11 @@ router.put('/events/:eventId/questions/:questionId', getEvent, async (req, res, 
 
 router.delete('/events/:eventId/questions/:questionId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
-          user:   User   = res.locals.user;
+          user:   User   = res.locals.user,
+          event:  Event  = res.locals.event;
+
+    if(!event.active)           return http.clientError(res, 'Event inactive');
+    if(event.settings.isLocked) return http.clientError(res, 'Event locked');
 
     try{
         /*
@@ -113,7 +123,6 @@ router.delete('/events/:eventId/questions/:questionId', getEvent, async (req, re
             ----
             - Check that user has permissions to delete question
                 - User must own question or be mod/admin
-            - Check that event is active
         */
         const deletedQuestion: Question|undefined = await eventService.deleteQuestion(<number>user.id, +req.params.questionId);
 
@@ -136,7 +145,11 @@ router.delete('/events/:eventId/questions/:questionId', getEvent, async (req, re
 
 router.post('/events/:eventId/questions/:questionId/votes', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
-          user:   User   = res.locals.user;
+          user:   User   = res.locals.user,
+          event:  Event  = res.locals.event;
+
+    if(!event.active)           return http.clientError(res, 'Event inactive');
+    if(event.settings.isLocked) return http.clientError(res, 'Event locked');
 
     let value = parseInt(req.body.value);
     

@@ -12,7 +12,7 @@ export async function getEvent(req: Request, res: Response, next: NextFunction){
     const client: Client = res.locals.client;
 
     if(!(client && client.id)){
-        return http.unauthorized(res, 'Cannot fetch event for unidentified client account');
+        return http.forbidden(res, 'Cannot fetch event for unidentified client account');
     }
 
     const eventId:   number = +req.params.eventId,
@@ -34,7 +34,7 @@ export async function getEvent(req: Request, res: Response, next: NextFunction){
     }
 
     if(event.clientId !== client.id){
-        return http.unauthorized(res);
+        return http.forbidden(res);
     }
 
     res.locals.event = event;

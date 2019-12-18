@@ -8,32 +8,30 @@ import { http }         from '../utilities';
 import { SocketServer } from '../socket-server';
 import { MessageType }  from '../constants';
 
-import { Client, Message, User }     from '../models';
-import { IMessagePost, IMessagePut } from '../interfaces';
+import { Client, Message, User, Event } from '../models';
+import { IMessagePost, IMessagePut }    from '../interfaces';
 
 const router = Router();
 
 router.get('/events/:eventId/chat', getEvent, async (req, res, next) => {
-    try{
-        const messages = await eventService.getEventMessages(+req.params.eventId);
+    const messages = await eventService.getEventMessages(+req.params.eventId);
 
-        res.json(messages);
-    }
-    catch(e){
-        return http.serverError(res, e);
-    }
+    res.json(messages);
 });
 
 router.post('/events/:eventId/chat', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
-          user:   User   = res.locals.user;
+          user:   User   = res.locals.user,
+          event:  Event  = res.locals.event;
+
+    if(!event.active)           return http.clientError(res, 'Event inactive');
+    if(event.settings.isLocked) return http.clientError(res, 'Event locked');
 
     try{
         /*
             TODO
             ----
             - Check that user has permissions to create message
-            - Check that event is active
             - Sanitize inputs
         */
         const message: IMessagePost = {
@@ -63,14 +61,18 @@ router.post('/events/:eventId/chat', getEvent, async (req, res, next) => {
 
 router.put('/events/:eventId/chat/:messageId', getEvent, async (req, res, next) => {
     const client: Client = res.locals.client,
-          user:   User   = res.locals.user;
+          user:   User   = res.locals.user,
+          event:  Event  = res.locals.event;
+
+    if(!event.active)           return http.clientError(res, 'Event inactive');
+    if(event.settings.isLocked) return http.clientError(res, 'Event locked');
+
     try{
         /*
             TODO
             ----
             - Check that user has permissions to update message
             - User should be owner of message
-            - Check that event is active
             - Sanitize inputs
         */
         const message: IMessagePut = {
@@ -99,14 +101,18 @@ router.put('/events/:eventId/chat/:messageId', getEvent, async (req, res, next) 
 });
 
 router.delete('/events/:eventId/chat/:messageId', getEvent, async (req, res, next) => {
-    const client: Client = res.locals.client;
+    const client: Client = res.locals.client,
+          event:  Event  = res.locals.event;
+
+    if(!event.active)           return http.clientError(res, 'Event inactive');
+    if(event.settings.isLocked) return http.clientError(res, 'Event locked');
+
     try{
         /*
             TODO
             ----
             - Check that user has permissions to delete message
             - User should be owner of message or moderator
-            - Check that event is active
         */
         const deletedMessage = await eventService.deleteEventMessage(+req.params.messageId);
 
