@@ -1,6 +1,8 @@
 'use strict';
 
-import { IDBUser } from '../../db/interfaces';
+import { IDBUser }  from '../../db/interfaces';
+import { IUser }    from '../../interfaces';
+import { RoleType } from '../../constants';
 
 export class User{
     id?:              number;
@@ -17,22 +19,6 @@ export class User{
 
     roles:            string[];
 
-    constructor(user: User){
-        this.id              = user.id;
-        this.clientId        = user.clientId;
-        this.firstName       = user.firstName;
-        this.lastName        = user.lastName;
-        this.email           = user.email;
-        this.username        = user.username;
-        this.password        = user.password;
-        this.lastLogin       = user.lastLogin;
-        this.isAnonymous     = user.isAnonymous;
-        this.isDisabled      = user.isDisabled;
-        this.disabledComment = user.disabledComment;
-
-        this.roles = user.roles || [];
-    }
-
     static fromDb(u: IDBUser): User{
         return new User({
             id:               u.id,
@@ -48,6 +34,34 @@ export class User{
             disabledComment:  u.disabled_comment,
 
             roles: u.roles || []
-        })
+        });
+    }
+
+    constructor(user: IUser){
+        this.id              = user.id;
+        this.clientId        = user.clientId;
+        this.firstName       = user.firstName;
+        this.lastName        = user.lastName;
+        this.email           = user.email;
+        this.username        = user.username;
+        this.password        = user.password;
+        this.lastLogin       = user.lastLogin;
+        this.isAnonymous     = user.isAnonymous;
+        this.isDisabled      = user.isDisabled;
+        this.disabledComment = user.disabledComment;
+
+        this.roles = user.roles || [];
+    }
+
+    isAdmin(): boolean{
+        return this.roles.includes(RoleType.ADMIN);
+    }
+
+    isSubAdmin(): boolean{
+        return this.roles.includes(RoleType.SUB_ADMIN);
+    }
+
+    isModerator(): boolean{
+        return this.roles.includes(RoleType.MODERATOR);
     }
 }

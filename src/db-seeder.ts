@@ -3,6 +3,7 @@
 import { clientService, userService } from './services';
 import { Client }                     from './models';
 import { IUserPost }                  from './interfaces';
+import { RoleType }                   from './constants';
 
 (async () => {
     /*
@@ -15,11 +16,11 @@ import { IUserPost }                  from './interfaces';
     if(!roles.length){
         console.log('DB has no roles, creating...');
 
-        const rolesToCreate = [
-            { name: 'admin'     },
-            { name: 'sub-admin' },
-            { name: 'moderator' }
-        ];
+
+
+        const rolesToCreate = Object.values(RoleType).map(t => {
+            return { name: t }
+        });
 
         for(let i = 0, len = rolesToCreate.length; i < len; i++){
             const role = rolesToCreate[i];
