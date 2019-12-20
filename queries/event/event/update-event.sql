@@ -1,9 +1,8 @@
 
 UPDATE event.event SET
-      client_id=$2
-    , title=$3
-    , slug=$4
-    , slug_id=$2::text || '_' || $4
+      title=$2
+    , slug=$3
+    , slug_id=$4
     , description=$5
     , start_time=$6
     , end_time=$7

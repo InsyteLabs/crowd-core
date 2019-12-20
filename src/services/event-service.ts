@@ -76,8 +76,9 @@ class EventService{
     }
 
     async createEvent(event: IEventPost): Promise<Event|undefined>{
+        event.slug = event.slug || slugify(event.title);
 
-        const slugExists = await this.slugExists(event.clientId, event.slug || slugify(event.title));
+        const slugExists = await this.slugExists(event.clientId, event.slug);
 
         if(slugExists) return;
 
@@ -86,7 +87,8 @@ class EventService{
             newEvent = await db.q('create-event', [
                 event.clientId,
                 event.title,
-                event.slug || slugify(event.title),
+                event.slug,
+                `${ event.clientId }_${ event.slug }`,
                 event.description,
                 event.startTime,
                 event.endTime
@@ -115,17 +117,26 @@ class EventService{
     }
 
     async updateEvent(event: IEventPut): Promise<Event|undefined>{
-        const slugExists = await this.slugExists(event.clientId, event.slug || slugify(event.title));
+        event.slug = event.slug || slugify(event.title);
 
-        if(slugExists) return;
+        const newSlugId: string = `${ event.clientId }_${ event.slug }`;
+
+        const existingEvent: Event|undefined = await this.getEvent(event.id);
+        if(!existingEvent) return;
+
+        if(existingEvent.slugId !== newSlugId){
+            const slugExists = await this.slugExists(event.clientId, event.slug);
+
+            if(slugExists) return;
+        }
 
         let updatedEvent: IDBEvent|undefined;
         try{
             updatedEvent = await db.q('update-event', [
                 event.id,
-                event.clientId,
                 event.title,
-                event.slug || slugify(event.title),
+                event.slug,
+                newSlugId,
                 event.description,
                 event.startTime,
                 event.endTime
