@@ -76,6 +76,11 @@ class EventService{
     }
 
     async createEvent(event: IEventPost): Promise<Event|undefined>{
+
+        const slugExists = await this.slugExists(event.clientId, event.slug || slugify(event.title));
+
+        if(slugExists) return;
+
         let newEvent: IDBEvent|undefined;
         try{
             newEvent = await db.q('create-event', [
@@ -110,6 +115,10 @@ class EventService{
     }
 
     async updateEvent(event: IEventPut): Promise<Event|undefined>{
+        const slugExists = await this.slugExists(event.clientId, event.slug || slugify(event.title));
+
+        if(slugExists) return;
+
         let updatedEvent: IDBEvent|undefined;
         try{
             updatedEvent = await db.q('update-event', [
@@ -162,6 +171,20 @@ class EventService{
         }
 
         return existingEvent;
+    }
+
+    async slugExists(clientId: number, slug: string): Promise<boolean>{
+        try{
+            const result: { exists: boolean } = await db.q('event-slug-exists', [ clientId, slug ]);
+
+            return result.exists;
+        }
+        catch(e){
+            console.error(`Error checking for existence of event slug "${ slug }" for client ID "${ clientId }"`);
+            console.error(e.message);
+
+            return true;
+        }
     }
 
 

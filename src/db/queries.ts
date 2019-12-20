@@ -211,6 +211,11 @@ export const queries: IQueryDescriptor[] = [
         path:     'setting/event/delete-event-settings.sql',
         firstRow: true
     },
+    {
+        name:     'event-slug-exists',
+        path:     'event/event/event-slug-exists.sql',
+        firstRow: true
+    },
 
 
     /*

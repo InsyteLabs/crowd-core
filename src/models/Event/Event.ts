@@ -8,6 +8,7 @@ export class Event{
     clientId:    number;
     title:       string;
     slug:        string;
+    slugId:      string;
     description: string;
     startTime:   Date;
     endTime:     Date;
@@ -21,6 +22,7 @@ export class Event{
         this.clientId    = event.clientId;
         this.title       = event.title;
         this.slug        = event.slug;
+        this.slugId      = event.slugId;
         this.description = event.description;
         this.startTime   = new Date(event.startTime);
         this.endTime     = new Date(event.endTime);
@@ -36,6 +38,7 @@ export class Event{
 
             title:       e.title,
             slug:        e.slug,
+            slugId:      e.slug_id,
             description: e.description,
             startTime:   new Date(e.start_time),
             endTime:     new Date(e.end_time),

@@ -6,7 +6,8 @@ INSERT INTO event.event
     slug,
     description,
     start_time,
-    end_time
+    end_time,
+    slug_id
 )
 
 VALUES
@@ -16,7 +17,8 @@ VALUES
     $3,
     $4,
     $5,
-    $6
+    $6,
+    $1::text || '_' || $3
 )
 
 RETURNING

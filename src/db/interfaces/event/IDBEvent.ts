@@ -6,6 +6,7 @@ export interface IDBEvent{
 
     title:       string;
     slug:        string;
+    slug_id:     string;
     description: string;
     start_time:  string;
     end_time:    string;

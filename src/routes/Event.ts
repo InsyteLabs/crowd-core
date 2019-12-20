@@ -42,6 +42,15 @@ router.get('/events/:eventSlug', getEvent, async (req, res, next) => {
     return http.notFound(res);
 });
 
+router.get('/events/check-slug/:slug', async (req, res, next) => {
+    const client: Client = res.locals.client,
+          slug:   string = req.params.slug;
+    
+    const exists = await eventService.slugExists(<number>client.id, slug);
+
+    res.json({ exists });
+});
+
 router.post('/events', async (req, res, next) => {
     const client: Client = res.locals.client,
           user:   User   = res.locals.user;

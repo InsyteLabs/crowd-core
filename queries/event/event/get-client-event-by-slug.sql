@@ -4,6 +4,7 @@ SELECT
 	, E.client_id
 	, E.title
 	, E.slug
+	, E.slug_id
 	, E.description
 	, E.start_time
 	, E.end_time
