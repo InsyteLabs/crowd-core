@@ -24,7 +24,8 @@ export class Client {
     type: ClientType;
 
     usage: {
-        totalEvents: number;
+        totalEvents:        number;
+        activeEvents:       number;
         userCount:          number;
         anonymousUserCount: number;
         totalUsers:         number;
@@ -69,6 +70,7 @@ export class Client {
 
             usage: {
                 totalEvents:        c.total_events,
+                activeEvents:       c.active_events,
                 userCount:          c.user_count,
                 anonymousUserCount: c.anonymous_user_count,
                 totalUsers:         c.total_users

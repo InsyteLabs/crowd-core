@@ -2,7 +2,10 @@
 WITH client_events AS (
 	SELECT
 		  C.id
-		, COUNT(1) AS total_events
+		, COUNT(1)::int AS total_events
+		, COUNT(
+			CASE WHEN E.start_time < NOW() AND E.end_time > NOW() THEN 1 ELSE NULL END
+		)::int AS active_events
 
 	FROM
 		event.event AS E
@@ -23,11 +26,11 @@ client_users AS (
 		  C.id
 		, COUNT(
 			  CASE WHEN U.is_anonymous=True THEN 1 ELSE NULL END
-		  ) AS anonymous_user_count
+		  )::int AS anonymous_user_count
 		, COUNT(
 			  CASE WHEN U.is_anonymous=False THEN 1 ELSE NULL END
-		  ) AS user_count
-		, COUNT(1) AS total_users
+		  )::int AS user_count
+		, COUNT(1)::int AS total_users
 
 	FROM
 		account.user AS U
@@ -65,6 +68,7 @@ SELECT
 	, CT.max_event_viewers
 
 	, CE.total_events
+	, CE.active_events
 	, CU.anonymous_user_count
 	, CU.user_count
 	, CU.total_users

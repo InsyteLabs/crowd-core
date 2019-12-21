@@ -26,6 +26,7 @@ export interface IDBClient{
 
     // Account usage
     total_events:         number;
+    active_events:        number;
     anonymous_user_count: number;
     user_count:           number;
     total_users:          number;
