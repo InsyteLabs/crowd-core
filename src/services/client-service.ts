@@ -4,6 +4,7 @@ import { db }                       from '../db';
 import { IDBClient, IDBClientType } from '../db/interfaces';
 import { Client, ClientType }       from '../models';
 import { slugify }                  from '../utilities';
+import { IClientPost, IClientPut }  from '../interfaces';
 
 class ClientService{
 
@@ -50,14 +51,14 @@ class ClientService{
         }
     }
 
-    async createClient(newClient: Client): Promise<Client|undefined>{
+    async createClient(newClient: IClientPost): Promise<Client|undefined>{
         let client: IDBClient;
         try{
             client = await db.q('create-client', [
                 newClient.name,
                 newClient.slug || slugify(newClient.name),
-                newClient.owner.id,
-                newClient.type.id
+                newClient.ownerId,
+                newClient.typeId
             ]);
         }
         catch(e){
@@ -70,15 +71,15 @@ class ClientService{
         return this.getClient(client.id);
     }
 
-    async updateClient(client: Client): Promise<Client|undefined>{
+    async updateClient(client: IClientPut): Promise<Client|undefined>{
         const curClient: Client|undefined = await this.getClient(<number>client.id);
         
         if(!curClient) return;
 
         client.name            !== undefined && (curClient.name            =   client.name);
         client.slug            !== undefined && (curClient.slug            =   client.slug);
-        client.owner.id        !== undefined && (curClient.owner.id        =   client.owner.id);
-        client.type.id         !== undefined && (curClient.type.id         =   client.type.id);
+        client.ownerId         !== undefined && (curClient.owner.id        =   client.ownerId);
+        client.typeId          !== undefined && (curClient.type.id         =   client.typeId);
         client.isDisabled      !== undefined && (curClient.isDisabled      = !!client.isDisabled);
         client.disabledComment !== undefined && (curClient.disabledComment =   client.disabledComment);
 

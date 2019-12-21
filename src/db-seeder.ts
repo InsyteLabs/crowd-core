@@ -2,7 +2,7 @@
 
 import { clientService, userService } from './services';
 import { Client }                     from './models';
-import { IUserPost }                  from './interfaces';
+import { IUserPost, IClientPost }                  from './interfaces';
 import { RoleType }                   from './constants';
 
 (async () => {
@@ -132,34 +132,25 @@ import { RoleType }                   from './constants';
 
         console.log('DB has no clients, creating...');
 
-        const users = await userService.getUsers();
+        const users = await userService.getUsers(),
+              types = await clientService.getClientTypes();
 
         if(!users.length){
             throw new Error('No users to assign clients to');
         }
+        if(!types.length){
+            throw new Error('No client types to assign clients to');
+        }
 
-        const owner = users[0];
+        const owner = users[0],
+              type  = types[1];
 
-        const clientsToCreate: Client[] = [
+        const clientsToCreate: IClientPost[] = [
             {
                 name:    'InsyteLabs',
                 slug:    'insyte-labs',
-                owner:    {
-                    id: <number>owner.id,
-                    firstName: owner.firstName,
-                    lastName: owner.lastName,
-                    email: owner.email,
-                    username: owner.username,
-                    isAnonymous: !!owner.isAnonymous,
-                    isDisabled: !!owner.isDisabled,
-                    disabledComment: owner.disabledComment || ''
-                },
-                type: {
-                    id: 2,
-                    name: 'Standard',
-                    maxEvents: 10,
-                    maxEventViewers: 100
-                }
+                ownerId: <number>owner.id,
+                typeId:  <number>type.id
             }
         ];
 

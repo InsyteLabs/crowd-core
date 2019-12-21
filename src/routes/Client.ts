@@ -2,8 +2,9 @@
 
 import { Router } from 'express';
 
-import { clientService } from '../services';
-import { http }          from '../utilities';
+import { clientService }           from '../services';
+import { http, slugify }           from '../utilities';
+import { IClientPost, IClientPut } from '../interfaces';
 
 const router = Router();
 
@@ -46,9 +47,16 @@ router.get('/clients/slug/:slug', async (req, res, next) => {
 
 router.post('/clients', async (req, res, next) => {
     try{
-        const client = await clientService.createClient(req.body);
+        const client: IClientPost = {
+            ownerId: req.body.ownerId,
+            typeId:  req.body.typeId,
+            name:    req.body.name,
+            slug:    req.body.slug || slugify(req.body.name)
+        }
+        
+        const newClient = await clientService.createClient(client);
 
-        return res.json(client);
+        return res.json(newClient);
     }
     catch(e){
         return http.serverError(res, e);
@@ -57,9 +65,20 @@ router.post('/clients', async (req, res, next) => {
 
 router.put('/clients/:id', async (req, res, next) => {
     try{
-        const client = await clientService.updateClient(req.body);
+        const client: IClientPut = {
+            id:               +req.params.id,
+            name:              req.body.name,
+            slug:              req.body.slug || slugify(req.body.name),
+            ownerId:           req.body.ownerId,
+            typeId:            req.body.typeId,
+            isDisabled:      !!req.body.isDisabled,
+            disabledComment:   req.body.disabledComment
+        }
 
-        return res.json(client);
+
+        const updatedClient = await clientService.updateClient(client);
+
+        return res.json(updatedClient);
     }
     catch(e){
         return http.serverError(res, e);

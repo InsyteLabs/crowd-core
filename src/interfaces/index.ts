@@ -5,3 +5,4 @@ export * from './question';
 export * from './message';
 export * from './event';
 export * from './user';
+export * from './client';
