@@ -23,6 +23,13 @@ export class Client {
 
     type: ClientType;
 
+    usage: {
+        totalEvents: number;
+        userCount:          number;
+        anonymousUserCount: number;
+        totalUsers:         number;
+    }
+
     constructor(c: Client){
         this.id              = c.id;
         this.name            = c.name;
@@ -31,6 +38,7 @@ export class Client {
         this.type            = c.type;
         this.isDisabled      = c.isDisabled;
         this.disabledComment = c.disabledComment;
+        this.usage           = c.usage;
     }
 
     static fromDb(c: IDBClient): Client{
@@ -57,6 +65,13 @@ export class Client {
                 name:            c.type_name,
                 maxEvents:       c.max_events,
                 maxEventViewers: c.max_event_viewers
+            },
+
+            usage: {
+                totalEvents:        c.total_events,
+                userCount:          c.user_count,
+                anonymousUserCount: c.anonymous_user_count,
+                totalUsers:         c.total_users
             }
         });
     }

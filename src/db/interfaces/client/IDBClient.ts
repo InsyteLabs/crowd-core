@@ -8,6 +8,7 @@ export interface IDBClient{
     is_disabled:      boolean;
     disabled_comment: string;
 
+    // Account owner
     owner_id:               number;
     owner_first_name:       string;
     owner_last_name:        string;
@@ -17,8 +18,16 @@ export interface IDBClient{
     owner_is_disabled:      boolean;
     owner_disabled_comment: string;
 
+    // Client type
     type_id:           number;
     type_name:         string;
     max_events:        number;
     max_event_viewers: number;
+
+    // Account usage
+    total_events:         number;
+    anonymous_user_count: number;
+    user_count:           number;
+    total_users:          number;
+
 }
