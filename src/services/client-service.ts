@@ -144,7 +144,8 @@ class ClientService{
             const type: IDBClientType = await db.q('create-client-type', [
                 newType.name,
                 newType.maxEvents,
-                newType.maxEventViewers
+                newType.maxEventViewers,
+                newType.maxRegisteredUsers
             ]);
 
             return type ? ClientType.fromDb(type) : undefined;
@@ -166,7 +167,8 @@ class ClientService{
                 curType.id,
                 type.name,
                 type.maxEvents,
-                type.maxEventViewers
+                type.maxEventViewers,
+                type.maxRegisteredUsers
             ]);
 
             return this.getClientType(updatedType.id);

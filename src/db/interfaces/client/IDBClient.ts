@@ -19,10 +19,11 @@ export interface IDBClient{
     owner_disabled_comment: string;
 
     // Client type
-    type_id:           number;
-    type_name:         string;
-    max_events:        number;
-    max_event_viewers: number;
+    type_id:              number;
+    type_name:            string;
+    max_events:           number;
+    max_event_viewers:    number;
+    max_registered_users: number;
 
     // Account usage
     total_events:         number;

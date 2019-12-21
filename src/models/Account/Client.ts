@@ -62,10 +62,11 @@ export class Client {
             },
             
             type: {
-                id:              c.type_id,
-                name:            c.type_name,
-                maxEvents:       c.max_events,
-                maxEventViewers: c.max_event_viewers
+                id:                 c.type_id,
+                name:               c.type_name,
+                maxEvents:          c.max_events,
+                maxEventViewers:    c.max_event_viewers,
+                maxRegisteredUsers: c.max_registered_users
             },
 
             usage: {

@@ -101,10 +101,41 @@ import { RoleType }                   from './constants';
         console.log('DB has no account types, creating...');
 
         const typesToCreate = [
-            { id: 0, name: 'Demo',     maxEvents: 1,   maxEventViewers: 10   },
-            { id: 0, name: 'Standard', maxEvents: 10,  maxEventViewers: 100  },
-            { id: 0, name: 'Pro',      maxEvents: 25,  maxEventViewers: 250  },
-            { id: 0, name: 'Elite',    maxEvents: 100, maxEventViewers: 1000 }
+            {
+                id: 0,
+                name: 'Demo',
+                maxEvents: 1,
+                maxEventViewers: 10,
+                maxRegisteredUsers: 1
+            },
+            {
+                id: 0,
+                name: 'Standard',
+                maxEvents: 10,
+                maxEventViewers: 100,
+                maxRegisteredUsers: 25
+            },
+            {
+                id: 0,
+                name: 'Pro',
+                maxEvents: 25,
+                maxEventViewers: 250,
+                maxRegisteredUsers: 100
+            },
+            {
+                id: 0,
+                name: 'Elite',
+                maxEvents: 50,
+                maxEventViewers: 500,
+                maxRegisteredUsers: 500
+            },
+            {
+                id: 0,
+                name: 'Ultimate',
+                maxEvents: 100,
+                maxEventViewers: 1000,
+                maxRegisteredUsers: 1000
+            }
         ];
 
         for(let i = 0, len = typesToCreate.length; i < len; i++){

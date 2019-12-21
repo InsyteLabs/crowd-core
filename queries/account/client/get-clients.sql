@@ -56,6 +56,7 @@ SELECT
 	, CT.name as type_name
 	, CT.max_events
 	, CT.max_event_viewers
+	, CT.max_registered_users
 
 	, CE.total_events
 	, CE.active_events
