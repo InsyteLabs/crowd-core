@@ -289,11 +289,11 @@ class EventService{
     async getEventQuestions(userId: number, eventId: number): Promise<Question[]>{
         try{
             const questions: IDBQuestion[] = await db.q('get-event-questions', [ userId, eventId ]);
-            
+            console.log(questions);
             return questions.map(q => Question.fromDb(q));
         }
         catch(e){
-            console.error(`Failed to load quations for event of ID ${ eventId }`);
+            console.error(`Failed to load questions for event of ID ${ eventId }`);
             console.error(e.message);
 
             return [];
