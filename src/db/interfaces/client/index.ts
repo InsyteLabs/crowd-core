@@ -1,4 +1,4 @@
 'use strict';
 
-export * from './IDBClient';
-export * from './IDBClientType';
+export * from './IDbClient';
+export * from './IDbClientType';
