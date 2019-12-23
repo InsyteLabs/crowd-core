@@ -1,8 +1,9 @@
 'use strict';
 
 
-import { db }      from '../db';
-import { slugify } from '../utilities';
+import { db }                   from '../db';
+import { slugify }              from '../utilities';
+import { DefaultEventSettings } from '../constants';
 
 import {
     Event, EventSettings, Question, Message, Vote
@@ -111,6 +112,11 @@ class EventService{
                 console.error(`Error creating settings for new event "${ event.title }"`);
                 console.error(e.message);
             }
+        }
+        else{
+            DefaultEventSettings.eventId = newEvent.id;
+
+            await this.createEventSettings(DefaultEventSettings);
         }
 
         return this.getEvent(newEvent.id);
