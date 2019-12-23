@@ -1,4 +1,4 @@
 'use strict';
 
-export * from './IDBAuthLog';
-export * from './IDBEventViewLog';
+export * from './IDbAuthLog';
+export * from './IDbEventViewLog';

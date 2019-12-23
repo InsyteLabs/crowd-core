@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDbEventViewLog } from '../../db/interfaces/log/IDBEventViewLog';
+import { IDbEventViewLog } from '../../db/interfaces';
 
 export class EventView {
     id: number;

@@ -1,5 +1,5 @@
 'use strict';
 
-export * from './IDBUser';
-export * from './IDBRole';
-export * from './IDBUserRole';
+export * from './IDbUser';
+export * from './IDbRole';
+export * from './IDbUserRole';
