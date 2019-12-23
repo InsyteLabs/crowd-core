@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBRole{
+export interface IDbRole{
     id:   number;
     name: string;
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBEvent{
+export interface IDbEvent{
     id:        number;
     client_id: number;
 

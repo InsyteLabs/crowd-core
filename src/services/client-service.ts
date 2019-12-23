@@ -1,7 +1,7 @@
 'use strict';
 
 import { db }                       from '../db';
-import { IDBClient, IDBClientType } from '../db/interfaces';
+import { IDbClient, IDbClientType } from '../db/interfaces';
 import { Client, ClientType }       from '../models';
 import { slugify }                  from '../utilities';
 import { IClientPost, IClientPut }  from '../interfaces';
@@ -15,7 +15,7 @@ class ClientService{
     */
     async getClients(): Promise<Client[]>{
         try{
-            const clients: IDBClient[] = await db.q('get-clients');
+            const clients: IDbClient[] = await db.q('get-clients');
 
             return clients.map((c: any) => Client.fromDb(c));
         }
@@ -29,7 +29,7 @@ class ClientService{
 
     async getClient(id: number): Promise<Client|undefined>{
         try{
-            const client: IDBClient = await db.q('get-client', [ id ]);
+            const client: IDbClient = await db.q('get-client', [ id ]);
 
             return client ? Client.fromDb(client) : undefined;
         }
@@ -41,7 +41,7 @@ class ClientService{
 
     async getClientBySlug(slug: string): Promise<Client|undefined>{
         try{
-            const client: IDBClient = await db.q('get-client-by-slug', [ slug ]);
+            const client: IDbClient = await db.q('get-client-by-slug', [ slug ]);
 
             return client ? Client.fromDb(client) : undefined;
         }
@@ -52,7 +52,7 @@ class ClientService{
     }
 
     async createClient(newClient: IClientPost): Promise<Client|undefined>{
-        let client: IDBClient;
+        let client: IDbClient;
         try{
             client = await db.q('create-client', [
                 newClient.name,
@@ -83,7 +83,7 @@ class ClientService{
         client.isDisabled      !== undefined && (curClient.isDisabled      = !!client.isDisabled);
         client.disabledComment !== undefined && (curClient.disabledComment =   client.disabledComment);
 
-        let updated: IDBClient|undefined;
+        let updated: IDbClient|undefined;
         try{
             updated = await db.q('update-client', [
                 curClient.id,
@@ -115,7 +115,7 @@ class ClientService{
     */
     async getClientTypes(): Promise<ClientType[]>{
         try{
-            const types: IDBClientType[] = await db.q('get-client-types');
+            const types: IDbClientType[] = await db.q('get-client-types');
 
             return types && types.length ? types.map(t => ClientType.fromDb(t)) : [];
         }
@@ -129,7 +129,7 @@ class ClientService{
 
     async getClientType(id: number): Promise<ClientType|undefined>{
         try{
-            const type: IDBClientType|undefined = await db.q('get-client-type', [ id ]);
+            const type: IDbClientType|undefined = await db.q('get-client-type', [ id ]);
 
             return type ? ClientType.fromDb(type) : undefined;
         }
@@ -141,7 +141,7 @@ class ClientService{
 
     async createClientType(newType: ClientType): Promise<ClientType|undefined>{
         try{
-            const type: IDBClientType = await db.q('create-client-type', [
+            const type: IDbClientType = await db.q('create-client-type', [
                 newType.name,
                 newType.maxEvents,
                 newType.maxEventViewers,
@@ -163,7 +163,7 @@ class ClientService{
 
             if(!curType) return;
 
-            const updatedType: IDBClientType = await db.q('update-client-type', [
+            const updatedType: IDbClientType = await db.q('update-client-type', [
                 curType.id,
                 type.name,
                 type.maxEvents,

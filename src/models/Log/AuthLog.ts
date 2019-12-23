@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBAuthLog } from "../../db/interfaces";
+import { IDbAuthLog } from "../../db/interfaces";
 
 export class AuthLog{
     id?: number;
@@ -35,7 +35,7 @@ export class AuthLog{
         this.time    = new Date(l.time);
     }
 
-    static fromDb(l: IDBAuthLog): AuthLog{
+    static fromDb(l: IDbAuthLog): AuthLog{
         return new AuthLog({
             id: l.id,
             client: {

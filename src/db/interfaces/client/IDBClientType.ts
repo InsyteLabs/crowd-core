@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBClientType{
+export interface IDbClientType{
     id:                   number;
     name:                 string;
     max_events:           number;

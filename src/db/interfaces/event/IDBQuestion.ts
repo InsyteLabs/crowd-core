@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBQuestion{
+export interface IDbQuestion{
     id:       number;
     event_id: number;
     

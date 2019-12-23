@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBUser{
+export interface IDbUser{
     id:        number;
     client_id: number;
 

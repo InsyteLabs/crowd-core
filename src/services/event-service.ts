@@ -13,7 +13,7 @@ import {
 } from '../interfaces';
 
 import {
-    IDBEvent, IDBEventSettings, IDBQuestion, IDBQuestionVote, IDBMessage
+    IDbEvent, IDbEventSettings, IDbQuestion, IDbQuestionVote, IDbMessage
 } from '../db/interfaces';
 
 class EventService{
@@ -25,7 +25,7 @@ class EventService{
     */
     async getEvents(): Promise<Event[]>{
         try{
-            const events: IDBEvent[] = await db.q('get-events');
+            const events: IDbEvent[] = await db.q('get-events');
 
             return events.map(e => Event.fromDb(e));
         }
@@ -39,7 +39,7 @@ class EventService{
 
     async getClientEvents(clientId: number): Promise<Event[]>{
         try{
-            const events: IDBEvent[] = await db.q('get-client-events', [ clientId ]);
+            const events: IDbEvent[] = await db.q('get-client-events', [ clientId ]);
 
             return events.map(e => Event.fromDb(e));
         }
@@ -53,7 +53,7 @@ class EventService{
 
     async getClientEventBySlug(clientId: number, eventSlug: string): Promise<Event|undefined>{
         try{
-            const event: IDBEvent|undefined = await db.q('get-client-event-by-slug', [ clientId, eventSlug ]);
+            const event: IDbEvent|undefined = await db.q('get-client-event-by-slug', [ clientId, eventSlug ]);
             
             return event ? Event.fromDb(event) : undefined;
         }
@@ -65,7 +65,7 @@ class EventService{
 
     async getEvent(id: number): Promise<Event|undefined>{
         try{
-            const event: IDBEvent|undefined = await db.q('get-event', [ id ]);
+            const event: IDbEvent|undefined = await db.q('get-event', [ id ]);
 
             return event ? Event.fromDb(event) : undefined;
         }
@@ -82,7 +82,7 @@ class EventService{
 
         if(slugExists) return;
 
-        let newEvent: IDBEvent|undefined;
+        let newEvent: IDbEvent|undefined;
         try{
             newEvent = await db.q('create-event', [
                 event.clientId,
@@ -130,7 +130,7 @@ class EventService{
             if(slugExists) return;
         }
 
-        let updatedEvent: IDBEvent|undefined;
+        let updatedEvent: IDbEvent|undefined;
         try{
             updatedEvent = await db.q('update-event', [
                 event.id,
@@ -206,7 +206,7 @@ class EventService{
     */
     async getEventSettings(eventId: number): Promise<EventSettings|undefined>{
         try{
-            const settings: IDBEventSettings|undefined = await db.q('get-event-settings', [ eventId ]);
+            const settings: IDbEventSettings|undefined = await db.q('get-event-settings', [ eventId ]);
 
             return settings ? EventSettings.fromDb(settings) : undefined;
         }
@@ -218,7 +218,7 @@ class EventService{
 
     async createEventSettings(s: IEventSettingPost){
         try{
-            const settings: IDBEventSettings|undefined = await db.q('create-event-settings', [
+            const settings: IDbEventSettings|undefined = await db.q('create-event-settings', [
                 s.eventId,
                 s.isLocked,
                 s.requirePassword,
@@ -237,7 +237,7 @@ class EventService{
 
     async updateEventSettings(s: IEventSettingPut): Promise<EventSettings|undefined>{
         try{
-            const settings: IDBEventSettings|undefined = await db.q('update-event-settings', [
+            const settings: IDbEventSettings|undefined = await db.q('update-event-settings', [
                 s.eventId,
                 s.isLocked,
                 s.requirePassword,
@@ -262,7 +262,7 @@ class EventService{
     */
     async getQuestions(userId: number): Promise<Question[]>{
         try{
-            const questions: IDBQuestion[] = await db.query('get-questions', [ userId ]);
+            const questions: IDbQuestion[] = await db.query('get-questions', [ userId ]);
 
             return questions.map(q => Question.fromDb(q));
         }
@@ -276,7 +276,7 @@ class EventService{
 
     async getQuestion(userId: number, id: number): Promise<Question|undefined>{
         try{
-            const question: IDBQuestion|undefined = await db.q('get-question', [ userId, id ]);
+            const question: IDbQuestion|undefined = await db.q('get-question', [ userId, id ]);
 
             return question ? Question.fromDb(question) : undefined;
         }
@@ -288,7 +288,7 @@ class EventService{
 
     async getEventQuestions(userId: number, eventId: number): Promise<Question[]>{
         try{
-            const questions: IDBQuestion[] = await db.q('get-event-questions', [ userId, eventId ]);
+            const questions: IDbQuestion[] = await db.q('get-event-questions', [ userId, eventId ]);
             console.log(questions);
             return questions.map(q => Question.fromDb(q));
         }
@@ -318,7 +318,7 @@ class EventService{
 
     async createQuestion(q: IQuestionPost): Promise<Question|undefined>{
         try{
-            const question: IDBQuestion|undefined = await db.q('create-question', [
+            const question: IDbQuestion|undefined = await db.q('create-question', [
                 q.eventId,
                 q.userId,
                 q.text
@@ -334,7 +334,7 @@ class EventService{
 
     async updateQuestion(q: IQuestionPut): Promise<Question|undefined>{
         try{
-            const question: IDBQuestion|undefined = await db.q('update-question', [
+            const question: IDbQuestion|undefined = await db.q('update-question', [
                 q.id,
                 q.eventId,
                 q.userId,
@@ -358,7 +358,7 @@ class EventService{
     */
     async getQuestionVoteByUser(questionId: number, userId: number): Promise<Vote|undefined>{
         try{
-            const vote: IDBQuestionVote|undefined = await db.q('get-question-vote-by-user', [ questionId, userId ]);
+            const vote: IDbQuestionVote|undefined = await db.q('get-question-vote-by-user', [ questionId, userId ]);
 
             return vote ? Vote.fromDb(vote) : undefined;
         }
@@ -417,7 +417,7 @@ class EventService{
     */
     async getEventMessages(eventId: number): Promise<Message[]>{
         try{
-            let messages: IDBMessage[] = await db.q('get-event-messages', [ eventId ]);
+            let messages: IDbMessage[] = await db.q('get-event-messages', [ eventId ]);
 
             return messages.map((m: any) => Message.from(m));
         }
@@ -431,7 +431,7 @@ class EventService{
 
     async getEventMessage(id: number): Promise<Message|undefined>{
         try{
-            const message: IDBMessage|undefined = await db.q('get-message', [ id ]);
+            const message: IDbMessage|undefined = await db.q('get-message', [ id ]);
 
             return message ? Message.from(message) : message;
         }
@@ -449,7 +449,7 @@ class EventService{
         ];
 
         try{
-            const message: IDBMessage|undefined = await db.q('create-event-message', args);
+            const message: IDbMessage|undefined = await db.q('create-event-message', args);
 
             return message ? this.getEventMessage(message.id) : undefined;
         }
@@ -467,7 +467,7 @@ class EventService{
         ];
 
         try{
-            const message: IDBMessage|undefined = await db.q('update-event-message', args);
+            const message: IDbMessage|undefined = await db.q('update-event-message', args);
 
             return message ? this.getEventMessage(message.id) : undefined;
         }

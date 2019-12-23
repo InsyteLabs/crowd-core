@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBUser }  from '../../db/interfaces';
+import { IDbUser }  from '../../db/interfaces';
 import { IUser }    from '../../interfaces';
 import { RoleType } from '../../constants';
 
@@ -19,7 +19,7 @@ export class User{
 
     roles:            string[];
 
-    static fromDb(u: IDBUser): User{
+    static fromDb(u: IDbUser): User{
         return new User({
             id:               u.id,
             clientId:         u.client_id,

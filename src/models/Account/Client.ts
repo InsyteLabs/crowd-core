@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBClient }  from '../../db/interfaces';
+import { IDbClient }  from '../../db/interfaces';
 import { ClientType } from './ClientType';
 
 export class Client {
@@ -42,7 +42,7 @@ export class Client {
         this.usage           = c.usage;
     }
 
-    static fromDb(c: IDBClient): Client{
+    static fromDb(c: IDbClient): Client{
         return new Client({
             id:              c.id,
             name:            c.name,

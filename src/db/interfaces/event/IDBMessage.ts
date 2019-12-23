@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBMessage{
+export interface IDbMessage{
     id:       number;
     event_id: number;
 

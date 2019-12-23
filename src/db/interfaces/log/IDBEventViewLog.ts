@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBEventViewLog{
+export interface IDbEventViewLog{
     id:   number;
     code: string;
     time: Date;

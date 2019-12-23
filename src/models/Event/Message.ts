@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBMessage } from '../../db/interfaces';
+import { IDbMessage } from '../../db/interfaces';
 
 export class Message{
     id?:     number;
@@ -26,7 +26,7 @@ export class Message{
         this.user    = message.user;
     }
 
-    static from(m: IDBMessage): Message{
+    static from(m: IDbMessage): Message{
         return new Message({
             id:      m.id,
             eventId: m.event_id,

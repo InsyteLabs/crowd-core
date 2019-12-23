@@ -1,7 +1,7 @@
 'use strict';
 
 import { db }                          from '../db';
-import { IDBAuthLog, IDBEventViewLog } from '../db/interfaces';
+import { IDbAuthLog, IDbEventViewLog } from '../db/interfaces';
 import { AuthLog, EventView }          from '../models';
 
 class LogService{
@@ -13,7 +13,7 @@ class LogService{
     */
     async getAuthLog(): Promise<AuthLog[]>{
         try{
-            const authLog: IDBAuthLog[] = await db.q('get-auth-log');
+            const authLog: IDbAuthLog[] = await db.q('get-auth-log');
 
             return authLog.map(l => AuthLog.fromDb(l));
         }
@@ -27,7 +27,7 @@ class LogService{
 
     async getClientAuthLog(clientId: number): Promise<AuthLog[]>{
         try{
-            const authLog: IDBAuthLog[] = await db.q('get-client-auth-log', [ clientId ]);
+            const authLog: IDbAuthLog[] = await db.q('get-client-auth-log', [ clientId ]);
 
             return authLog.map(l => AuthLog.fromDb(l));
         }
@@ -41,7 +41,7 @@ class LogService{
 
     async getUserAuthLog(userId: number): Promise<AuthLog[]>{
         try{
-            const authLog: IDBAuthLog[] = await db.q('get-user-auth-log', [ userId ]);
+            const authLog: IDbAuthLog[] = await db.q('get-user-auth-log', [ userId ]);
 
             return authLog.map(l => AuthLog.fromDb(l));
         }
@@ -55,7 +55,7 @@ class LogService{
 
     async getAuthLogById(id: number): Promise<AuthLog|undefined>{
         try{
-            const authLog: IDBAuthLog = await db.q('get-auth-log-by-id', [ id ]);
+            const authLog: IDbAuthLog = await db.q('get-auth-log-by-id', [ id ]);
 
             return AuthLog.fromDb(authLog);
         }
@@ -90,7 +90,7 @@ class LogService{
     */
     async getEventViews(eventId: number): Promise<EventView[]>{
         try{
-            const views: IDBEventViewLog[] = await db.q('get-event-views', [ eventId ]);
+            const views: IDbEventViewLog[] = await db.q('get-event-views', [ eventId ]);
 
             return views.map(v => EventView.fromDb(v));
         }
@@ -104,7 +104,7 @@ class LogService{
 
     async getEventView(viewId: number): Promise<EventView|undefined>{
         try{
-            const view: IDBEventViewLog = await db.q('get-event-view', [ viewId ]);
+            const view: IDbEventViewLog = await db.q('get-event-view', [ viewId ]);
 
             return EventView.fromDb(view);
         }

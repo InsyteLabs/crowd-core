@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBClient{
+export interface IDbClient{
     id:       number;
     name:     string;
     slug:     string;

@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBEventSettings } from '../../db/interfaces';
+import { IDbEventSettings } from '../../db/interfaces';
 
 export class EventSettings{
     id?:             number;
@@ -21,7 +21,7 @@ export class EventSettings{
         this.enableChat      = s.enableChat;
     }
 
-    static fromDb(s: IDBEventSettings): EventSettings{
+    static fromDb(s: IDbEventSettings): EventSettings{
         return new EventSettings({
             id:              s.id,
             eventId:         s.event_id,

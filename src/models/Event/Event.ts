@@ -1,7 +1,7 @@
 'use strict';
 
 import { EventSettings } from './EventSettings';
-import { IDBEvent }      from '../../db/interfaces';
+import { IDbEvent }      from '../../db/interfaces';
 
 export class Event{
     id?:         number;
@@ -31,7 +31,7 @@ export class Event{
         this.settings    = event.settings;
     }
 
-    static fromDb(e: IDBEvent): Event{
+    static fromDb(e: IDbEvent): Event{
         return new Event({
             id:       e.id,
             clientId: e.client_id,

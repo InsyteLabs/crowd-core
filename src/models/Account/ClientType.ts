@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBClientType } from '../../db/interfaces';
+import { IDbClientType } from '../../db/interfaces';
 
 export class ClientType{
     id:                 number;
@@ -17,7 +17,7 @@ export class ClientType{
         this.maxRegisteredUsers = c.maxRegisteredUsers
     }
 
-    static fromDb(c: IDBClientType): ClientType{
+    static fromDb(c: IDbClientType): ClientType{
         return new ClientType({
             id:                 c.id,
             name:               c.name,

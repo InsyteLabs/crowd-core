@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IDBAuthLog{
+export interface IDbAuthLog{
     id: number;
 
     client_id:   number;

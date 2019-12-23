@@ -6,7 +6,7 @@ import uuid        from 'uuid/v4';
 import { db }                            from '../db';
 import { User }                          from '../models';
 import { IRole, IUserPost, IUserPut }    from '../interfaces';
-import { IDBUser, IDBRole, IDBUserRole } from '../db/interfaces';
+import { IDbUser, IDbRole, IDbUserRole } from '../db/interfaces';
 
 class UserService{
 
@@ -20,7 +20,7 @@ class UserService{
     */
     async getUsers(): Promise<User[]>{
         try{
-            const users: IDBUser[] = await db.q('get-users');
+            const users: IDbUser[] = await db.q('get-users');
 
             return users.map(u => User.fromDb(u));
         }
@@ -34,7 +34,7 @@ class UserService{
 
     async getUsersByClient(clientId: number): Promise<User[]>{
         try{
-            const users: IDBUser[] = await db.q('get-users-by-client', [ clientId ]);
+            const users: IDbUser[] = await db.q('get-users-by-client', [ clientId ]);
 
             return users.map(u => User.fromDb(u));
         }
@@ -60,7 +60,7 @@ class UserService{
 
     async getUserByUsername(username: string): Promise<User|undefined>{
         try{
-            const user: IDBUser = await db.q('get-user-by-username', [ username ]);
+            const user: IDbUser = await db.q('get-user-by-username', [ username ]);
 
             return user ? User.fromDb(user) : undefined;
         }
@@ -82,7 +82,7 @@ class UserService{
             return;
         }
 
-        let user: IDBUser;
+        let user: IDbUser;
         try{
             user = await db.query('create-user', [
                 newUser.clientId || null,
@@ -111,7 +111,7 @@ class UserService{
 
     async createAnonymousUser(clientId: number): Promise<User|undefined>{
         try{
-            const user: IDBUser|undefined = await db.q('create-anonymous-user', [ clientId, uuid() ]);
+            const user: IDbUser|undefined = await db.q('create-anonymous-user', [ clientId, uuid() ]);
 
             return user ? this.getUser(user.id) : undefined;
         }
@@ -181,7 +181,7 @@ class UserService{
         const hash = await this._hashPassword(password);
 
         try{
-            const user: IDBUser = await db.q('update-user-password', [ userId, hash ]);
+            const user: IDbUser = await db.q('update-user-password', [ userId, hash ]);
 
             return this.getUser(user.id);
         }
@@ -212,9 +212,9 @@ class UserService{
         ROLE METHODS
         ============
     */
-    async getRoles(): Promise<IDBRole[]>{
+    async getRoles(): Promise<IDbRole[]>{
         try{
-            const roles: IDBRole[] = await db.q('get-roles');
+            const roles: IDbRole[] = await db.q('get-roles');
 
             return roles;
         }
@@ -226,9 +226,9 @@ class UserService{
         }
     }
 
-    async getRole(id: number): Promise<IDBRole|undefined>{
+    async getRole(id: number): Promise<IDbRole|undefined>{
         try{
-            const role: IDBRole = await db.q('get-role', [ id ]);
+            const role: IDbRole = await db.q('get-role', [ id ]);
 
             return role ? role : undefined;
         }
@@ -238,9 +238,9 @@ class UserService{
         }
     }
 
-    async createRole(newRole: IRole): Promise<IDBRole|undefined>{
+    async createRole(newRole: IRole): Promise<IDbRole|undefined>{
         try{
-            const role: IDBRole = await db.q('create-role', [ newRole.name ]);
+            const role: IDbRole = await db.q('create-role', [ newRole.name ]);
 
             return role ? role : undefined;
         }
@@ -250,8 +250,8 @@ class UserService{
         }
     }
 
-    async updateRole(role: IRole): Promise<IDBRole|undefined>{
-        const curRole: IDBRole|undefined = await this.getRole(<number>role.id);
+    async updateRole(role: IRole): Promise<IDbRole|undefined>{
+        const curRole: IDbRole|undefined = await this.getRole(<number>role.id);
 
         if(!curRole) return;
 
@@ -259,7 +259,7 @@ class UserService{
 
         try{
 
-            const updatedRole: IDBRole = await db.q('update-role', [ curRole.id, curRole.name ]);
+            const updatedRole: IDbRole = await db.q('update-role', [ curRole.id, curRole.name ]);
 
             return updatedRole ? updatedRole : undefined;
         }
@@ -288,9 +288,9 @@ class UserService{
     async setUserRoles(userId: number, roles: string[]): Promise<string[]>{
         if(!roles.length) return [];
 
-        const validRoles: IDBRole[] = await this.getRoles();
+        const validRoles: IDbRole[] = await this.getRoles();
 
-        const rolesToSet: IDBRole[] = validRoles.filter(r => roles.includes(r.name));
+        const rolesToSet: IDbRole[] = validRoles.filter(r => roles.includes(r.name));
 
         await this.dropUserRoles(userId);
         await this.addUserRoles(userId, rolesToSet.map(r => r.id));
@@ -301,7 +301,7 @@ class UserService{
     async addUserRoles(userId: number, roles: number[]): Promise<string[]>{
         try{
             for(let i = 0, len = roles.length; i < len; i++){
-                const inserted: IDBUserRole = await db.q('add-user-role', [ roles[i], userId ]);
+                const inserted: IDbUserRole = await db.q('add-user-role', [ roles[i], userId ]);
             }
 
             return this.getUserRoles(userId);
@@ -316,7 +316,7 @@ class UserService{
 
     async dropUserRoles(userId: number): Promise<string[]>{
         try{
-            const droppedRoles: IDBUserRole[] = await db.q('drop-user-roles', [ userId ]);
+            const droppedRoles: IDbUserRole[] = await db.q('drop-user-roles', [ userId ]);
 
             return this.getUserRoles(userId);
         }

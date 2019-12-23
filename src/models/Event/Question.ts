@@ -1,7 +1,7 @@
 'use strict';
 
 import { IQuestionScore } from '../../interfaces';
-import { IDBQuestion }    from '../../db/interfaces/event/IDBQuestion';
+import { IDbQuestion }    from '../../db/interfaces/event/IDBQuestion';
 
 export class Question{
     id?:      number;
@@ -40,7 +40,7 @@ export class Question{
         this.stats             = q.stats;
     }
 
-    static fromDb(q: IDBQuestion): Question{
+    static fromDb(q: IDbQuestion): Question{
         return new Question({
             id:      q.id,
             eventId: q.event_id,

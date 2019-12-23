@@ -1,6 +1,6 @@
 'use strict';
 
-import { IDBEventViewLog } from '../../db/interfaces/log/IDBEventViewLog';
+import { IDbEventViewLog } from '../../db/interfaces/log/IDBEventViewLog';
 
 export class EventView {
     id: number;
@@ -39,7 +39,7 @@ export class EventView {
         this.client = e.client;
     }
 
-    static fromDb(e: IDBEventViewLog): EventView{
+    static fromDb(e: IDbEventViewLog): EventView{
         return new EventView({
             id:   e.id,
             code: e.code,
