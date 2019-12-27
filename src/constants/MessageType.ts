@@ -1,7 +1,8 @@
 'use strict';
 
 export const MessageType = {
-    CONNECTION_ACCEPTED: 'connection-accepted',
+    CONNECTION_ACCEPTED:     'connection-accepted',
+    SUBSCRIBER_COUNT_UPDATE: 'subscriber-count-update',
     
     // User Messages
     USER_CREATED: 'user-created',

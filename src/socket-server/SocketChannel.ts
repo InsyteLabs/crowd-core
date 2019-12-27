@@ -1,11 +1,18 @@
 
 import { SocketClient }   from './SocketClient';
 import { ISocketMessage } from './interfaces';
+import uuid = require('uuid');
+import { MessageType } from '../constants';
 
 export class SocketChannel{
+    channelName: string;
 
     clients:  SocketClient[]   = [];
     messages: ISocketMessage[] = [];
+
+    constructor(channelName: string){
+        this.channelName = channelName;
+    }
 
     sendMessage(socketMessage: ISocketMessage): void{
         this.messages.push(socketMessage);
@@ -19,8 +26,23 @@ export class SocketChannel{
         }
     }
 
+    notifySubscriberCountChange(): void{
+        const message: ISocketMessage = {
+            id:      uuid(),
+            channel: this.channelName,
+            type:    MessageType.SUBSCRIBER_COUNT_UPDATE,
+            data: {
+                count: this.getSubscriberCount()
+            }
+        }
+
+        this.sendMessage(message);
+    }
+
     addClient(client: SocketClient): void{
         this.clients.push(client);
+
+        this.notifySubscriberCountChange();
 
         if(client.lastMessageId){
             const messageIndex: number = this.getMessageIndex(client.lastMessageId);
@@ -43,6 +65,8 @@ export class SocketChannel{
         const idx = this.clients.findIndex(c => c.id === id);
         if(~idx){
             this.clients.splice(idx, 1);
+
+            this.notifySubscriberCountChange();
         }
     }
 
@@ -56,5 +80,9 @@ export class SocketChannel{
 
     getMessageIndex(id: string): number{
         return this.messages.findIndex(m => m.id === id);
+    }
+
+    getSubscriberCount(): number{
+        return this.clients.length;
     }
 }

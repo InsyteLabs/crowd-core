@@ -47,6 +47,12 @@ export class SocketServer{
         return this._server.clients.size;
     }
 
+    getChannelSubscriberCount(channelName: string): number{
+        const channel: SocketChannel|null = this._channels[channelName];
+
+        return channel ? channel.clients.length : 0;
+    }
+
     handleConnection(ws: WS, req: Request): void{
         const exp = new RegExp(`^\/${ this.PATH }`, 'i');
         if(!exp.test(req.url)) return ws.close();
@@ -88,7 +94,7 @@ export class SocketServer{
             socketChannel = <SocketChannel>this._channels[channel];
         }
         else{
-            socketChannel = this._channels[channel] = new SocketChannel();
+            socketChannel = this._channels[channel] = new SocketChannel(channel);
         }
 
         socketChannel.addClient(socketClient);
@@ -106,14 +112,14 @@ export class SocketServer{
             socketChannel.removeClient(clientId);
 
             if(!socketChannel.clients.length){
-                this._channels[channel] = null;
+                return this._channels[channel] = null;
             }
         });
         ws.on('close', () => {
             socketChannel.removeClient(clientId);
 
             if(!socketChannel.clients.length){
-                this._channels[channel] = null;
+                return this._channels[channel] = null;
             }
         });
 
