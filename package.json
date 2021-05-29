@@ -29,7 +29,7 @@
     "os-utils": "0.0.14",
     "pg": "^7.12.1",
     "uuid": "^3.3.3",
-    "ws": "^7.1.2"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
